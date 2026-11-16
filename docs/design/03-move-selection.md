@@ -20,8 +20,8 @@ defined **selection levels**. Strength control on top of the levels is in
 flowchart LR
     S["Root position S"] --> M["Legal moves m"]
     M --> L0["Level 0<br/>evaluate S'_m<br/>(check evasions if in check)"]
-    M --> L1["Level 1<br/>capture relaxation"]
-    M --> L2["Level 2<br/>one reply + relaxation"]
+    M --> L1["Level 1<br/>capture quiescence"]
+    M --> L2["Level 2<br/>one reply + quiescence"]
     L0 --> Q["Exact root scores Q_L(m)"]
     L1 --> Q
     L2 --> Q
