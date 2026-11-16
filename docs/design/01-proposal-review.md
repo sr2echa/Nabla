@@ -16,15 +16,17 @@ search, and visualised live. Four problems prevent it from being built as writte
    already includes SEE-based hanging-piece terms, king-zone pressure, and a
    momentum ("trace") field, and already ships as Rust → WebAssembly. Three
    of the proposal's statements about FFCE are refuted by its source code (§2).
-2. **The energy functional has four critical defects.** As written, it would play
+2. **The energy functional has five critical defects.** As written, it would play
    badly at any parameter setting, because tuning cannot repair structural
-   errors (§3, C-1 to C-4).
+   errors (§3, C-1 to C-5).
 3. **Several quantitative claims are wrong**, some by more than an order of
    magnitude (§3, M-6), and the Elo pipeline mixes incompatible rating scales (M-7).
 4. **The terminology would not survive physics review** (m-3).
 
 Every finding has a concrete resolution, adopted in documents 02–04. Severity
-counts: **4 critical**, **9 major**, **7 minor**.
+counts: **5 critical**, **9 major**, **7 minor**. Finding C-5 was missed in the
+first version of this review and added after the second proposal raised it
+(see [`01b-second-proposal-review.md`](01b-second-proposal-review.md)).
 
 | Severity | Meaning |
 | --- | --- |
@@ -36,7 +38,7 @@ counts: **4 critical**, **9 major**, **7 minor**.
 
 ## 1. Method
 
-1. **Structural analysis.** Each term of $H(S')$ was analysed for what it rewards,
+1. **Structural analysis.** Each term of $`H(S')`$ was analysed for what it rewards,
    which board quantities it depends on, and its magnitude on canonical positions.
    Numerical values below were computed with the proposal's own constants.
 2. **Arithmetic re-check** of every performance and cost figure.
@@ -65,7 +67,7 @@ explicitly makes **no strength claim**.
 | Ray geometry | Slider rays stop at the first occupied square, with per-type geometric decay (`fields.rs::compute_attack`). **No X-ray channel.** |
 | Exchange evaluation | Swap-algorithm SEE (`see_exchange`) over attacker lists that **omit X-ray attackers**. |
 | Use of SEE | Gains summed over **all** pieces of **both** colours, independent of the side to move (`eval.rs::compute_score`). |
-| Control term | $\sum_i w(i)\tanh(\beta_p P_i)$ over a signed pressure field $P = F_w - F_b$. |
+| Control term | $`\sum_i w(i)\tanh(\beta_p P_i)`$ over a signed pressure field $P = F_w - F_b$. |
 | King safety | King-zone-masked pressure, **linear** in the field. |
 | Momentum | "Trace" field with quaternion heading. |
 | Stack | Rust → `wasm32-unknown-unknown`, plain C ABI (no `wasm-bindgen`). |
@@ -109,18 +111,18 @@ live"). Its defensible contributions are:
 **Claim.** $\Phi_\text{king}$ "creates a dynamic attractive well … ensuring every
 piece coordinates to pressure the enemy king."
 
-**Problem.** $\Phi_\text{king}$ enters $H$ only through $\sum_i \Phi_\text{total}(i)$:
+**Problem.** $\Phi_\text{king}$ enters $H$ only through $`\sum_i \Phi_\text{total}(i)`$:
 
 ```math
 \sum_{i=0}^{63}\Phi_\text{king}(i)
-= -\sum_{c} s_c\,G_c \sum_{i}\frac{1}{1+\lVert \mathbf r_i-\mathbf r_{K_c}\rVert_2^2}
+= -\sum_{c} s_c\,G_c \sum_{i}\frac{1}{1+\lVert 𝐫_i-𝐫_{K_c}\rVert_2^2}
 = -\sum_c s_c\,G_c\,Z(K_c).
 ```
 
 $Z$ depends **only on the king's own square**; its derivative with respect to
 every other piece's position is zero, so no piece is attracted by this term. Worse,
-$Z$ is largest in the centre ($Z(\text{d4}) = 9.54$) and smallest in the corner
-($Z(\text{a1}) = 5.05$). The term therefore rewards White by $4.48 G_K$ when
+$Z$ is largest in the centre ($`Z(\text{d4}) = 9.54`$) and smallest in the corner
+($`Z(\text{a1}) = 5.05`$). The term therefore rewards White by $4.48 G_K$ when
 Black's king stands in the centre rather than the corner, the opposite of endgame
 technique, which drives the defending king to the edge.
 
@@ -141,7 +143,7 @@ the location of influence is irrelevant:
 
 Each piece contributes its charge times its transmittance-weighted reach $M_p$.
 Material appears only by removing a piece's emission, so a trapped piece
-($M_p \approx 0$) is valued at about zero. The scale is also distorted: a queen on
+($`M_p \approx 0`$) is valued at about zero. The scale is also distorted: a queen on
 d4 of an empty board emits $9 \times 21.5 = 193.5$ units, while a pawn emits
 $2 \times 1.4 = 2.8$ units plus its promotion term, a ratio of roughly $69{:}1$
 against the material ratio of $9{:}1$. A king emits $2.5$ onto each of up to 8
@@ -154,7 +156,7 @@ mobility, king pressure), all in pawn units (02, §5.1–5.3).
 
 #### C-3 · The hanging-piece term double-counts and ignores the side to move
 
-**Problem.** $w_\text{hang}\sum_{p}\max(0,-\mathrm{SEE}(p))$ sums the loss over
+**Problem.** $`w_\text{hang}\sum_{p}\max(0,-\mathrm{SEE}(p))`$ sums the loss over
 **all** friendly pieces. In $S'$ the opponent is to move and can capture only
 one piece; with two pieces each hanging 3 pawns, the penalty is 6 while the
 realisable loss is about 3. The term also never rewards the mover's own double
@@ -167,7 +169,7 @@ defect (§2.1), so the correction is also a measurable difference from prior wor
 
 #### C-4 · "Following the gradient" misdescribes the algorithm
 
-**Problem.** The procedure in §3 of the proposal evaluates $H(S'_m)$ for every
+**Problem.** The procedure in §3 of the proposal evaluates $`H(S'_m)`$ for every
 legal move and takes the argmax (or a softmax sample). That is a depth-one search
 with static evaluation $H$. The spatial gradient $\nabla\Phi$ of Step E never
 enters $H$ and plays no role in move choice. "No tree search" is accurate only in
@@ -178,14 +180,30 @@ game graph. The discrete gradient $\nabla_m E$ (03, Eq. (2)) makes the engine's
 name literal (steepest ascent of the energy over the position's neighbours). The
 spatial gradient is kept as a **diagnostic visualisation only**.
 
+#### C-5 · The side-to-move sign convention is missing
+
+**Claim.** The engine "scores the resulting state using a single global Field
+Hamiltonian $`H(S')`$" and samples $`P(m) \propto \exp(H(S')/\tau)`$.
+
+**Problem.** $H$ is White-positive: Step B signs every piece by colour
+($s = +1$ for White, $-1$ for Black). If both colours maximise $`H(S')`$, Black
+chooses moves that are best for White. This also contradicts the proposal's own
+prose ("your pieces emit positive potential"). Added on 2026-11-16 after the second
+proposal (00b, Part 1.1) raised it; confirmed by the mathematical audit.
+
+**Resolution.** The negamax convention: every child is scored from the mover's
+side, $`Q(m) = -e(S'_m)`$ with $`e(S) = s_{\text{stm}(S)} E(S)`$ (03 Eqs. (1)–(2)). The
+second proposal's own fix, "ego-centric" charges signed relative to the active
+player, is ill-defined, because the active player in $S'$ is the opponent.
+
 ### Major
 
 #### M-1 · Linear superposition erases contested squares
 
 A square attacked equally by both sides contributes $0$ to a signed field, which
 is exactly the flashpoint the proposal wants to visualise ("tension"). **Resolution:**
-fields are stored per side ($\Phi_W$, $\Phi_B$); signs are combined only inside
-explicitly non-linear terms; tension $\Theta = \min(\Phi_W, \Phi_B)$ is a diagnostic,
+fields are stored per side ($\Phi_W$, $`\Phi_B`$); signs are combined only inside
+explicitly non-linear terms; tension $`\Theta = \min(\Phi_W, \Phi_B)`$ is a diagnostic,
 and exchanges are resolved by SEE (02, §4).
 
 #### M-2 · The permittivity model conflates control with X-ray influence
@@ -202,7 +220,7 @@ along the ray (02, §4).
 
 #### M-3 · The promotion potential is unbounded and unconditional
 
-With $\mathrm{rank}_s \in \lbrace 0,\dots,7 \rbrace$, $0.35 e^{0.55 \cdot \mathrm{rank}}$ is
+With $`\mathrm{rank}_s \in \lbrace 0,\dots,7 \rbrace`$, $0.35 e^{0.55 \cdot \mathrm{rank}}$ is
 $0.61$ on the second rank, $5.47$ on the sixth, and $9.49$ on the seventh,
 more than a queen, for **any** pawn, passed or blocked. The text also leaves
 open which squares receive the potential. **Resolution:** a bounded rank potential
@@ -211,7 +229,7 @@ predicate in its limit, plus a light-cone (rule-of-the-square) term (02, §5.7).
 
 #### M-4 · King gravity scaling contradicts its stated intent
 
-"$G_K$ scales inversely with the opponent's remaining material" gives a **large**
+"$`G_K`$ scales inversely with the opponent's remaining material" gives a **large**
 $G_K$ in endgames, while the same sentence asks for a large $G_K$ in the middlegame.
 **Resolution:** king danger scales with the **attacker's** non-pawn material and
 queen presence (02, Eq. (19)).
@@ -264,7 +282,7 @@ overlay is limited to analysis and finished games (06, §7; decision D-011).
 
 | ID | Issue | Resolution |
 | --- | --- | --- |
-| m-1 | The softmax denominator uses $H(S'')$ (undefined) and $\tau$ has no units, so "$\tau \in [0.5, 4]$" has no meaning. | $\pi_\tau(m) \propto \exp(Q(m)/\tau)$ with $Q$ and $\tau$ in pawn units (04, Eq. (1)). |
+| m-1 | The softmax denominator uses $`H(S'')`$ (undefined) and $\tau$ has no units, so "$`\tau \in [0.5, 4]`$" has no meaning. | $`\pi_\tau(m) \propto \exp(Q(m)/\tau)`$ with $Q$ and $\tau$ in pawn units (04, Eq. (1)). |
 | m-2 | "Sobel/central-difference" names two different kernels; boundary handling is unspecified. | Central differences with one-sided differences at edges (02, §8). |
 | m-3 | "Hamiltonian", "Lagrangian", "least action", "tensor", "permittivity", "Pauli exclusion" are physically inaccurate. | Terminology policy ([`../notation.md`](../notation.md) §6). |
 | m-4 | Momentum makes the evaluation history-dependent, and useful manoeuvres (Nb1–d2–f1–g3) are not straight lines. | Repetition-aware boundary conditions; momentum kept as an ablation (H7). |
