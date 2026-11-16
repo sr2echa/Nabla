@@ -14,7 +14,7 @@
 | Square indexing | Little-endian rank–file (LERF): $i = 8r + f$, so a1 $= 0$, h1 $= 7$, a8 $= 56$, h8 $= 63$. |
 | Coordinates | File $f \in \lbrace 0,\dots,7 \rbrace$ (a–h), rank $r \in \lbrace 0,\dots,7 \rbrace$ (1–8). |
 | Sign | All energies are **White-positive**: $E > 0$ favours White. |
-| Perspective | Search code uses the side-to-move value $e(S) = s_{\text{stm}} \, E(S)$ (negamax convention). |
+| Perspective | Search code uses the side-to-move value $e(S) = s_{\text{stm}} E(S)$ (negamax convention). |
 | Units | Energies are in **pawn units** (1.0 = one pawn). UCI output uses centipawns ($\times 100$). |
 | Unit fixing | The pawn's rest mass is fixed, $m_P \equiv 1$; every other coefficient is relative to it. |
 | Equations | Display equations are numbered per document with `\tag{}` and cited as "Eq. (n) of <doc>". |
@@ -35,6 +35,7 @@
 | $\text{stm}$ | Side to move. |
 | $t$ | Piece type, $t \in \lbrace P, N, B, R, Q, K \rbrace$. |
 | $\Pi(S)$, $\Pi_c$ | All pieces in $S$; pieces of colour $c$. |
+| $\Pi_c^{N,B,R,Q}$ | Pieces of colour $c$ restricted to the listed types. |
 | $\sigma(p)$, $t(p)$, $c(p)$ | Square, type, and colour of piece $p$. |
 | $\mathrm{Att}(p)$ | Pseudo-legal attack set of $p$ (squares $p$ attacks, including occupied ones). |
 | $\mathrm{Occ}_c$ | Set of squares occupied by colour $c$. |
@@ -85,8 +86,8 @@
 | $\mathcal{F}$ | Colour flip: mirror ranks, swap colours, swap side to move, map castling rights and en-passant square. |
 | $\mathcal{H}$ | File mirror (a↔h); a symmetry only when no castling rights remain. |
 | $\sigma_\text{L}(x)$ | Logistic function, $1/(1+e^{-x})$. |
-| $\operatorname{softplus}(x)$ | $\ln(1+e^{x})$. |
-| $\mathbb{1}[\cdot]$ | Indicator function. |
+| $\mathrm{softplus}(x)$ | $\ln(1+e^{x})$. |
+| $\mathbf{1}[\cdot]$ | Indicator function. |
 | $\mathrm{SEE}_c(i)$ | Static exchange evaluation: material gain for colour $c$ from capturing on square $i$, with X-ray attackers. |
 
 ---
@@ -105,8 +106,10 @@ it would mislead a physicist reviewer. The table records the deliberate choices.
 | Gradient (for move choice) | **Discrete gradient on the game graph** | Moves are graph edges, not spatial displacements; see 03, §2. |
 
 Analogies that remain in use (Born–Oppenheimer separation, dielectric breakdown,
-Plummer softening, confinement) are always introduced explicitly as analogies,
-with the chess-level definition stated first.
+softened gravity, light cones, confinement) are always introduced explicitly as
+analogies, with the chess-level definition stated first. The full list, with what
+does and does not carry over, is the analogy register in
+[`design/02-field-model.md`](design/02-field-model.md#11-analogy-register).
 
 ---
 
