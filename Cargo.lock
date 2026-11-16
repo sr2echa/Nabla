@@ -44,6 +44,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "nabla-uci"
+version = "0.1.0"
+dependencies = [
+ "nabla-core",
+ "shakmaty",
+]
+
+[[package]]
 name = "nohash-hasher"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -1,0 +1,16 @@
+[package]
+name = "nabla-uci"
+description = "UCI front end of the Nabla chess engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "nabla"
+path = "src/main.rs"
+
+[dependencies]
+nabla-core.workspace = true
+shakmaty.workspace = true

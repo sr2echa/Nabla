@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/nabla-core"]
+members = ["crates/nabla-core", "crates/nabla-uci"]
 resolver = "3"
 
 [workspace.package]
