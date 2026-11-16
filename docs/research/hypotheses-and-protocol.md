@@ -13,7 +13,7 @@
 | --- | --- |
 | RQ1 | How strongly can an interpretable field energy play with no lookahead beyond one ply (Level 0)? |
 | RQ2 | How much does each structural element (X-ray transport, side-to-move-aware exchange, breakdown king model, pawn transport) contribute? |
-| RQ3 | How much do capture-only relaxation (Level 1) and a single reply (Level 2) add? |
+| RQ3 | How much do capture-only quiescence (Level 1) and a single reply (Level 2) add? |
 | RQ4 | Can strength be controlled continuously and calibrated accurately with a temperature? |
 | RQ5 | Given the same search, does the field energy encode chess knowledge comparably to a classical evaluation? |
 
