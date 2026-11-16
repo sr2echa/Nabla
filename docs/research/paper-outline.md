@@ -62,7 +62,7 @@ Games; ICGA Journal; IEEE Conference on Games (CoG); Advances in Computer Games 
 | --- | --- | --- |
 | F1 | Pipeline from position to move | 02 §3 and 03 §1 diagrams |
 | F2 | Ray transport through a battery and a pin, annotated with $T_k$ | Lab, layer 4 |
-| F3 | One middlegame position: $\Phi$, $\Omega$, and $\mathbf{J}$ | Lab, layers 1, 2, 5 |
+| F3 | One middlegame position: $\Phi$, $\Omega$, and $𝐉$ | Lab, layers 1, 2, 5 |
 | F4 | King breakdown curve with sample positions marked | Lab, layer 8 |
 | F5 | Rating by level with 95 % CIs | H4 |
 | F6 | Ablation forest plot | H1–H3, A4–A11 |
