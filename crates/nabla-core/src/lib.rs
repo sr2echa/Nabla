@@ -9,5 +9,6 @@
 #![forbid(unsafe_code)]
 pub mod board;
 pub mod params;
+pub mod transport;
 
 pub use params::Params;
