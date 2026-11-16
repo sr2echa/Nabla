@@ -8,8 +8,10 @@
 
 #![forbid(unsafe_code)]
 pub mod board;
+pub mod energy;
 pub mod params;
 pub mod see;
 pub mod transport;
 
+pub use energy::{EvalConfig, Term, Terms, evaluate};
 pub use params::Params;
