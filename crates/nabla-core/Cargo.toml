@@ -1,0 +1,12 @@
+[package]
+name = "nabla-core"
+description = "Ray-transport fields, energy functional, and move selection of the Nabla chess engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+libm.workspace = true
+shakmaty.workspace = true
