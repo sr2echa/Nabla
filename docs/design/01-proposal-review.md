@@ -94,7 +94,7 @@ live"). Its defensible contributions are:
 3. **A non-linear king-safety model** (breakdown threshold) and a small set of
    further terms that each reduce to a classical heuristic in a stated limit.
 4. **A strength-oriented regime study:** levels with no lookahead, capture-only
-   relaxation, and a single reply, with every claim measured, not asserted.
+   quiescence, and a single reply, with every claim measured, not asserted.
 5. **Learned, low-dimensional, interpretable parameters** (Texel tuning, then SPSA).
 6. **Calibrated strength control** via a Boltzmann temperature mapped to Elo.
 7. **A rigorous, reproducible evaluation**, including head-to-head games against
