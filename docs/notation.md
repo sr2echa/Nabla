@@ -14,10 +14,11 @@
 | Square indexing | Little-endian rank–file (LERF): $i = 8r + f$, so a1 $= 0$, h1 $= 7$, a8 $= 56$, h8 $= 63$. |
 | Coordinates | File $f \in \lbrace 0,\dots,7 \rbrace$ (a–h), rank $r \in \lbrace 0,\dots,7 \rbrace$ (1–8). |
 | Sign | All energies are **White-positive**: $E > 0$ favours White. |
-| Perspective | Search code uses the side-to-move value $e(S) = s_{\text{stm}} E(S)$ (negamax convention). |
-| Units | Energies are in **pawn units** (1.0 = one pawn). UCI output uses centipawns ($\times 100$). |
+| Perspective | Search code uses the side-to-move value $`e(S) = s_{\text{stm}} E(S)`$ (negamax convention). |
+| Units | Energies are in **pawn units** (1.0 = one pawn). UCI output uses centipawns ($`\times 100`$). |
 | Unit fixing | The pawn's rest mass is fixed, $m_P \equiv 1$; every other coefficient is relative to it. |
-| Equations | Display equations are numbered per document with `\tag{}` and cited as "Eq. (n) of <doc>". |
+| Equations | Display equations are numbered per document and cited as "Eq. (n) of <doc>". |
+| Rendering | GitHub renders the mathematics, so: display equations go in fenced `math` blocks and end in `\qquad\text{(n)}` (not `\tag`); script and bold letters are written as Unicode (ℬ, ℱ, ℋ, ℳ, 𝐉, 𝐝, and 𝟙 for the indicator), because Chromium ignores `\mathcal` and `\mathbf`; `\operatorname` is blocked, so use `\mathrm`; inline mathematics containing an underscore after a closing brace or bracket uses the `` $`…`$ `` form, because Markdown can otherwise read the underscore as emphasis; set braces are `\lbrace \rbrace`. |
 | Defaults | Every coefficient has a named symbol, an initial value, and a tuning method in the parameter table of [`design/02-field-model.md`](design/02-field-model.md#9-parameter-table). Code never contains unnamed constants. |
 
 ---
@@ -27,29 +28,31 @@
 | Symbol | Meaning |
 | --- | --- |
 | $S$ | A chess position (board, side to move, castling rights, en-passant square, clocks). |
-| $S'_m$ | The position reached from $S$ by legal move $m$. |
-| $\mathcal{M}(S)$ | Set of legal moves in $S$. |
-| $\mathcal{B}$ | The 64 squares, $\mathcal{B} = \lbrace 0,\dots,63 \rbrace$. |
+| $`S'_m`$ | The position reached from $S$ by legal move $m$. |
+| $`ℳ(S)`$ | Set of legal moves in $S$. |
+| $ℬ$ | The 64 squares, $ℬ = \lbrace 0,\dots,63 \rbrace$. |
 | $c, \bar{c}$ | A colour and its opponent, $c \in \lbrace W, B \rbrace$. |
 | $s_c$ | Colour sign: $s_W = +1$, $s_B = -1$. |
 | $\text{stm}$ | Side to move. |
 | $t$ | Piece type, $t \in \lbrace P, N, B, R, Q, K \rbrace$. |
-| $\Pi(S)$, $\Pi_c$ | All pieces in $S$; pieces of colour $c$. |
+| $`\Pi(S)`$, $\Pi_c$ | All pieces in $S$; pieces of colour $c$. |
 | $\Pi_c^{N,B,R,Q}$ | Pieces of colour $c$ restricted to the listed types. |
-| $\sigma(p)$, $t(p)$, $c(p)$ | Square, type, and colour of piece $p$. |
-| $\mathrm{Att}(p)$ | Pseudo-legal attack set of $p$ (squares $p$ attacks, including occupied ones). |
-| $\mathrm{Occ}_c$ | Set of squares occupied by colour $c$. |
-| $\mathrm{PA}_c$ | Set of squares attacked by pawns of colour $c$. |
+| $`\sigma(p)`$, $`t(p)`$, $`c(p)`$ | Square, type, and colour of piece $p$. |
+| $`\mathrm{Att}(p)`$ | Pseudo-legal attack set of $p$ (squares $p$ attacks, including occupied ones). |
+| $`\mathrm{Occ}_c`$ | Set of squares occupied by colour $c$. |
+| $`\mathrm{PA}_c`$ | Set of squares attacked by pawns of colour $c$. |
+| $`\mathrm{Att}_c`$ | Set of squares attacked by colour $c$ (exact attack bitboard). |
+| $`\mathrm{Att}^{\not K}_c`$ | As $`\mathrm{Att}_c`$, with the enemy king removed from the board (02 §4.2). |
 | $K_c$ | Square of the king of colour $c$. |
-| $\rho(p)$ | Relative rank of a pawn: $1$ on its second rank, $6$ on its seventh rank. |
-| $d_\infty(i,j)$ | Chebyshev (king-move) distance. |
-| $d_1(i,j)$ | Manhattan distance. |
-| $d_2(i,j)$ | Euclidean distance, in squares. |
-| $d_c(i)$ | Centre distance, $\max(\lvert f - 3.5 \rvert, \lvert r - 3.5 \rvert) - 0.5 \in \lbrace 0,1,2,3 \rbrace$. |
+| $`\rho(p)`$ | Relative rank of a pawn: $1$ on its second rank, $6$ on its seventh rank. |
+| $`d_\infty(i,j)`$ | Chebyshev (king-move) distance. |
+| $`d_1(i,j)`$ | Manhattan distance. |
+| $`d_2(i,j)`$ | Euclidean distance, in squares. |
+| $`d_c(i)`$ | Centre distance, $\max(\lvert f - 3.5 \rvert, \lvert r - 3.5 \rvert) - 0.5 \in \lbrace 0,1,2,3 \rbrace$. |
 | $\varphi$ | Game phase, $\varphi \in [0,1]$; $1$ = full middlegame material, $0$ = bare kings and pawns. |
-| $\mathrm{NPM}_c$ | Non-pawn material of colour $c$ in pawn units. |
+| $`\mathrm{NPM}_c`$ | Non-pawn material of colour $c$ in pawn units. |
 
-## 3. Fields (64-vectors over $\mathcal{B}$)
+## 3. Fields (64-vectors over $`ℬ`$)
 
 | Symbol | Meaning | Defined in |
 | --- | --- | --- |
@@ -59,36 +62,39 @@
 | $X_c$ | X-ray field of colour $c$ (beyond the first blocker). | 02, Eq. (6) |
 | $\Phi_c$ | Influence field of colour $c$, $A_c + \chi X_c$. | 02, Eq. (7) |
 | $\Phi$ | Net potential, $\Phi_W - \Phi_B$ (diagnostic). | 02, Eq. (8) |
-| $\Theta$ | Tension, $\min(\Phi_W, \Phi_B)$ (diagnostic). | 02, Eq. (9) |
-| $\Omega$ | Saturating control field, $\Omega \in (-1, 1)$. | 02, Eq. (10) |
-| $T^\text{pass}_p$ | Passage transmittance of pawn $p$'s forward path. | 02, Eq. (21) |
-| $\mathbf{J}_c$ | Flux (lines-of-force) vector field of colour $c$ (diagnostic). | 02, §8 |
+| $\Theta$ | Tension, $`\min(\Phi_W, \Phi_B)`$ (diagnostic). | 02, Eq. (9) |
+| $\Omega$ | Saturating control field, $`\Omega \in (-1, 1)`$; scale $\Phi_0 \equiv 1$. | 02, Eq. (10) |
+| $`T^\text{pass}_p`$ | Passage transmittance of pawn $p$'s forward path. | 02, Eq. (21) |
+| $𝐉_c$ | Flux (lines-of-force) vector field of colour $c$ (diagnostic). | 02, §8 |
 | $\nabla_{xy}\Phi$ | Spatial gradient of $\Phi$ on the 8×8 grid (diagnostic). | 02, §8 |
 
 ## 4. Energies and search quantities
 
 | Symbol | Meaning | Defined in |
 | --- | --- | --- |
-| $E(S)$ | Total energy functional (static evaluation), White-positive. | 02, Eq. (11) |
+| $`E(S)`$ | Total energy functional (static evaluation), White-positive. | 02, Eq. (11) |
 | $E_\text{mat}, E_\text{flux}, \dots$ | Additive energy terms (see 02, §5). | 02 |
-| $e(S)$ | Side-to-move value, $s_\text{stm} E(S)$. | 03, Eq. (1) |
+| $`e(S)`$ | Side-to-move value, $`s_\text{stm} E(S)`$. | 03, Eq. (1) |
+| $`G^{(1)}_c, G^{(2)}_c`$ | Largest and second-largest SEE gains available to colour $c$. | 02, Eq. (16) |
+| $D_c$ | Breakdown (king danger before saturation) of king $c$. | 02, Eq. (19) |
+| $D_\text{max}$ | Saturation level of king danger. | 02, Eq. (19) |
 | $\nabla_m E$ | Discrete gradient of $E$ along move $m$ (edge of the game graph). | 03, Eq. (2) |
-| $Q_L(m)$ | Root score of move $m$ at selection level $L$. | 03, §4 |
+| $`Q_L(m)`$ | Root score of move $m$ at selection level $L$. | 03, §4 |
 | $L$ | Selection level: $0$ (pure field), $1$ (quiescent), $2$ (reply-aware). | 03, §4 |
 | $\tau$ | Policy temperature, in pawn units. | 04, Eq. (1) |
-| $\pi_\tau(m)$ | Boltzmann move probability at temperature $\tau$. | 04, Eq. (1) |
+| $`\pi_\tau(m)`$ | Boltzmann move probability at temperature $\tau$. | 04, Eq. (1) |
 | $\eta$ | Strength coordinate on the calibrated path, $\eta \in [0,1]$. | 04, §4 |
 
 ## 5. Operators and special functions
 
 | Symbol | Definition |
 | --- | --- |
-| $\mathcal{F}$ | Colour flip: mirror ranks, swap colours, swap side to move, map castling rights and en-passant square. |
-| $\mathcal{H}$ | File mirror (a↔h); a symmetry only when no castling rights remain. |
-| $\sigma_\text{L}(x)$ | Logistic function, $1/(1+e^{-x})$. |
-| $\mathrm{softplus}(x)$ | $\ln(1+e^{x})$. |
-| $\mathbf{1}[\cdot]$ | Indicator function. |
-| $\mathrm{SEE}_c(i)$ | Static exchange evaluation: material gain for colour $c$ from capturing on square $i$, with X-ray attackers. |
+| $ℱ$ | Colour flip: mirror ranks, swap colours, swap side to move, map castling rights and en-passant square. |
+| $ℋ$ | File mirror (a↔h); a symmetry only when no castling rights remain. |
+| $`\sigma_\text{L}(x)`$ | Logistic function, $`1/(1+e^{-x})`$. |
+| $`\mathrm{softplus}(x)`$ | $`\ln(1+e^{x})`$. |
+| $𝟙[\cdot]$ | Indicator function. |
+| $`\mathrm{SEE}_c(i)`$ | Static exchange evaluation: material gain for colour $c$ from capturing on square $i$, with X-ray attackers. |
 
 ---
 
@@ -104,9 +110,12 @@ it would mislead a physicist reviewer. The table records the deliberate choices.
 | Scalar potential tensor | **Field** (a 64-vector) | Rank-1 quantities are vectors; "tensor" is reserved for genuinely multi-index objects. |
 | Pauli exclusion, nuclear repulsion | **Exchange energy** (static exchange evaluation) | The term is a material-balance computation, not a quantum effect. |
 | Gradient (for move choice) | **Discrete gradient on the game graph** | Moves are graph edges, not spatial displacements; see 03, §2. |
+| Graph Laplacian (as a gradient) | **Incidence (graph) gradient** | The Laplacian $L = B^\top B$ is the divergence of the gradient, a second-order operator. |
+| Boundary-value problem (for field computation) | **Explicit ray summation** | No unknowns are solved for; fields are forward sums along rays. "Boundary conditions" is used only for fixed values at terminal positions (03 §3). |
+| Energy relaxation (for quiescence) | **Quiescence search (capture minimax)** | The two sides optimise in opposite directions; no single energy is minimised and there is no time variable. |
 
 Analogies that remain in use (Born–Oppenheimer separation, dielectric breakdown,
-softened gravity, light cones, confinement) are always introduced explicitly as
+softened inverse-square kernel, light cones, confinement) are always introduced explicitly as
 analogies, with the chess-level definition stated first. The full list, with what
 does and does not carry over, is the analogy register in
 [`design/02-field-model.md`](design/02-field-model.md#11-analogy-register).
@@ -122,6 +131,8 @@ does and does not carry over, is the analogy register in
 | **Pin / skewer** | Line attack through an enemy piece onto a more (pin) or less (skewer) valuable piece behind it. |
 | **SEE** | Static exchange evaluation: the material outcome of the optimal capture sequence on one square, computed without search. |
 | **Quiescence search** | A selective search over captures (and promotions, check evasions) that resolves tactical exchanges before evaluation. |
+| **Check extension** | Searching the forced replies to a check one ply further than the nominal depth. |
+| **Fail-soft** | An alpha-beta variant that returns the best score found even when it lies outside the search window, instead of clamping it to the window bound. |
 | **Tapered evaluation** | Linear interpolation between middlegame and endgame coefficients using the game phase $\varphi$. |
 | **Mop-up evaluation** | Endgame heuristic that drives the losing king to the edge and the winning king towards it. |
 | **Rule of the square** | Classical test of whether a king can catch a passed pawn before it promotes. |

@@ -18,6 +18,8 @@
 | [D-010](#d-010--bit-identical-native-and-webassembly-results) | Bit-identical native and WebAssembly results | Accepted |
 | [D-011](#d-011--no-overlays-on-live-third-party-games) | No overlays on live third-party games | Accepted |
 | [D-012](#d-012--front-end-framework-deferred) | Front-end framework deferred | Accepted |
+| [D-013](#d-013--level-0-extends-checks) | Level 0 extends checks | Accepted |
+| [D-014](#d-014--exact-root-scores-at-every-level) | Exact root scores at every level | Accepted |
 
 ---
 
@@ -26,9 +28,10 @@
 - **Context.** The project's identity is "no tree search", yet the stated goal is a
   strong engine. A purely one-ply engine cannot see replies; deep search would make
   the field model one more evaluation function among many.
-- **Decision.** Three levels (03 §4): Level 0, no lookahead beyond the move; Level 1,
-  capture-only relaxation; Level 2, one full-width reply. No iterative deepening, no
-  transposition table, no quiet moves beyond one reply. Results are reported per level.
+- **Decision.** Three levels (03 §4): Level 0, no lookahead beyond the move except
+  forced check evasions (D-013); Level 1, capture-only quiescence; Level 2, one
+  full-width reply. No iterative deepening, no transposition table, no quiet moves
+  beyond one reply. Results are reported per level.
 - **Consequences.** The search regime becomes an experimental variable (RQ1, RQ3)
   rather than a slogan. The positioning statement of 03 §9 is used verbatim.
 - **Alternatives.** Level 0 only (rejected: caps strength and confounds evaluation
@@ -117,16 +120,23 @@
   is costly and error-prone.
 - **Decision.** Specify before implementing; change the specification in the same
   commit as the code; keep notation, coefficients, and decisions each in one place;
-  commit in small stacked steps with Conventional Commit messages; state the `bench`
-  checksum in commits that change behaviour.
+  commit in small stacked steps with Conventional Commit messages; state the Level 2
+  `bench` checksum in commits that change behaviour; follow the GitHub rendering
+  conventions of notation §1 (fenced `math` blocks, no `\tag`, Unicode script
+  letters) so that every equation renders on github.com; keep agent-facing working
+  rules in `AGENTS.md`.
 - **Consequences.** Slightly slower commits; a complete audit trail for the paper.
 - **Alternatives.** Documentation after implementation (rejected).
 
 ## D-010 · Bit-identical native and WebAssembly results
 
 - **Context.** The lab must show exactly what the UCI engine computes.
-- **Decision.** The five numerics rules of 05 §6, enforced by a cross-target golden
-  test. Fields are recomputed in full rather than updated incrementally.
+- **Decision.** The six numerics rules of 05 §6: `f32` without fused operations,
+  colour-relative iteration, per-side accumulation, transcendental functions from
+  the `libm` crate, counter-based randomness, and an FNV-1a parameter hash (no
+  cryptographic dependency is needed to identify a parameter set). Enforced by the
+  exact-antisymmetry test now and a cross-target golden test from Milestone 6.
+  Fields are recomputed in full rather than updated incrementally.
 - **Consequences.** Figures and explanations in the lab are faithful to measured play.
 - **Alternatives.** Tolerance-based agreement (rejected: hides divergence);
   incremental updates (rejected for now: unnecessary within the budget of 05 §8).
@@ -149,3 +159,33 @@
   against the requirements of 06 §9.
 - **Consequences.** No front-end work before Milestone 6.
 - **Alternatives.** Choosing now (rejected: no information gained by deciding early).
+
+## D-013 · Level 0 extends checks
+
+- **Context.** The chess-engine audit showed that a purely static Level 0 cannot see
+  a checking fork: after the check, the exchange term assumes the opponent may parry
+  a threat, although the check forces the reply. Checking forks are the commonest
+  tactic at low levels.
+- **Decision.** At Level 0, a move that gives check is valued by the best of the
+  opponent's forced evasions, each evaluated statically (03 §4.1). The positioning
+  statement (03 §9) says so explicitly.
+- **Consequences.** Level 0 is no longer strictly "one evaluation per legal move";
+  a check typically adds 1–6 evaluations. The research claims are worded
+  accordingly. A static in-check rule in the exchange term (02 §5.4) covers the
+  remaining in-check leaves.
+- **Alternatives.** A purely static in-check correction (kept as the fallback rule,
+  but insufficient on its own); no correction (rejected: blind to the commonest
+  tactic).
+
+## D-014 · Exact root scores at every level
+
+- **Context.** The Boltzmann policy, MultiPV, and per-term explanations all use the
+  scores of non-best root moves. Alpha-beta at the root returns only bounds for
+  moves that fail low.
+- **Decision.** Every root move is searched with a full window; alpha-beta pruning
+  happens only below the root (03 §4).
+- **Consequences.** Level 2 costs the full $35 \times 35$ replies plus quiescence
+  (measured 14.6 ms per decision), well inside budget. With $\tau > 0$ a narrower
+  window $`(Q_\text{best} - 12\tau, +\infty)`$ would be a safe speed-up if ever needed.
+- **Alternatives.** Root alpha-beta (rejected: corrupts the policy and
+  explanations); aspiration windows (unnecessary at this cost).

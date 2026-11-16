@@ -1,6 +1,7 @@
 # 04 — Strength Control and Elo Calibration
 
-> **Status:** Draft v0.1 · **Depends on:** [`03-move-selection.md`](03-move-selection.md)
+> **Status:** Draft v0.2 · **Implemented in:** `crates/nabla-core/src/policy.rs` (policy;
+> calibration is Milestone 5) · **Depends on:** [`03-move-selection.md`](03-move-selection.md)
 > · **Resolves:** m-1, and the strength-scale part of M-7, of
 > [`01-proposal-review.md`](01-proposal-review.md)
 
@@ -30,13 +31,12 @@ calibrated, and what rating scale the numbers refer to.
 At the root, Nabla samples a move from
 
 ```math
-\pi_\tau(m) = \frac{\exp\!\big(\hat Q(m) / \tau\big)}{\sum_{m' \in \mathcal{M}(S)} \exp\!\big(\hat Q(m') / \tau\big)},
+\pi_\tau(m) = \frac{\exp\!\big(\hat Q(m) / \tau\big)}{\sum_{m' \in ℳ(S)} \exp\!\big(\hat Q(m') / \tau\big)},
 \qquad
-\hat Q(m) = \mathrm{clip}\!\big(Q_L(m),\ -Q_\text{cap},\ Q_\text{cap}\big),
-\tag{1}
+\hat Q(m) = \max\!\Big(Q_L(m),\ \max_{m'} Q_L(m') - Q_\text{cap}\Big), \qquad \text{(1)}
 ```
 
-where $Q_L$ is the level-$L$ root score (03 §4) and $\tau \ge 0$ is in pawn units.
+where $Q_L$ is the level-$`L`$ root score (03 §4) and $\tau \ge 0$ is in pawn units.
 As $\tau \to 0$ the policy becomes the deterministic argmax of 03 §5.
 
 **Properties.**
@@ -48,18 +48,25 @@ As $\tau \to 0$ the policy becomes the deterministic argmax of 03 §5.
   one-pawn mistake is chosen $e^{-2} \approx 13.5$ % as often as the best move;
   large blunders become rare much faster than small inaccuracies, which is closer
   to human error patterns than uniform random moves.
-- *Score cap.* $Q_\text{cap} = 20$ pawns lets very high temperatures miss even a
-  mate in one (realistic at the lowest strengths). At $\tau \le 2$, a mate in one in
-  an otherwise level position (30 alternatives scoring about 0) is still chosen
-  with probability $1/(1 + 30e^{-10}) > 99.8$ %.
-- *Measurable randomness.* The policy entropy $H_\pi = -\sum_m \pi_\tau(m)\ln \pi_\tau(m)$
+- *Gap cap.* No move is treated as more than $Q_\text{cap} = 20$ pawns worse than the
+  best, so very high temperatures can miss even a mate in one (realistic at the
+  lowest strengths). At $\tau \le 2$, a mate in one in an otherwise level position
+  (30 alternatives scoring about 0) is still chosen with probability
+  $1/(1 + 30e^{-10}) > 99.8$ %. Capping the gap rather than the score keeps the
+  $\tau \to 0$ limit intact (an absolute cap would make a mate in one and any
+  20-pawn win tie, and sample them uniformly at every temperature) and keeps mates
+  of different lengths in order.
+- *Measurable randomness.* The policy entropy $`H_\pi = -\sum_m \pi_\tau(m)\ln \pi_\tau(m)`$
   is reported in an `info string` line.
 
 **Reproducibility (R3).** Each decision draws its random number from a
-counter-based generator keyed by $(\text{Seed},\ \text{Zobrist}(S),\ \text{ply})$.
-A decision therefore depends only on the position, the ply, and the seed, not on
-previous queries or thread timing, and native and WebAssembly builds sample
-identically.
+counter-based generator (SplitMix64) keyed by
+$`(\text{Seed},\ \text{game},\ \text{Zobrist}(S),\ \text{ply})`$, where the game counter
+increases on every `ucinewgame`. A decision therefore depends only on these
+values, not on previous queries or thread timing, and native and WebAssembly builds
+sample identically. The game counter matters for calibration: without it, every
+game against a deterministic opponent (Maia at one node, the alpha-beta controls)
+from the same opening would repeat move for move and inflate the sample size.
 
 ---
 
@@ -67,7 +74,7 @@ identically.
 
 Two controls determine strength: the level $L \in \lbrace 0, 1, 2 \rbrace$ and the
 temperature $\tau$. Their measured ratings form the **strength surface**
-$\mathrm{Elo}(L, \tau)$, expected to decrease in $\tau$ for each level (hypothesis
+$`\mathrm{Elo}(L, \tau)`$, expected to decrease in $\tau$ for each level (hypothesis
 H6) and to increase with $L$ at $\tau = 0$ (H4).
 
 ---
@@ -86,8 +93,8 @@ through the surface in three segments:
 | 2 | 2 | $\tau_2 \to 0$ |
 
 The breakpoints $\tau_1$ and $\tau_2$ are chosen from the fitted curves so that the
-path is continuous: $\mathrm{Elo}(1, \tau_1) = \mathrm{Elo}(0, 0)$ and
-$\mathrm{Elo}(2, \tau_2) = \mathrm{Elo}(1, 0)$. A requested rating is therefore
+path is continuous: $`\mathrm{Elo}(1, \tau_1) = \mathrm{Elo}(0, 0)`$ and
+$`\mathrm{Elo}(2, \tau_2) = \mathrm{Elo}(1, 0)`$. A requested rating is therefore
 served by the **highest level that can reach it**, with temperature supplying the
 weakening. Rationale: a deterministic low level fails on the same tactics every
 time, which an opponent can exploit repeatedly; a higher level with temperature
@@ -104,7 +111,7 @@ errs randomly and in proportion to the size of the error.
    fixed at their nominal `UCI_Elo` values.
 4. **Fit.** For each level, an isotonic (monotone decreasing) regression of rating
    on $\tau$, then monotone piecewise-cubic (PCHIP) interpolation for inversion.
-5. **Compose and invert** the path to obtain the map $\mathrm{Elo} \mapsto (L, \tau)$.
+5. **Compose and invert** the path to obtain the map $`\mathrm{Elo} \mapsto (L, \tau)`$.
 6. **Validate.** Five held-out target ratings across the range each play at least
    400 games against the pool. **Acceptance:** RMS calibration error ≤ 50 Elo
    within the anchored range; targets below the lowest anchor are reported as
@@ -129,12 +136,14 @@ centipawns.
 | --- | --- | --- | --- | --- |
 | `Level` | spin | 0–2 | 2 | Selection level (03 §4). |
 | `Temperature` | spin | 0–500 | 0 | $\tau$ in centipawns. |
-| `UCI_LimitStrength` | check | — | false | When true, `UCI_Elo` overrides `Level` and `Temperature`. |
+| `UCI_LimitStrength` | check | — | false | When true, `UCI_Elo` overrides `Level` and `Temperature`. Advertised only with a valid table. |
 | `UCI_Elo` | spin | Range of the compiled calibration table | Table maximum | Target rating on the scale of §6. Advertised only with a valid table (§4.2). |
 | `Seed` | spin | 0–2147483647 | 0 | Random seed for the policy (§2). |
 | `Contempt` | spin | −100–100 | 15 | $\delta_\text{draw}$ in centipawns (03 §3). |
 | `MultiPV` | spin | 1–256 | 1 | Number of candidates reported. |
 
+In v0.1 no calibration table exists yet, so neither strength-limiting option is
+advertised; `setoption` for either replies with an `info string` saying so.
 Evaluation coefficients are additionally exposed as hidden options for automated
 tuning (05 §4).
 

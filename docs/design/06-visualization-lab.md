@@ -1,6 +1,6 @@
 # 06 — Visualisation Lab
 
-> **Status:** Draft v0.1 · **Built in:** Milestone 6 ([`../roadmap.md`](../roadmap.md))
+> **Status:** Draft v0.2 · **Built in:** Milestone 6 ([`../roadmap.md`](../roadmap.md))
 > · **Depends on:** the WebAssembly API of [`05-architecture.md`](05-architecture.md#5-webassembly-api)
 > · **Resolves:** M-9 of [`01-proposal-review.md`](01-proposal-review.md)
 
@@ -22,19 +22,35 @@ when its coefficients change.
 
 ## 2. Layout
 
-```text
-┌──────────────────────────────────┬─────────────────────────────────┐
-│  BOARD                           │  INSPECTOR                      │
-│  8×8 board with overlay layers   │  • Energy decomposition (bars)  │
-│                                  │  • Candidates: Q, π, ∇ terms    │
-│  Layer toggles:                  │  • King breakdown gauges        │
-│  [Φ] [Ω] [Θ] [A/X] [J] [∇Φ]      │                                 │
-│  [moves] [kings] [pawns] [box]   ├─────────────────────────────────┤
-├──────────────────────────────────┤  CONTROLS                       │
-│  TIMELINE                        │  • Level, temperature, seed     │
-│  Move list · scrubber · Δ-view   │  • Coefficient sliders (02 §9)  │
-│  (S versus S'ₘ)                  │  • Reset · import/export TOML   │
-└──────────────────────────────────┴─────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph LEFT["Left column"]
+        direction TB
+        subgraph BOARD["Board"]
+            B1["8×8 board with overlay layers"]
+            B2["Layer toggles<br/>Φ · Ω · Θ · A/X · J · ∇Φ<br/>moves · kings · pawns · box · threats"]
+        end
+        subgraph TIMELINE["Timeline"]
+            T1["Move list · scrubber"]
+            T2["Δ-view: S versus S'ₘ"]
+        end
+        BOARD ~~~ TIMELINE
+    end
+    subgraph RIGHT["Right column"]
+        direction TB
+        subgraph INSPECTOR["Inspector"]
+            I1["Energy decomposition (bars)"]
+            I2["Candidates: Q, π, per-term ∇"]
+            I3["King breakdown gauges"]
+        end
+        subgraph CONTROLS["Controls"]
+            C1["Level · temperature · seed"]
+            C2["Coefficient sliders (02 §9)"]
+            C3["Reset · import/export TOML"]
+        end
+        INSPECTOR ~~~ CONTROLS
+    end
+    LEFT ~~~ RIGHT
 ```
 
 ---
@@ -46,17 +62,28 @@ when its coefficients change.
 | 1 | Net potential $\Phi$ | `fields.net` | Diverging colour map, fixed symmetric limits | Who dominates where? |
 | 2 | Control $\Omega$ | `fields.control` | Diverging, fixed limits $[-1, 1]$ | Who owns each square? |
 | 3 | Tension $\Theta$ | `fields.tension` | Sequential, single hue | Where are the flashpoints? |
-| 4 | Direct and X-ray channels | `fields.direct*`, `fields.xray*` | Per side; X-ray drawn hatched | What is attacked, and what is only X-rayed (pins, batteries)? |
-| 5 | Lines of force $\mathbf{J}$ | `fields.flux*` | Streamlines; width proportional to $\lVert \mathbf{J} \rVert$ | Where does pressure point? |
+| 4 | Direct and X-ray channels | `fields.direct*`, `fields.xray*` | Per side; X-ray drawn as dashed beams through the blocking piece | What is attacked, and what is only X-rayed (pins, batteries)? |
+| 5 | Lines of force $𝐉$ | `fields.flux*` | Streamlines; width proportional to $\lVert 𝐉 \rVert$ | Where does pressure point? |
 | 6 | Terrain slope $\nabla_{xy}\Phi$ | `fields.grad*` | Small arrows | How does dominance change across the board? |
 | 7 | Move gradients | `candidates` | Arrow from origin to target; colour = $Q$, width = $\pi_\tau$ | Which moves does the energy favour, and why? |
 | 8 | King breakdown | `diagnostics.kingPressure`, `diagnostics.shelter` | Zone outline plus a gauge marking the current point on the breakdown curve of 02 Eq. (19) | How close is each king to collapse? |
 | 9 | Pawn cones | `diagnostics.passage`, `diagnostics.unstoppable` | Shaded forward path; light-cone square for unstoppable pawns | Which pawns are passed, and which cannot be caught? |
 | 10 | Confinement | `diagnostics.confinement` | Outline of the defending king's region | How boxed-in is the defending king? |
+| 11 | Exchange threats | `diagnostics.threatsW`, `diagnostics.threatsB` | Ring around each piece that can be won by SEE; thickness = gain | What can be captured profitably right now? |
 
 Layers 1–3 and 5–6 are diagnostics (02 §8); layer 7 is the decision itself. The lab
 labels the two kinds differently so viewers do not mistake a diagnostic for the
-reason a move was chosen.
+reason a move was chosen. Layers 4 and 11 were suggested by the second proposal
+(00b, Part 4); its other suggestions are handled as follows:
+
+- **Tracer particles** may animate the lines of force $𝐉$, never the Cartesian
+  gradient $\nabla_{xy}\Phi$, which the engine does not use and which would show a
+  Euclidean flow that does not exist in the model.
+- **Bilinear smoothing** of the 8×8 fields is available only as a labelled
+  "smooth" view in the interactive lab. It invents values between squares (for
+  example across a pawn wall), so it is never used in exported figures.
+- A **king potential** layer is not offered: the energy has no such term (02 §5.5),
+  so drawing one would depict a cause that is absent from the decision.
 
 ---
 
@@ -67,7 +94,7 @@ reason a move was chosen.
 2. **Hover a square** to see every field value there and its top five sources
    (`explainSquare`), split into direct and X-ray contributions.
 3. **Select a candidate** to open the Δ-view: the change in each field from $S$ to
-   $S'_m$, with the per-term gradient bars of 03 §6.
+   $`S'_m`$, with the per-term gradient bars of 03 §6.
 4. **Move a slider** to re-analyse immediately at Level 0, and after a 150 ms pause
    at Levels 1–2.
 5. **Step through** the principal variation at Levels 1–2 to the leaf whose energy
@@ -93,9 +120,11 @@ reason a move was chosen.
 
 ## 6. Reproducible figure export
 
-1. Export the board with selected layers as SVG or PNG. Each file embeds its
-   provenance: FEN, move history, parameter hash, engine version, level,
-   temperature, seed, layers, and colour-map limits.
+1. Export the board with selected layers as SVG or PNG. Fields are drawn as flat
+   per-square cells with a diverging colour map symmetric about 0 and the same
+   limits in every panel. Each file embeds its provenance: FEN, move history,
+   parameter hash, engine version, level, temperature, seed, layers, and
+   colour-map limits.
 2. Export the raw arrays as JSON alongside each figure.
 3. A figure manifest in `tools/figures/` lists every figure in the paper; one
    command regenerates all of them from the manifest.
@@ -128,3 +157,8 @@ The front-end framework (React, Svelte, or plain TypeScript) is chosen at
 Milestone 6 (decision D-012). Any choice must support static deployment with no
 server, Web Workers, SVG export, and TypeScript types generated from the
 WebAssembly bindings.
+
+A candidate board component is **Chessground** (lichess-org), published as
+`@lichess-org/chessground` (v10.5.0 on 2026-11-17). It has no dependencies, ships a
+single ES module that works on a static site, and is licensed GPL-3.0-or-later,
+which is compatible with Nabla's licence.
