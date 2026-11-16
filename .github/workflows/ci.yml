@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  FASTCHESS_VERSION: v1.8.3-alpha
+
+jobs:
+  check:
+    name: Format, lint, test, bench, UCI compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Lint
+        run: cargo clippy --release --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --release
+
+      - name: Bench (Level 2 checksum is the behaviour fingerprint)
+        run: ./target/release/nabla bench
+
+      - name: UCI compliance (fastchess)
+        run: |
+          curl -sSL "https://github.com/Disservin/fastchess/releases/download/${FASTCHESS_VERSION}/fastchess-linux-x86-64.tar" -o fastchess.tar
+          tar xf fastchess.tar
+          ./fastchess-linux-x86-64/fastchess --compliance ./target/release/nabla
