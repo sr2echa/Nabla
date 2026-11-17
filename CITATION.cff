@@ -1,10 +1,10 @@
 cff-version: 1.2.0
 message: "If you use Nabla in your research, please cite it using these metadata."
 type: software
-title: "Nabla: A Chess Engine Driven by Energy Descent on Ray-Transport Fields"
+title: "Nabla: A Chess Engine That Chooses Moves by Energy Descent on Ray-Transport Fields"
 abstract: >-
-  Nabla is a research chess engine whose evaluation is a small, physically
-  structured energy functional over ray-transport fields. Each piece emits
+  Nabla is a chess engine that chooses moves by energy descent on
+  ray-transport fields. Each piece emits
   influence along its exact attack rays, attenuated by blocking pieces so that
   direct control is separated from X-ray pressure. Every evaluation decomposes
   exactly into named terms. Moves are chosen by steepest ascent of the energy on
@@ -17,10 +17,7 @@ authors:
 license: GPL-3.0-or-later
 keywords:
   - chess engine
-  - interpretable evaluation
-  - potential fields
   - ray transport
-  - energy-based models
-  - low-search game playing
+  - low-search chess
   - Rust
   - WebAssembly

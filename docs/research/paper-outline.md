@@ -8,10 +8,10 @@
 
 ## 1. Working title
 
-> **Nabla: Chess by Energy Descent on Ray-Transport Fields**
+> **Nabla: A Chess Engine That Chooses Moves by Energy Descent on Ray-Transport Fields**
 
-Alternative: *How Far Can Fields Go? An Interpretable Field Energy for Low-Search
-Chess.*
+Use this title everywhere. Do not use "zero-search", "electrostatic", or
+"continuous anisotropic potential fields".
 
 **Candidate venues** (to be confirmed against current calls): IEEE Transactions on
 Games; ICGA Journal; IEEE Conference on Games (CoG); Advances in Computer Games (ACG).
