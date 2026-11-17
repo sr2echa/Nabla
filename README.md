@@ -177,9 +177,10 @@ board to read what it is. The pause before a move is a slider.
 ### In your own page
 
 `npm run engine --prefix web` writes the WebAssembly into `web/src/engine`
-(`nabla_wasm.js` and `nabla_wasm_bg.wasm`). Those files are GPL-3.0-or-later,
-the same as the rest of Nabla. Copy that directory into your site and load it
-from a browser module. The page keeps the rules. You do not reimplement chess.
+(`nabla_wasm.js` and `nabla_wasm_bg.wasm`). Those files are committed, so a
+site build does not need Rust. They are GPL-3.0-or-later, the same as the rest
+of Nabla. Copy that directory into your site and load it from a browser module.
+The page keeps the rules. You do not reimplement chess.
 
 ```js
 import init, { Lab } from "./nabla_wasm.js";

@@ -140,8 +140,9 @@ control, tension, hanging pieces, and the candidate arrows from those two calls.
 Flux lines, the king-pressure gauge, pawn cones, and confinement are not in this
 build.
 
-Build it with `npm run engine --prefix web`. The generated files land in
-`web/src/engine` and are not committed.
+Build it with `npm run engine --prefix web`. The generated files are committed
+in `web/src/engine`, so the page can be built where Rust is not installed.
+Regenerate them after a change to the engine.
 
 ---
 
