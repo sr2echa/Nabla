@@ -228,7 +228,12 @@ cg-board square.move-dest:hover { background-color: rgb(58 86 112 / 0.12); }
   pointer-events: none;
   background: rgb(243 241 235 / 0.55);
 }
-cg-board square.check { box-shadow: inset 0 0 0 2px var(--ink); background: transparent !important; }
+cg-board square.check {
+  z-index: 5;
+  background: transparent !important;
+  box-shadow: inset 0 0 0 3px #8d3b32;
+  pointer-events: none;
+}
 cg-board square { z-index: 2; }
 cg-board piece { z-index: 4 !important; }
 cg-board piece.dragging { z-index: 8 !important; filter: drop-shadow(0 8px 10px rgb(36 34 32 / 0.16)); }
@@ -428,6 +433,9 @@ section.energy, .pair { flex: none; }
 .track i[data-sign="neg"] { right: 50%; background: var(--field-black); }
 .bar b, .split b, #candidates b, .results td:last-child { font-family: var(--mono); font-weight: 450; }
 .total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
   margin: 12px 0 22px;
   font-family: var(--serif);
   font-style: italic;
@@ -436,6 +444,7 @@ section.energy, .pair { flex: none; }
   letter-spacing: -0.03em;
   color: var(--ink);
 }
+.total b { font-weight: 600; font-style: italic; }
 #candidates { list-style: none; margin: 0; padding: 0; }
 #candidates li { display: grid; grid-template-columns: minmax(0, 1fr) 3.2rem; align-items: center; gap: 8px; padding: 0; line-height: 1.25; color: var(--ink-2); font-size: 12px; }
 #candidates .move { display: flex; align-items: center; gap: 4px; min-width: 0; }

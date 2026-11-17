@@ -32,7 +32,8 @@ show the recorded self-play. Matches against Stockfish and Maia have not been
 recorded. Control is one inset rim under the pieces, and only while Nabla is
 to move, in the same geometry the legend draws. Tension ticks,
 hanging-piece numbers, and candidate arrows use that same geometry. Check,
-checkmate, stalemate, and the draw reasons are written on the board. Flux
+checkmate, stalemate, and the draw reasons are written on the board. The king that is
+in check is outlined; the piece that gave the check is not. Flux
 lines, the king gauge, pawn cones, confinement, and figure export are still to
 build. The notes state the official description and do not offer coefficient
 sliders.

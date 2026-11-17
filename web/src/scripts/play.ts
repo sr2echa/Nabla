@@ -630,7 +630,7 @@ function refresh(): void {
     orientation,
     lastMove,
     turnColor: view.turn,
-    check: view.state === "check" || view.state === "checkmate",
+    check: view.state === "check" || view.state === "checkmate" ? view.turn : false,
     movable: { color: actor() === "human" ? view.turn : undefined, dests, free: false },
   });
   setStatus(view.state === "checkmate" || view.state === "draw" ? "" : `${cap(view.turn)} to move.`);
@@ -730,7 +730,11 @@ function drawEnergy(energy: Terms): void {
   }
   const total = document.createElement("p");
   total.className = "total";
-  total.textContent = `Total ${energy.total.toFixed(2)}`;
+  const word = document.createElement("span");
+  word.textContent = "Total";
+  const number = document.createElement("b");
+  number.textContent = energy.total.toFixed(2);
+  total.append(word, number);
   host.append(total);
 }
 
