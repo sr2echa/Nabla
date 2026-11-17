@@ -1,0 +1,24 @@
+{
+  "name": "nabla-lab",
+  "private": true,
+  "type": "module",
+  "description": "Play Nabla and see the fields it computes.",
+  "scripts": {
+    "engine": "node scripts/engine.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "astro": "^5.14.1",
+    "chessground": "^9.2.1",
+    "katex": "^0.19.1",
+    "stockfish": "^19.0.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
+}

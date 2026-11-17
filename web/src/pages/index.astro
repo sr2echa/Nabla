@@ -1,0 +1,269 @@
+---
+import "@fontsource-variable/geist/wght.css";
+import "@fontsource-variable/geist-mono/wght.css";
+import "katex/dist/katex.min.css";
+import "../styles/app.css";
+import "chessground/assets/chessground.base.css";
+import "chessground/assets/chessground.brown.css";
+import "chessground/assets/chessground.cburnett.css";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>∇ Nabla</title>
+    <meta
+      name="description"
+      content="Nabla is a chess engine that chooses moves by energy descent on ray-transport fields."
+    />
+  </head>
+  <body>
+    <header class="top">
+      <h1><span class="sym">∇</span> Nabla</h1>
+      <p class="lede">Nabla is a chess engine that chooses moves by energy descent on ray-transport fields.</p>
+    </header>
+
+    <main class="desk">
+      <aside class="judge" aria-label="Judge">
+        <p class="judge-kicker">Judge</p>
+        <div class="judge-picks" role="group" aria-label="Who scores the position">
+          <button type="button" data-judge="nabla" aria-pressed="true">Nabla</button>
+          <button type="button" data-judge="stockfish" aria-pressed="false">Stockfish</button>
+          <button type="button" data-judge="maia" aria-pressed="false">Maia</button>
+        </div>
+        <p class="pole">Black</p>
+        <div class="meter" id="meter" style="--share: 0.5"><i id="meter-fill"></i></div>
+        <p class="pole">White</p>
+        <p id="judge-read">White grows up from the bottom of the bar.</p>
+      </aside>
+
+      <section class="board-column">
+        <div class="board-well">
+          <div id="rank-rail" class="rail ranks"></div>
+          <div class="square-board">
+            <div id="board"></div>
+            <canvas id="fields"></canvas>
+            <svg id="arrows" viewBox="0 0 8 8" aria-hidden="true"></svg>
+            <div id="callout" class="callout" hidden></div>
+            <div id="promo" hidden></div>
+          </div>
+          <div id="file-rail" class="rail files"></div>
+        </div>
+        <p id="status" aria-live="polite">Loading the engine.</p>
+      </section>
+
+      <aside class="panel">
+        <fieldset class="seg">
+          <legend>Match</legend>
+          <label><input type="radio" name="mode" value="you" checked /> You</label>
+          <label><input type="radio" name="mode" value="mirror" /> Nabla vs Nabla</label>
+          <label><input type="radio" name="mode" value="fish" /> Stockfish lite</label>
+        </fieldset>
+        <div class="knobs">
+          <button id="new-game" type="button">New game</button>
+          <button id="flip" type="button">Flip</button>
+          <button id="pause" type="button">Pause</button>
+          <label id="side-field"><span id="side-label">You play</span>
+            <select id="side">
+              <option value="white">White</option>
+              <option value="black">Black</option>
+            </select>
+          </label>
+          <label id="level-one">Nabla
+            <select id="level">
+              <option value="0">Level 0, the move</option>
+              <option value="1">Level 1, captures</option>
+              <option value="2" selected>Level 2, one reply</option>
+            </select>
+          </label>
+          <div id="level-pair" class="pair" hidden>
+            <label>White
+              <select id="level-w">
+                <option value="0">Level 0</option>
+                <option value="1">Level 1</option>
+                <option value="2" selected>Level 2</option>
+              </select>
+            </label>
+            <label>Black
+              <select id="level-b">
+                <option value="0">Level 0</option>
+                <option value="1">Level 1</option>
+                <option value="2" selected>Level 2</option>
+              </select>
+            </label>
+          </div>
+          <div id="fish-opts" class="pair" hidden>
+            <label>Stockfish cap
+              <select id="fish-elo">
+                <option value="1320" selected>Elo cap 1320</option>
+                <option value="1600">Elo cap 1600</option>
+                <option value="2000">Elo cap 2000</option>
+                <option value="full">No cap</option>
+              </select>
+            </label>
+            <label>Think
+              <select id="fish-ms">
+                <option value="200" selected>200 ms</option>
+                <option value="500">500 ms</option>
+                <option value="1000">1 s</option>
+              </select>
+            </label>
+          </div>
+          <label class="temp">Temperature <output id="temp-out">0.00</output>
+            <input id="temp" type="range" min="0" max="500" value="0" step="5" />
+          </label>
+          <label class="temp">Pause before a move <output id="pace-out">500 ms</output>
+            <input id="pace" type="range" min="0" max="1500" value="500" step="50" />
+          </label>
+        </div>
+
+        <h2>Legend</h2>
+        <figure class="legend-board">
+          <svg id="legend-board" viewBox="0 0 6 6" role="img" aria-label="A small board. Hover a mark.">
+            <rect x="0" y="0" width="6" height="6" fill="#b58863" />
+            <g fill="#f0d9b5">
+              <rect x="0" y="1" width="1" height="1" /><rect x="2" y="1" width="1" height="1" /><rect x="4" y="1" width="1" height="1" />
+              <rect x="1" y="2" width="1" height="1" /><rect x="3" y="2" width="1" height="1" /><rect x="5" y="2" width="1" height="1" />
+              <rect x="0" y="3" width="1" height="1" /><rect x="2" y="3" width="1" height="1" /><rect x="4" y="3" width="1" height="1" />
+              <rect x="1" y="4" width="1" height="1" /><rect x="3" y="4" width="1" height="1" /><rect x="5" y="4" width="1" height="1" />
+            </g>
+            <g class="lm" tabindex="0" data-text="Blue at the rim. White controls that square more than Black. The centre stays clear so a piece can sit on it.">
+              <rect class="hit" x="1" y="3" width="1" height="1" />
+              <rect class="wash blue" x="1.08" y="3.08" width="0.84" height="0.84" rx="0.12" />
+            </g>
+            <g class="lm" tabindex="0" data-text="Rust at the rim. Black controls that square more than White.">
+              <rect class="hit" x="4" y="1" width="1" height="1" />
+              <rect class="wash rust" x="4.08" y="1.08" width="0.84" height="0.84" rx="0.12" />
+            </g>
+            <g class="lm" tabindex="0" data-text="Corner ticks. Both sides bear on the square. Turn the layer on with Tension.">
+              <rect class="hit" x="2" y="2" width="1" height="1" />
+              <path class="ticks" d="M2.16 2.34 H2.34 V2.16 M2.84 2.16 V2.34 H2.66 M2.16 2.66 V2.84 H2.34 M2.66 2.84 H2.84 V2.66" />
+            </g>
+            <g class="lm" tabindex="0" data-text="The number is how many pawns the opponent wins by taking the piece. It sits in the corner, off the piece.">
+              <rect class="hit" x="3" y="2" width="1" height="1" />
+              <circle cx="3.78" cy="2.22" r="0.16" fill="#8d2f2a" />
+              <text x="3.78" y="2.22" text-anchor="middle" dominant-baseline="central" fill="#fffdf8" font-size="0.16">3</text>
+            </g>
+            <g class="lm" tabindex="0" data-text="Green arrow. The move about to be played. A paler arrow is another move that was considered. The chip is the move in chess notation.">
+              <rect class="hit" x="1" y="4" width="1" height="2" />
+              <polygon points="1.5,5.62 1.42,4.55 1.58,4.55" fill="#fffdf8" />
+              <polygon points="1.5,5.55 1.44,4.62 1.56,4.62" fill="#1f6b45" />
+              <polygon points="1.5,4.28 1.32,4.62 1.68,4.62" fill="#1f6b45" stroke="#fffdf8" stroke-width="0.03" />
+            </g>
+          </svg>
+          <figcaption id="legend-caption">Hover a mark.</figcaption>
+        </figure>
+        <div class="layers">
+          <label><input type="checkbox" data-layer="control" checked /> Control</label>
+          <label><input type="checkbox" data-layer="tension" /> Tension</label>
+          <label><input type="checkbox" data-layer="threats" checked /> Hanging pieces</label>
+          <label><input type="checkbox" data-layer="moves" checked /> Candidate moves</label>
+        </div>
+
+        <h2>Energy now</h2>
+        <p class="note">White-positive, in pawns. A gain for White grows to the right. This is the position, not the reason for the last move.</p>
+        <div id="energy"></div>
+
+        <h2>Why that move</h2>
+        <p class="note">For a Nabla move, the score is the value of the move. The bars are how each term changed, from the side that moved.</p>
+        <div id="reason"><p class="empty">No move to explain yet.</p></div>
+
+        <h2>Moves it considered</h2>
+        <ol id="candidates"></ol>
+
+        <h2>Recorded results</h2>
+        <p class="note">Self-play on one machine, 17 November 2026. These are not ratings against Stockfish or Maia. No such match is recorded yet.</p>
+        <table class="results">
+          <thead>
+            <tr><th>Comparison</th><th>Score</th><th>Conditions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Level 1 vs Level 0</td>
+              <td>+521 ± 120</td>
+              <td>200 games, 189 wins, 8 losses, 3 draws. 4 s + 0.04 s. <code>noob_3moves.epd</code>.</td>
+            </tr>
+            <tr>
+              <td>Level 2 vs Level 1</td>
+              <td>+334 ± 76</td>
+              <td>200 games, 170 wins, 21 losses, 9 draws. Same clock and book.</td>
+            </tr>
+            <tr>
+              <td>Time losses</td>
+              <td>0</td>
+              <td>1,000 games at each level, 2 s + 0.02 s, after the node budget.</td>
+            </tr>
+            <tr>
+              <td>Tuner</td>
+              <td>0.1145 to 0.1134</td>
+              <td>40 Level 0 games, 1,988 quiet positions. The fit was not installed.</td>
+            </tr>
+          </tbody>
+        </table>
+      </aside>
+    </main>
+
+    <article class="paper">
+      <h2>The energy</h2>
+      <p>Nine terms, white-positive, in pawn units. Equation (11) of the field model:</p>
+      <p class="math" data-tex="E(S)=E_{\mathrm{mat}}+E_{\mathrm{flux}}+E_{\mathrm{terr}}+E_{\mathrm{ex}}+E_{\mathrm{king}}+E_{\mathrm{trop}}+E_{\mathrm{pawn}}+E_{\mathrm{conf}}+E_{\mathrm{tempo}}" data-display="true"></p>
+      <p>The phase that tapers a coefficient from the middlegame to the endgame is equation (12):</p>
+      <p class="math" data-tex="\varphi=\min\left(1,\frac{N_{N}+N_{B}+2N_{R}+4N_{Q}}{24}\right)" data-display="true"></p>
+      <p>Colour antisymmetry is exact, equation (27):</p>
+      <p class="math" data-tex="E(\mathcal{F}S)=-E(S)" data-display="true"></p>
+
+      <h2>What the terms are</h2>
+      <p>
+        Each piece sends influence along the squares it can actually attack. A piece
+        in the way weakens what gets through. A rook behind its own rook still
+        presses hard (a battery). A rook behind an enemy piece continues past it,
+        at a lower strength. Nabla plays the legal move that raises its own energy the most.
+      </p>
+      <dl>
+        <div><dt>Material</dt><dd>Who has more wood. A pawn is 1.</dd></div>
+        <div><dt>Mobility</dt><dd>Safe squares a piece can use.</dd></div>
+        <div><dt>Territory</dt><dd>Who controls the board, with the centre counting more. Extra attackers on a square add less and less.</dd></div>
+        <div><dt>Exchange</dt><dd>Whether a capture wins material. A fork counts. One move cannot both grab and defend.</dd></div>
+        <div><dt>King</dt><dd>Enemy influence on the king. A pawn shelter holds it down, and the danger cannot grow without limit.</dd></div>
+        <div><dt>Tropism</dt><dd>A weak pull of pieces toward the enemy king, and king centralisation when little material is left.</dd></div>
+        <div><dt>Pawns</dt><dd>Passed pawns, isolated and doubled pawns, and whether the enemy king can catch a passer.</dd></div>
+        <div><dt>Confinement</dt><dd>In an ending, how small a region the losing king can still reach.</dd></div>
+        <div><dt>Tempo</dt><dd>A tenth of a pawn for having the move.</dd></div>
+      </dl>
+
+      <h2>How far it looks</h2>
+      <ul>
+        <li><strong>Level 0</strong> scores the position after each move, and the forced replies when that move gives check.</li>
+        <li><strong>Level 1</strong> also plays out captures.</li>
+        <li><strong>Level 2</strong> also looks at every reply, then plays out captures. This is the default.</li>
+      </ul>
+      <p>
+        That is a little lookahead, not zero and not a deep tree. On one desktop, a
+        middlegame decision took about a millisecond at Level 0 and about twenty
+        milliseconds at Level 2. Temperature 0 always plays the best of those moves.
+        Raising it sometimes plays another move from the list.
+      </p>
+      <h2>Who can sit down</h2>
+      <p>
+        You can take White or Black, watch two Nabla levels play, or face Stockfish 19 lite.
+        The Elo cap is Stockfish's own limit. The judge on the left is separate from the
+        player: Nabla maps its energy, Stockfish lite reads the position at depth 8, and
+        Maia is left to the gauntlet. The pause before a move is the wait after an arrow
+        is drawn.
+      </p>
+      <p>
+        The coefficients are still the hand-set values. <code>cargo run -p nabla-tune --release</code>
+        prints a fit and does not install it. The same engine speaks UCI as <code>nabla</code>.
+        To use the WebAssembly, copy <code>web/src/engine</code> after
+        <code>npm run engine --prefix web</code>. Nabla is free software under the GNU GPL v3 or later.
+        The Stockfish build in this page is GPL v3.
+      </p>
+    </article>
+    <script>
+      import { start } from "../scripts/play";
+      start();
+    </script>
+  </body>
+</html>

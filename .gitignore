@@ -1,1 +1,8 @@
 /target
+/web/node_modules
+/web/dist
+/web/.astro
+/web/src/engine
+/web/test-results
+/web/playwright-report
+/tools/gauntlet/out
