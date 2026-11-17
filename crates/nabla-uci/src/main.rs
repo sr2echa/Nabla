@@ -112,7 +112,9 @@ impl Engine {
         println!("option name Contempt type spin default 15 min -100 max 100");
         println!("option name Seed type spin default 0 min 0 max 2147483647");
         println!("option name MultiPV type spin default 1 min 1 max 256");
-        println!("option name Move Overhead type spin default {DEFAULT_OVERHEAD_MS} min 0 max 5000");
+        println!(
+            "option name Move Overhead type spin default {DEFAULT_OVERHEAD_MS} min 0 max 5000"
+        );
         println!("uciok");
     }
 
@@ -221,7 +223,8 @@ impl Engine {
                 }
                 (None, None) => None,
             };
-            budget_ms.map(|ms| (ms.max(0) as u64).saturating_sub(self.overhead_ms).max(1) * NODES_PER_MS)
+            budget_ms
+                .map(|ms| (ms.max(0) as u64).saturating_sub(self.overhead_ms).max(1) * NODES_PER_MS)
         };
 
         let start = Instant::now();
