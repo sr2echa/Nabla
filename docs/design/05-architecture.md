@@ -1,7 +1,7 @@
 # 05 — System Architecture
 
-> **Status:** Draft v0.2 · **Implemented:** native UCI engine (v0.1); WebAssembly
-> module planned for Milestone 6 · **Depends on:** 02, 03, 04 · **Decisions:**
+> **Status:** Draft v0.3 · **Implemented:** native UCI engine, the `nabla-wasm` lab
+> package, and the Astro page in `web/` · **Depends on:** 02, 03, 04 · **Decisions:**
 > D-005, D-008, D-010 in [`../decisions.md`](../decisions.md)
 
 Nabla is one Rust engine core compiled to two targets: a native command-line
@@ -31,18 +31,18 @@ flowchart TB
     subgraph Clients
         FC["fastchess<br/>(gauntlets, SPRT)"]
         GUI["Chess GUIs"]
-        LAB["Visualisation lab<br/>(browser, Web Worker)"]
-        TUNE["Tuning and calibration scripts"]
+        LAB["Visualisation lab<br/>(browser)"]
+        TUNE["nabla-tune"]
     end
     subgraph Nabla
         UCI["nabla-uci<br/>binary: nabla"]
-        WASM["nabla-wasm<br/>(planned)"]
+        WASM["nabla-wasm<br/>Lab"]
         CORE["nabla-core<br/>fields · energy · SEE · selection · policy"]
     end
     FC -- UCI --> UCI
     GUI -- UCI --> UCI
-    TUNE -- "UCI options" --> UCI
-    LAB -- "JS API, typed arrays" --> WASM
+    TUNE --> CORE
+    LAB -- JSON --> WASM
     UCI --> CORE
     WASM --> CORE
     CORE --> BOARD["shakmaty<br/>rules, attacks, Zobrist"]
@@ -65,16 +65,19 @@ Nabla/
 │   │   │   ├── energy/          # one module per term (02 §5) + decomposition
 │   │   │   ├── select.rs        # boundary conditions, levels 0–2 (03)
 │   │   │   ├── policy.rs        # Boltzmann policy, counter-based RNG (04 §2)
-│   │   │   └── params.rs        # the 57 coefficients, fixed constants, hash
+│   │   │   ├── params.rs        # the 57 coefficients, fixed constants, hash
+│   │   │   └── snapshot.rs      # the picture the lab paints
 │   │   └── tests/               # invariant tests (§7)
-│   └── nabla-uci/               # binary `nabla`: UCI loop, options, analysis commands
+│   ├── nabla-uci/               # binary `nabla`: UCI loop, options, analysis commands
+│   ├── nabla-wasm/              # `Lab` for the page (05 §5)
+│   └── nabla-tune/              # coordinate descent; prints a fit, does not install it
+├── web/                         # Astro lab (decision D-012)
 └── docs/
 ```
 
-Planned additions: `crates/nabla-wasm` (Milestone 6), `params/*.toml` and
-`tools/` for tuning (Milestone 4), `calibration/elo-map.toml` (Milestone 5), and
-`web/` for the lab (Milestone 6). The board library sits behind `board.rs`, so
-replacing it touches one module (decision D-005).
+Still planned: `params/*.toml` (Milestone 4), `calibration/elo-map.toml`
+(Milestone 5). The board library sits behind `board.rs`, so replacing it touches
+one module (decision D-005).
 
 ---
 
@@ -116,74 +119,29 @@ Stockfish development).
 
 ---
 
-## 5. WebAssembly API (planned, Milestone 6)
+## 5. WebAssembly API
 
-The lab runs the module inside a **Web Worker** so analysis never blocks rendering.
-The interface, shown from the JavaScript side:
+`crates/nabla-wasm` exposes one `Lab` object to the page. It keeps the game, so
+the page does not implement chess rules. Analysis runs on the page thread. A
+Level 2 opening decision is a few milliseconds, so a worker is not used yet.
 
-```ts
-class FieldEngine {
-  constructor(paramsToml?: string);
-  analyze(fen: string, history: string[], options: AnalyzeOptions): Analysis;
-  explainSquare(fen: string, square: number): Source[];   // who contributes to one square
-  setParam(symbol: string, value: number): void;
-  params(): ParamInfo[];            // symbol, value, range, group: drives the sliders
-}
+| Method | Effect |
+| --- | --- |
+| `new Lab()` | Start position, Level 2, temperature 0. |
+| `set_level(0\|1\|2)`, `set_temperature(pawns)` | The next analysis uses these. |
+| `fen()`, `turn()`, `moves()` | Position, side to move, and legal moves as JSON `{uci, san, from, to}`. |
+| `push(uci)` | Play a legal move, including a promotion such as `e7e8q`. |
+| `reset()`, `load(fen)` | New game, or a FEN. Each one advances the policy's game counter. |
+| `view()` | JSON for the HUD: turn, `state`, `detail` (play, check, checkmate, stalemate, material, fifty, or repetition), the nine energy terms, and 64-length `control`, `tension`, and `threats` arrays (a1 = 0). |
+| `analyze()` | JSON `{best, level, nodes, candidates}`. Each candidate has `uci`, `san`, `q`, `prob`, and `terms` (null when the line is mate or a draw). |
 
-interface AnalyzeOptions {
-  level: 0 | 1 | 2;
-  temperature: number;              // pawn units
-  seed: number;
-  game: number;                     // game counter for the policy key (04 §2)
-  multiPv: number;
-}
+`view` is the current position. `analyze` is the move choice. The page draws
+control, tension, hanging pieces, and the candidate arrows from those two calls.
+Flux lines, the king-pressure gauge, pawn cones, and confinement are not in this
+build.
 
-interface Analysis {
-  bestMove: string;                 // UCI notation
-  candidates: Candidate[];          // sorted by exact score
-  energy: Terms & { total: number };
-  fields: {                         // Float32Array(64) each, LERF order (a1 = 0)
-    directW: Float32Array;  directB: Float32Array;
-    xrayW: Float32Array;    xrayB: Float32Array;
-    net: Float32Array;      tension: Float32Array;  control: Float32Array;
-    fluxWx: Float32Array;   fluxWy: Float32Array;
-    fluxBx: Float32Array;   fluxBy: Float32Array;
-    gradX: Float32Array;    gradY: Float32Array;
-  };
-  diagnostics: {
-    kingPressure: [number, number]; // P_W, P_B (02 Eq. 17)
-    shelter: [number, number];      // H_W, H_B (02 Eq. 18)
-    passage: Float32Array;          // T^pass on squares holding a pawn, else 0 (02 Eq. 21)
-    unstoppable: Float32Array;      // u_p on squares holding a pawn, else 0 (02 Eq. 23)
-    confinement: Uint8Array;        // 1 on the defending king's region R (02 §5.8)
-    threatsW: Uint8Array;           // SEE gain for White capturing on each square (02 §5.4)
-    threatsB: Uint8Array;           // SEE gain for Black capturing on each square
-  };
-  meta: { level: number; nodes: number; paramsHash: string; engineVersion: string };
-}
-
-interface Candidate {
-  uci: string;  san: string;
-  q: number;                        // exact root score, pawn units, mover's perspective
-  prob: number;                     // Boltzmann probability (04 §2)
-  terms: Terms | null;              // per-term gradient (03 §6); null for terminal lines
-  pv: string[];                     // principal variation
-}
-
-interface Source {
-  from: number;                     // square of the contributing piece
-  piece: string;                    // e.g. "wQ"
-  channel: "direct" | "xray";
-  value: number;                    // contribution to Φ_c on the queried square
-}
-
-interface Terms {
-  mat: number; flux: number; terr: number; ex: number; king: number;
-  trop: number; pawn: number; conf: number; tempo: number;
-}
-```
-
-Typed arrays are transferred, not copied, between the worker and the page.
+Build it with `npm run engine --prefix web`. The generated files land in
+`web/src/engine` and are not committed.
 
 ---
 
@@ -262,7 +220,8 @@ budget, and incremental schemes would complicate exactness (A2).
 - **UCI:** malformed input (invalid FEN, illegal move, unknown or out-of-range
   option) produces `info string error: <reason>` and leaves the previous state
   unchanged. The loop never panics on external input; all parsing returns `Result`.
-- **WebAssembly:** errors will surface as JavaScript exceptions with the same messages.
+- **WebAssembly:** an invalid FEN or an illegal move throws a JavaScript exception
+  and leaves the position unchanged.
 - **Core:** functions take validated positions (the adapter enforces legality), so
   the core has no error paths for impossible states.
 
@@ -274,7 +233,7 @@ budget, and incremental schemes would complicate exactness (A2).
 | --- | --- | --- | --- |
 | `shakmaty` 0.30.2 | Rules, attacks, FEN/SAN/UCI parsing, Zobrist hashing | GPL-3.0-or-later | In use; maintained; `no_std`-capable |
 | `libm` 0.2 | Portable `exp`, `log1p`, `tanh` (rule 4 of §6) | MIT / Apache-2.0 | In use |
-| `wasm-bindgen`, `js-sys` | WebAssembly bindings | MIT / Apache-2.0 | Milestone 6 |
+| `wasm-bindgen` 0.2.100 | WebAssembly bindings for `Lab` | MIT / Apache-2.0 | In use |
 | `serde`, `toml` | Parameter files | MIT / Apache-2.0 | Milestone 4 |
 
 All licences are compatible with GPL-3.0-or-later (decision D-008). New

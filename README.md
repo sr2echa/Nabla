@@ -2,7 +2,7 @@
 
 # Nabla (∇)
 
-**A UCI chess engine that plays by energy descent on ray-transport fields**
+**A chess engine that chooses moves by energy descent on ray-transport fields**
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![Rust 1.97+](https://img.shields.io/badge/rust-1.97%2B-orange.svg)](https://www.rust-lang.org)
@@ -10,21 +10,20 @@
 
 </div>
 
-Nabla evaluates a chess position the way a physicist would describe a field.
-Every piece emits influence along its exact attack rays; the influence is
-attenuated by the pieces it passes through, which separates **direct control**
-from **X-ray pressure** (batteries, pins, skewers). A small energy functional
-over those fields scores the position, and every score decomposes exactly into
-nine named terms. Nabla then moves by **steepest ascent of that energy over the
-legal moves**: the discrete gradient ∇ on the game graph that gives the engine
-its name. There is no deep tree search; at most, Nabla looks one reply ahead.
+Nabla is a chess engine that chooses moves by energy descent on ray-transport
+fields. Each piece sends influence along the squares it actually attacks. Pieces
+in the way weaken that influence, which separates **direct control** from
+**X-ray pressure** (batteries, pins, skewers). Nine named terms add up to one
+energy. Nabla plays the legal move that raises its energy the most. Lookahead is
+small and explicit: none past the move itself, or captures only, or one reply.
 
 > **Status:** v0.1. The full energy functional, all three selection levels, the
-> Boltzmann policy, and the UCI front end are implemented and tested, and the
-> engine passes the fastchess UCI compliance check. The coefficients are hand-set
-> initial values (not yet tuned), and playing strength has not yet been measured
-> against an anchored pool; self-play confirms that each level beats the one below
-> it by several hundred Elo. See the [roadmap](docs/roadmap.md).
+> Boltzmann policy, the UCI front end, and the playable page in `web/` are
+> implemented. The engine passes the fastchess UCI compliance check. The
+> coefficients are hand-set initial values. A tuner prints a fit and does not
+> install it. Playing strength has not been measured against an anchored pool;
+> self-play confirms that each level beats the one below it by several hundred
+> Elo. See the [roadmap](docs/roadmap.md).
 
 ## Contents
 
@@ -158,8 +157,54 @@ The engine binary is `target/release/nabla` (`nabla.exe` on Windows).
 
 ```sh
 cargo test --release      # invariants: symmetry, SEE, selection, policy
-./target/release/nabla bench
+cargo run --release -- bench
 ```
+
+The lab is a separate page:
+
+```sh
+npm run engine --prefix web    # Rust to WebAssembly, once
+npm install --prefix web
+npm run dev --prefix web       # http://127.0.0.1:4321
+```
+
+You can play White or Black, watch two Nabla levels play, or play Stockfish 19
+lite. The judge is the column on the left. The controls, the legend, and the
+recorded self-play results are on the right. Control is drawn under the pieces.
+Arrows and hanging-piece numbers are drawn above them. Hover a mark on the small
+board to read what it is. The pause before a move is a slider.
+
+### In your own page
+
+`npm run engine --prefix web` writes the WebAssembly into `web/src/engine`
+(`nabla_wasm.js` and `nabla_wasm_bg.wasm`). Those files are GPL-3.0-or-later,
+the same as the rest of Nabla. Copy that directory into your site and load it
+from a browser module. The page keeps the rules. You do not reimplement chess.
+
+```js
+import init, { Lab } from "./nabla_wasm.js";
+
+await init();
+const lab = new Lab();          // start position, level 2, temperature 0
+lab.set_level(2);               // 0, 1, or 2
+lab.set_temperature(0);         // pawns. 0 plays the best move. The cap is 5.
+const view = JSON.parse(lab.view());
+// view.turn, view.state, view.detail
+// view.energy.mat … view.energy.total
+// view.control, view.tension, view.threats: 64 numbers, a1 = 0
+const choice = JSON.parse(lab.analyze());
+lab.push(choice.best);          // also accepts a move from your board, such as "e7e8q"
+```
+
+`view` describes the current position and does not choose a move. `analyze`
+chooses. `detail` is `play`, `check`, `checkmate`, `stalemate`, `material`,
+`fifty`, or `repetition`. A threefold repetition ends the displayed game.
+Nabla's search still treats the first recurrence as a draw when it is choosing
+a move (03 §3). That rule does not, by itself, end the game on the board.
+
+Matches against Stockfish, Maia, and the other engines named in the protocol
+are run with `node tools/gauntlet.mjs`. The page's Stockfish lite opponent is
+for play. It is not that measurement.
 
 `bench [level]` runs a fixed 16-position suite (Level 2 by default) and prints the
 node count, speed, mean decision time, and a checksum of the chosen moves. On an
@@ -235,9 +280,13 @@ Nabla/
 │   │   │   ├── energy/      # one module per energy term
 │   │   │   ├── select.rs    # boundary conditions and levels 0–2
 │   │   │   ├── policy.rs    # Boltzmann policy and counter-based RNG
-│   │   │   └── params.rs    # the 57 coefficients
+│   │   │   ├── params.rs    # the 57 coefficients
+│   │   │   └── snapshot.rs  # the picture the lab paints
 │   │   └── tests/           # symmetry, SEE, fields, selection, policy
-│   └── nabla-uci/           # the `nabla` binary (UCI front end)
+│   ├── nabla-uci/           # the `nabla` binary (UCI front end)
+│   ├── nabla-wasm/          # the same engine for the page
+│   └── nabla-tune/          # prints a fit; does not change the defaults
+├── web/                     # the playable page
 └── docs/                    # specification, decisions, research protocol
 ```
 

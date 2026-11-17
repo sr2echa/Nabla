@@ -90,6 +90,24 @@ commit under test:
 `maia-1500` is held out of all tuning and used only for final ratings, as a check
 against over-fitting to the pool.
 
+### 4.2 Development matches
+
+`node tools/gauntlet.mjs` runs one of three opponents under the clock in §4,
+with Nabla at temperature 0:
+
+| `--opponent` | Engine | What it is |
+| --- | --- | --- |
+| `stockfish` | Native Stockfish, `UCI_LimitStrength`, `UCI_Elo` 1320 to 3190, one thread | An anchor from §4.1 |
+| `maia` | `lc0` with `--weights` pointing at a Maia network, `nodes=1`, one thread | A human-like member from §4.1 |
+| `self` | A second Nabla at `--other-level` | A level comparison, not an anchor |
+
+`--book` must be the protocol book before a score is treated as protocol data.
+Without it, every game is the opening position, and the result is only a check
+that the engines move. The script prints the 95 % half-width from Eq. (1) for
+the game count it asks for. The browser's Stockfish 19 lite is a different
+program from the native binary in this table, and the page does not load Maia.
+Neither browser game is a row in §13.
+
 ---
 
 ## 5. Statistics
@@ -233,6 +251,7 @@ ladder steps are reported alongside, not instead of, the leave-one-out results.
 | --- | --- | --- |
 | 2026-11-16 | Initial version. | — |
 | 2026-11-17 | Added H11 with a fair compute axis; TOST sample size; the √2 note for differences; SPRT error rates fixed in advance under Holm; additive ladder as a complement; motif suites; preliminary observations (§13). No confirmatory hypothesis or success criterion changed. | Audits of the second proposal (01b). |
+| 2026-11-17 | Added §4.2, the `tools/gauntlet.mjs` runner. No confirmatory hypothesis, success criterion, or opponent configuration changed. | The lab can play Stockfish lite. Rating matches stay on the native engines named in §4.1. |
 
 ---
 
@@ -248,3 +267,5 @@ Recorded for transparency; none of these is a confirmatory test.
 | 2026-11-17 | Level 2 vs Level 1: +334 ± 76 Elo (170 wins, 21 losses, 9 draws) | Same |
 | 2026-11-17 | No illegal moves, crashes, or time losses in 400 games; UCI compliance 40/40 | Same |
 | 2026-11-17 | Correctness gate, protocol §3: 1,000 games per level at 2 s + 0.02 s, temperature 0.30, `noob_3moves.epd`, 7 concurrent games. Zero illegal moves, crashes, disconnections, or time losses at any level. | fastchess 1.8.3, Intel i7-7700HQ under WSL2. A first run lost 9 (Level 1) and 38 (Level 2) games on time, which is why decisions now have a node budget (03 §7); the retest after the budget change is the clean run recorded here. |
+| 2026-11-17 | `nabla-tune`, 40 Level 0 self-play games, 1,988 quiet positions. Logistic loss 0.1145 to 0.1134. Every tried coefficient moved one step down (`w_c` 0.06 to 0.04, `mu_n` 0.04 to 0.03, `g_0` 0.6 to 0.4, `beta_2` 0.6 to 0.4, `psi_i` 0.15 to 0.09, `h_max_eg` 1.5 to 1.1). | Not installed. The labels are Nabla's own results, so this is not H5 and not a rating. |
+| 2026-11-17 | `tools/gauntlet.mjs` can run Nabla against native Stockfish, against Maia through lc0, or against a second Nabla. No match from this harness is recorded yet. | The binaries were not run for a scored match in this change. A browser game against Stockfish lite is not a substitute. |

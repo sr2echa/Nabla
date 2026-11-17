@@ -5,8 +5,10 @@
 > commands; this index explains what each document is for.
 >
 > **Status:** Engine v0.1 implemented (all terms, levels 0–2, Boltzmann policy,
-> UCI); specification v0.2; coefficients not yet tuned; strength not yet measured
-> under the protocol.
+> UCI, the `nabla-wasm` lab, and the page in `web/`); specification v0.2 for the
+> field model, v0.3 for the architecture and the lab. Coefficients are still the
+> hand-set values. Self-play results are in the protocol log; there is no rating
+> against other engines.
 
 ---
 
@@ -18,7 +20,7 @@
 | 2 | [`design/03-move-selection.md`](design/03-move-selection.md) | How does Nabla choose a move from the energy? |
 | 3 | [`design/04-strength-control.md`](design/04-strength-control.md) | How is playing strength controlled and calibrated to Elo? |
 | 4 | [`design/05-architecture.md`](design/05-architecture.md) | How is the software organised (Rust core, UCI, WebAssembly), and how is it tested? |
-| 5 | [`design/06-visualization-lab.md`](design/06-visualization-lab.md) | What will the interactive demo show, and how? |
+| 5 | [`design/06-visualization-lab.md`](design/06-visualization-lab.md) | What does the interactive demo show, and how? |
 | 6 | [`research/hypotheses-and-protocol.md`](research/hypotheses-and-protocol.md) | What exactly will be measured, and how rigorously? |
 | 7 | [`research/related-work.md`](research/related-work.md) | What prior work exists, and what is new here? |
 | 8 | [`research/paper-outline.md`](research/paper-outline.md) | How do the documents map onto the paper? |

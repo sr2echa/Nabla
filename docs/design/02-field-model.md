@@ -509,7 +509,8 @@ the edges (resolves m-2):
 
 and analogously for $\partial_r \Phi$. The **decision-relevant** vectors are the
 move gradients $\nabla_m E$ of 03 §2, not $\nabla_{xy}\Phi$. Neither diagnostic is
-implemented in v0.1; both arrive with the WebAssembly API (Milestone 6).
+implemented. The lab draws control, tension, and threats; these two fields are
+still to build.
 
 ---
 

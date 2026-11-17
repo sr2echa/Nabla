@@ -3,6 +3,15 @@
 Orientation for agents and contributors picking up the work. Read this file, then
 the documents it points to, before changing code.
 
+**Official description.** Use this sentence, and no other, for what Nabla is:
+
+> Nabla is a chess engine that chooses moves by energy descent on ray-transport fields.
+
+Do not call it zero-search, electrostatic, continuous, anisotropic, or a
+boundary-value solver. Those names describe rejected formulations. Lookahead is
+"little or none": Level 0 evaluates the move (and forced replies to a check),
+Level 1 adds capture-only quiescence, Level 2 adds one reply.
+
 ## 1. What to read first
 
 | Order | Document | Why |
@@ -26,6 +35,10 @@ cargo test --release                                # all invariant tests (use -
 cargo fmt --all
 cargo clippy --release --all-targets -- -D warnings
 ./target/release/nabla bench                        # node count, speed, move checksum
+npm run engine --prefix web                         # rebuild the lab's WebAssembly
+npm run dev --prefix web                            # the playable page
+cargo run -p nabla-tune --release                   # prints a fit; does not change defaults
+node tools/gauntlet.mjs                             # one protocol match; not a rating by itself
 ```
 
 ## 3. Ground rules
@@ -75,6 +88,8 @@ cargo clippy --release --all-targets -- -D warnings
 | 03 §3 Boundary conditions, §4 Levels | `select.rs` |
 | 04 §2 Boltzmann policy | `policy.rs` |
 | 05 §4 UCI | `nabla-uci/src/main.rs` |
+| 05 §5 Lab | `nabla-wasm/src/lib.rs`, `web/` |
+| 06 HUD layers that exist | `nabla-core/src/snapshot.rs`, `web/src/scripts/play.ts` |
 
 ## 5. Definition of done
 

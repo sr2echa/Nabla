@@ -221,7 +221,7 @@ and no explanation is given. The tempo term contributes $-2\delta_\text{tempo}$ 
 the leaf has the opponent to move (always at Level 0) and 0 otherwise, and the
 exchange term changes perspective in the same way; comparisons between moves are
 therefore best read relative to the best move. Explanations are exposed by the
-custom UCI command `explain` and by the planned WebAssembly API (05 §5).
+custom UCI command `explain` and by `Lab.analyze` in the WebAssembly API (05 §5).
 
 ---
 

@@ -17,7 +17,7 @@
 | [D-009](#d-009--documentation-as-the-source-of-truth) | Documentation as the source of truth | Accepted |
 | [D-010](#d-010--bit-identical-native-and-webassembly-results) | Bit-identical native and WebAssembly results | Accepted |
 | [D-011](#d-011--no-overlays-on-live-third-party-games) | No overlays on live third-party games | Accepted |
-| [D-012](#d-012--front-end-framework-deferred) | Front-end framework deferred | Accepted |
+| [D-012](#d-012--the-lab-is-an-astro-page) | The lab is an Astro page | Accepted |
 | [D-013](#d-013--level-0-extends-checks) | Level 0 extends checks | Accepted |
 | [D-014](#d-014--exact-root-scores-at-every-level) | Exact root scores at every level | Accepted |
 
@@ -151,14 +151,17 @@
   defaults to off.
 - **Alternatives.** None acceptable.
 
-## D-012 · Front-end framework deferred
+## D-012 · The lab is an Astro page
 
-- **Context.** The lab's requirements are fixed (06), but its framework does not
-  affect the engine or the paper.
-- **Decision.** Choose between React, Svelte, and plain TypeScript at Milestone 6,
-  against the requirements of 06 §9.
-- **Consequences.** No front-end work before Milestone 6.
-- **Alternatives.** Choosing now (rejected: no information gained by deciding early).
+- **Context.** The lab has to play a game and draw the fields. The reference site
+  che2s.com is Astro with chessground.
+- **Decision.** The lab lives in `web/`. Astro serves the page. A client script
+  uses chessground for the pieces and a canvas for the HUD. The engine is the
+  `nabla-wasm` package, loaded in the page. No React.
+- **Consequences.** `npm run engine --prefix web` rebuilds the WebAssembly, then
+  `npm run dev --prefix web` serves the page.
+- **Alternatives.** React (used by che2s.com; not needed for one page); a hand-drawn
+  board (rejected: drag and drop is already solved by chessground, which is GPL).
 
 ## D-013 · Level 0 extends checks
 

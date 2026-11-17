@@ -1,12 +1,29 @@
 # 06 — Visualisation Lab
 
-> **Status:** Draft v0.2 · **Built in:** Milestone 6 ([`../roadmap.md`](../roadmap.md))
+> **Status:** Draft v0.3 · The playable page is `web/` · **Built in:** Milestone 6 ([`../roadmap.md`](../roadmap.md))
 > · **Depends on:** the WebAssembly API of [`05-architecture.md`](05-architecture.md#5-webassembly-api)
 > · **Resolves:** M-9 of [`01-proposal-review.md`](01-proposal-review.md)
 
 The lab is the public face of the project and the source of the paper's figures.
 It shows what Nabla computes, why it chooses a move, and how its behaviour changes
 when its coefficients change.
+
+The page in `web/` is a light, paper-coloured sheet. The judge sits to the left
+of a square board and the controls sit to the right. You can play Nabla, watch
+two Nabla levels, or face Stockfish 19 lite. The pause before a move is a
+slider. The board draws control under the pieces, and tension, hanging-piece
+numbers, and candidate arrows above them. A small board in the legend explains
+each mark when it is hovered. Check, checkmate, stalemate, and the draw reasons
+are written on the board.
+Check, checkmate, stalemate, and the draw reasons are written on the board. The
+side panel shows the nine energy terms and, for a Nabla move, the term-by-term
+change. Flux lines, the king gauge, pawn cones, confinement, and figure export
+are still to build. The page states the official description and does not offer
+coefficient sliders.
+
+Stockfish's Elo cap is Stockfish's own UCI option. A game against it is not a
+rating for Nabla. Maia is not loaded in the page. Anchored matches go through
+`node tools/gauntlet.mjs`, under the conditions in the research protocol.
 
 ---
 
@@ -145,20 +162,17 @@ This policy is recorded as decision D-011.
 
 ## 8. Performance
 
-Analysis runs in a Web Worker; typed arrays are transferred, not copied. A 64-cell
-board is drawn with Canvas 2D; streamlines are computed once per analysis. The
-re-analysis budget is one frame (16 ms) at Level 0 (05 §8).
+Nabla's analysis runs on the page thread. A Level 2 opening decision is a few
+milliseconds, so Nabla itself is not put in a worker. Stockfish 19 lite, when
+that opponent is selected, runs in its own worker. The HUD is one canvas over
+the board, redrawn after each move. Streamlines are not computed in this build.
 
 ---
 
-## 9. Technology choice (deferred)
+## 9. Technology
 
-The front-end framework (React, Svelte, or plain TypeScript) is chosen at
-Milestone 6 (decision D-012). Any choice must support static deployment with no
-server, Web Workers, SVG export, and TypeScript types generated from the
-WebAssembly bindings.
-
-A candidate board component is **Chessground** (lichess-org), published as
-`@lichess-org/chessground` (v10.5.0 on 2026-11-17). It has no dependencies, ships a
-single ES module that works on a static site, and is licensed GPL-3.0-or-later,
-which is compatible with Nabla's licence.
+Astro serves one page. A client script uses Chessground 9.2.1 (lichess-org,
+GPL-3.0-or-later) for the pieces and drag-and-drop, and a canvas for the HUD.
+The engine is `nabla-wasm`. Stockfish 19 lite (`stockfish` 19.0.1, GPL-3.0) is
+loaded only when that match is selected. Type is Geist (SIL Open Font License).
+There is no React and no server. Decision D-012.
