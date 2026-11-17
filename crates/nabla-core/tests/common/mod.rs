@@ -1,4 +1,5 @@
 //! Shared test helpers: deterministic random positions.
+#![allow(dead_code)]
 
 use shakmaty::fen::Fen;
 use shakmaty::{CastlingMode, Chess, Position};

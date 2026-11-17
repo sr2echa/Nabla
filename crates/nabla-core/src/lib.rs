@@ -14,8 +14,10 @@ pub mod params;
 pub mod policy;
 pub mod see;
 pub mod select;
+pub mod snapshot;
 pub mod transport;
 
 pub use energy::{EvalConfig, Term, Terms, evaluate};
 pub use params::Params;
 pub use select::{Candidate, Decision, Level, SearchConfig, decide};
+pub use snapshot::{Outcome, Picture, is_quiet, outcome, picture, turn_name, white_energy};

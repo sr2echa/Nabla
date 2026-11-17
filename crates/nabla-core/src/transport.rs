@@ -53,6 +53,12 @@ impl Fields {
     pub fn control(&self, sq: Square) -> f32 {
         libm::tanhf((self.influence(Color::White, sq) - self.influence(Color::Black, sq)) / PHI_0)
     }
+
+    /// Tension $\Theta(i) = \min(\Phi_W, \Phi_B)$ (Eq. (9)).
+    pub fn tension(&self, sq: Square) -> f32 {
+        self.influence(Color::White, sq)
+            .min(self.influence(Color::Black, sq))
+    }
 }
 
 /// Control weight $\alpha_t$; the king's is tapered by $1 - \varphi$ so that
