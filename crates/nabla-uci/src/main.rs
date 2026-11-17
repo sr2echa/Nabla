@@ -21,9 +21,10 @@ const AUTHOR: &str = "Sreecharan S.";
 const LOW_TIME_MS: u64 = 100;
 /// Conservative search speed used to turn a time budget into a node budget
 /// (03 §7); measured speed is about 140 nodes/ms on a 2017 laptop CPU.
-const NODES_PER_MS: u64 = 40;
-/// Time reserved for process and protocol overhead per move.
-const OVERHEAD_MS: u64 = 10;
+const NODES_PER_MS: u64 = 8;
+/// Default time reserved for process and protocol overhead per move; the
+/// `Move Overhead` option overrides it.
+const DEFAULT_OVERHEAD_MS: u64 = 50;
 
 /// Fixed bench suite: opening, middlegame, tactical, and endgame positions.
 const BENCH: &[&str] = &[
@@ -51,6 +52,7 @@ struct Engine {
     params: Params,
     cfg: SearchConfig,
     multipv: usize,
+    overhead_ms: u64,
     pending: Option<String>,
 }
 
@@ -63,6 +65,7 @@ impl Engine {
             params: Params::default(),
             cfg: SearchConfig::default(),
             multipv: 1,
+            overhead_ms: DEFAULT_OVERHEAD_MS,
             pending: None,
         }
     }
@@ -109,6 +112,7 @@ impl Engine {
         println!("option name Contempt type spin default 15 min -100 max 100");
         println!("option name Seed type spin default 0 min 0 max 2147483647");
         println!("option name MultiPV type spin default 1 min 1 max 256");
+        println!("option name Move Overhead type spin default {DEFAULT_OVERHEAD_MS} min 0 max 5000");
         println!("uciok");
     }
 
@@ -138,6 +142,10 @@ impl Engine {
             }
             ("multipv", Some(v)) if (1..=256).contains(&v) => {
                 self.multipv = v as usize;
+                true
+            }
+            ("move overhead", Some(v)) if (0..=5000).contains(&v) => {
+                self.overhead_ms = v as u64;
                 true
             }
             ("uci_limitstrength" | "uci_elo", _) => {
@@ -209,11 +217,11 @@ impl Engine {
                 (Some(movetime), _) => Some(movetime),
                 (None, Some(time)) => {
                     let inc = my_inc.unwrap_or(0);
-                    Some((time / 30 + inc * 3 / 4).min(time / 4))
+                    Some((time / 40 + inc * 3 / 4).min(time / 8))
                 }
                 (None, None) => None,
             };
-            budget_ms.map(|ms| (ms.max(0) as u64).saturating_sub(OVERHEAD_MS).max(1) * NODES_PER_MS)
+            budget_ms.map(|ms| (ms.max(0) as u64).saturating_sub(self.overhead_ms).max(1) * NODES_PER_MS)
         };
 
         let start = Instant::now();

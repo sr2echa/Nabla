@@ -247,3 +247,4 @@ Recorded for transparency; none of these is a confirmatory test.
 | 2026-11-17 | Level 1 vs Level 0: +521 ± 120 Elo (189 wins, 8 losses, 3 draws) | Self-play, 200 games, 4+0.04 s, `noob_3moves.epd`, fastchess 1.8.3 |
 | 2026-11-17 | Level 2 vs Level 1: +334 ± 76 Elo (170 wins, 21 losses, 9 draws) | Same |
 | 2026-11-17 | No illegal moves, crashes, or time losses in 400 games; UCI compliance 40/40 | Same |
+| 2026-11-17 | Correctness gate, protocol §3: 1,000 games per level at 2 s + 0.02 s, temperature 0.30, `noob_3moves.epd`, 7 concurrent games. Zero illegal moves, crashes, disconnections, or time losses at any level. | fastchess 1.8.3, Intel i7-7700HQ under WSL2. A first run lost 9 (Level 1) and 38 (Level 2) games on time, which is why decisions now have a node budget (03 §7); the retest after the budget change is the clean run recorded here. |

@@ -141,7 +141,7 @@ centipawns.
 | `Seed` | spin | 0–2147483647 | 0 | Random seed for the policy (§2). |
 | `Contempt` | spin | −100–100 | 15 | $\delta_\text{draw}$ in centipawns (03 §3). |
 | `MultiPV` | spin | 1–256 | 1 | Number of candidates reported. |
-| `Move Overhead` | spin | 0–5000 ms | 30 | Time reserved for process and protocol overhead when computing the node budget (03 §7). |
+| `Move Overhead` | spin | 0–5000 ms | 50 | Time reserved for process and protocol overhead when computing the node budget (03 §7). |
 
 In v0.1 no calibration table exists yet, so neither strength-limiting option is
 advertised; `setoption` for either replies with an `info string` saying so.
