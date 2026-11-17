@@ -8,21 +8,38 @@ The lab is the public face of the project and the source of the paper's figures.
 It shows what Nabla computes, why it chooses a move, and how its behaviour changes
 when its coefficients change.
 
-The page in `web/` is a light, paper-coloured sheet. The judge sits to the left
-of a square board and the controls sit to the right. You can play Nabla, watch
-two Nabla levels, or face Stockfish 19 lite. The pause before a move is a
-slider. The board draws control under the pieces, and tension, hanging-piece
-numbers, and candidate arrows above them. A small board in the legend explains
-each mark when it is hovered. Check, checkmate, stalemate, and the draw reasons
-are written on the board.
-Check, checkmate, stalemate, and the draw reasons are written on the board. The
-side panel shows the nine energy terms and, for a Nabla move, the term-by-term
-change. Flux lines, the king gauge, pawn cones, confinement, and figure export
-are still to build. The page states the official description and does not offer
-coefficient sliders.
+The notes are `/` and the board is `/play`. The play page is one viewport high
+on a desktop. A framed square board has a seat on each side. Choosing a seat
+opens a roster: you, Nabla, Stockfish 19 lite, or Maia. Maia-3 downloads in the
+browser the first time it moves. That seat also holds the model's own settings.
+The mast is the width of the page column on both Notes and Play. The judgement
+bar stands to the left of the board, square-ended: cream where White's pieces
+sit, grey where Black's sit, including after a flip, with a mark at the
+midpoint. The side to move is the lit seat. The other seat is dulled. There is
+no "to move" line. The score is white-positive. A Stockfish mate is M2 when
+White mates in two, and −M4 when Black mates in four. Captured pieces and the
+material lead sit on the seat that took them. The move controls sit under the
+board, with a gap above them. Why that move sits beside Considered, the two
+columns the same width: the nine terms of the chosen move, and up to eight
+moves it weighed. The move itself is not named again above those terms. The
+right column does not scroll. Reading holds the layer switches, the nine
+energy terms, and the reason for the last Nabla move. Those marks stay on
+the board while the other side thinks. Two Nablas use two colours. Moves holds
+the game. The question mark opens the legend. Pause, then hover a mark, to read
+which pieces and squares make it. The pause before an engine move is at the top
+of a seat, and a move does not start while that seat is open. The notes
+show the recorded self-play. Matches against Stockfish and Maia have not been
+recorded. Control is one inset rim under the pieces, and only while Nabla is
+to move, in the same geometry the legend draws. Tension ticks,
+hanging-piece numbers, and candidate arrows use that same geometry. Check,
+checkmate, stalemate, and the draw reasons are written on the board. Flux
+lines, the king gauge, pawn cones, confinement, and figure export are still to
+build. The notes state the official description and do not offer coefficient
+sliders.
 
 Stockfish's Elo cap is Stockfish's own UCI option. A game against it is not a
-rating for Nabla. Maia is not loaded in the page. Anchored matches go through
+rating for Nabla. Maia-3 is fetched by the browser and is not in the repository.
+Anchored matches go through
 `node tools/gauntlet.mjs`, under the conditions in the research protocol.
 
 ---

@@ -1,0 +1,238 @@
+---
+import "chessground/assets/chessground.base.css";
+import "chessground/assets/chessground.cburnett.css";
+import Base from "../layouts/Base.astro";
+---
+
+<Base body="play">
+  <div id="board-probe" aria-hidden="true"></div>
+  <header class="mast">
+    <a class="brand" href="/"><span class="sym">∇</span> Nabla</a>
+    <nav>
+      <a href="/">Notes</a>
+      <a href="/play" aria-current="page">Play</a>
+      <a href="https://github.com/sr2echa/Nabla" target="_blank" rel="noreferrer">GitHub</a>
+    </nav>
+    <div class="mast-actions">
+      <button class="go" id="new-game" type="button">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.2v9.6M3.2 8h9.6" /></svg>
+        New game
+      </button>
+      <button id="help-open" type="button" aria-label="How to read the board">?</button>
+    </div>
+  </header>
+
+  <main class="desk">
+    <div class="column">
+      <div class="stage">
+        <button class="seat" id="seat-top" type="button" data-seat="black">
+          <span class="chip black"></span>
+          <span class="who"><span class="name">Nabla</span><span class="sub">Energy descent</span></span>
+          <span class="loot"></span>
+        </button>
+        <div class="evalbar" id="meter" style="--share: 0.51"><i class="fill"></i></div>
+        <div id="meter-read" class="meter-read">0.51</div>
+        <div id="rank-rail" class="rail ranks"></div>
+        <div class="board">
+          <div id="board"></div>
+          <canvas id="fields"></canvas>
+          <svg id="arrows" viewBox="0 0 8 8" aria-hidden="true"></svg>
+          <div id="callout" class="callout" hidden></div>
+          <div id="promo" class="cg-wrap" hidden></div>
+        </div>
+        <div id="file-rail" class="rail files"></div>
+        <button class="seat" id="seat-bottom" type="button" data-seat="white">
+          <span class="chip white"></span>
+          <span class="who"><span class="name">You</span><span class="sub">At this keyboard</span></span>
+          <span class="loot"></span>
+        </button>
+      </div>
+      <div class="playbar">
+        <div class="transport" role="group" aria-label="Move through the game">
+          <button class="nav" id="to-start" type="button" aria-label="First position" disabled>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3v10M6 4.2 12.2 8 6 11.8z" /></svg>
+          </button>
+          <button class="nav" id="prev" type="button" aria-label="Previous move" disabled>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 3.2 5 8l5.5 4.8" /></svg>
+          </button>
+          <div class="ply">
+            <p class="ply-main"><b id="ply-name">Start</b><span class="count"> <span id="move-count">0</span> / <span id="move-total">0</span></span></p>
+            <p class="ply-sub" id="status" aria-live="polite"></p>
+          </div>
+          <button class="nav" id="redo" type="button" aria-label="Next move" disabled>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.2 11 8l-5.5 4.8" /></svg>
+          </button>
+          <button class="nav" id="to-end" type="button" aria-label="Latest move" disabled>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 3v10M10 4.2 3.8 8 10 11.8z" /></svg>
+          </button>
+        </div>
+        <div class="deck-actions">
+          <button class="labeled" id="pause" type="button" aria-pressed="false">
+            <svg class="when-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3v10M11 3v10" /></svg>
+            <svg class="when-paused" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3l8 5-8 5z" /></svg>
+            <span class="when-play">Pause</span>
+            <span class="when-paused">Resume</span>
+          </button>
+          <button class="labeled" id="undo" type="button" disabled>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.2 4.2 3.2 7.2l3 3M3.4 7.2h6.2a3.2 3.2 0 1 1 0 6.4H8" /></svg>
+            <span>Undo</span>
+          </button>
+          <button class="labeled" id="flip" type="button">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 4.6A5 5 0 0 0 4.4 6.2M2.8 11.4A5 5 0 0 0 11.6 9.8" /><path d="M11.2 2.2 13.4 4.6 11 6.4M4.8 13.8 2.6 11.4 5 9.6" /></svg>
+            <span>Flip</span>
+          </button>
+          <button class="labeled" id="swap" type="button">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.2h8M10.2 3.8 12.4 6.2 10.2 8.6M12 9.8H4M5.8 7.4 3.6 9.8l2.2 2.4" /></svg>
+            <span>Swap</span>
+          </button>
+          <button class="labeled" id="pgn" type="button">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5h5.2L13 5.2V13.5H5zM10 2.6V5.4h2.8" /></svg>
+            <span>PGN</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <section class="judge" aria-label="Judgement">
+        <div class="judge-top">
+          <p class="score" id="judge-score">+0.10</p>
+          <div class="seg" role="group" aria-label="Who scores the position">
+            <button type="button" data-judge="nabla" aria-pressed="true">Nabla</button>
+            <button type="button" data-judge="stockfish" aria-pressed="false">Stockfish</button>
+          </div>
+        </div>
+        <p class="read" id="judge-read"></p>
+      </section>
+      <div class="tabs" role="tablist">
+        <button type="button" data-tab="read" aria-selected="true">Reading</button>
+        <button type="button" data-tab="moves" aria-selected="false">Moves</button>
+      </div>
+      <div class="side-read" data-panel="read">
+        <div class="reading-body">
+        <div class="layers" role="group" aria-label="Nabla layers">
+          <button type="button" data-layer="control" aria-pressed="false">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="1.5" /></svg>
+            <span>Control</span>
+          </button>
+          <button type="button" data-layer="tension" aria-pressed="false">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6V4h2M12 6V4h-2M4 10v2h2M12 10v2h-2" /></svg>
+            <span>Tension</span>
+          </button>
+          <button type="button" data-layer="threats" aria-pressed="true">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="11" cy="5" r="2.2" /><path d="M4 12h5" /></svg>
+            <span>Hanging</span>
+          </button>
+          <button type="button" data-layer="moves" aria-pressed="true">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h8M9 5l3 3-3 3" /></svg>
+            <span>Moves</span>
+          </button>
+        </div>
+        <section class="energy">
+          <h2>Energy</h2>
+          <p class="note">White-positive, in pawns. Nabla's reading of this position.</p>
+          <div id="energy"></div>
+        </section>
+        <div class="pair">
+          <section class="why">
+            <h2>Why that move</h2>
+            <div id="reason"></div>
+          </section>
+          <section class="considered">
+            <h2>Considered</h2>
+            <ol id="candidates"></ol>
+          </section>
+        </div>
+        </div>
+      </div>
+      <div class="side-read" data-panel="moves" hidden>
+        <div id="moves"></div>
+      </div>
+    </aside>
+  </main>
+
+  <div id="scrim" hidden></div>
+
+  <aside id="help" class="panel" hidden role="dialog" aria-label="How to read the board">
+    <header>
+      <h2>How to read the board</h2>
+      <button id="help-close" class="text-btn" type="button">Close</button>
+    </header>
+    <figure class="legend">
+      <svg id="legend-board" class="legend-board" role="img" aria-label="A small board. Hover a mark."></svg>
+      <figcaption id="legend-caption">Hover a mark on the small board.</figcaption>
+    </figure>
+    <p class="about">A steel rim means White controls that square. An olive rim means Black does. Nabla keeps these marks up while a Nabla is seated, including on the other side's turn. Two Nablas use two colours. The number is the pawns its exchange sees the opponent winning. The king is not marked. Pause the game and hover a mark on the board to see the pieces and squares behind it.</p>
+  </aside>
+
+  <aside id="sheet" class="panel" hidden role="dialog" aria-label="Choose a player">
+    <header>
+      <h2><span id="sheet-chip" class="chip white"></span><span id="sheet-title">White seat</span></h2>
+      <button id="sheet-close" class="text-btn" type="button">Close</button>
+    </header>
+    <label class="field">Pause before a move <b id="pace-out">500 ms</b>
+      <input id="pace" type="range" min="0" max="1500" value="500" step="50" />
+    </label>
+    <p class="about">This is the pause while the arrow is on the board, before the engine plays. Each model's own settings are in its seat.</p>
+    <div class="roster" role="group" aria-label="Player">
+      <button type="button" data-pick="human" aria-pressed="true">You</button>
+      <button type="button" data-pick="nabla" aria-pressed="false">Nabla</button>
+      <button type="button" data-pick="stockfish" aria-pressed="false">Stockfish</button>
+      <button type="button" data-pick="maia" aria-pressed="false">Maia</button>
+    </div>
+    <p class="lead" id="sheet-lead">You</p>
+    <p class="approach" id="sheet-approach">At this keyboard</p>
+    <p class="about" id="sheet-about">You move the pieces on this board.</p>
+    <div id="set-nabla" hidden>
+      <div id="level-w-field">
+        <p class="label">White's level</p>
+        <div class="choices" id="level-w" role="group" aria-label="White's level">
+          <button type="button" data-value="0" aria-pressed="false">Level 0, the move</button>
+          <button type="button" data-value="1" aria-pressed="false">Level 1, captures</button>
+          <button type="button" data-value="2" aria-pressed="true">Level 2, one reply</button>
+        </div>
+      </div>
+      <div id="level-b-field" hidden>
+        <p class="label">Black's level</p>
+        <div class="choices" id="level-b" role="group" aria-label="Black's level">
+          <button type="button" data-value="0" aria-pressed="false">Level 0, the move</button>
+          <button type="button" data-value="1" aria-pressed="false">Level 1, captures</button>
+          <button type="button" data-value="2" aria-pressed="true">Level 2, one reply</button>
+        </div>
+      </div>
+      <label class="field">Temperature <b id="temp-out">0.00</b>
+        <input id="temp" type="range" min="0" max="500" value="0" step="5" />
+      </label>
+    </div>
+    <div id="set-fish" hidden>
+      <label class="field">Elo cap <b id="fish-elo-out">1320</b>
+        <input id="fish-elo" type="range" min="1320" max="3190" value="1320" step="10" />
+      </label>
+      <p class="label">Think</p>
+      <div class="choices" id="fish-ms" role="group" aria-label="Stockfish time">
+        <button type="button" data-value="200" aria-pressed="true">200 ms</button>
+        <button type="button" data-value="500" aria-pressed="false">500 ms</button>
+        <button type="button" data-value="1000" aria-pressed="false">1 s</button>
+      </div>
+    </div>
+    <div id="set-maia" hidden>
+      <label class="field">Rating <b id="maia-self-out">1500</b>
+        <input id="maia-self" type="range" min="600" max="2600" value="1500" step="10" />
+      </label>
+      <label class="field">Opponent <b id="maia-oppo-out">1500</b>
+        <input id="maia-oppo" type="range" min="600" max="2600" value="1500" step="10" />
+      </label>
+      <label class="field">Variety <b id="maia-mix-out">0</b>
+        <input id="maia-mix" type="range" min="0" max="100" value="0" step="5" />
+      </label>
+      <p class="about">Maia-3 downloads the first time it moves, about 45 MB, then stays in this browser. The weights are AGPL-3.0.</p>
+    </div>
+  </aside>
+
+  <div id="mark-tip" class="mark-tip" hidden></div>
+
+  <script>
+    import { start } from "../scripts/play";
+    start();
+  </script>
+</Base>

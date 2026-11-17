@@ -168,11 +168,19 @@ npm install --prefix web
 npm run dev --prefix web       # http://127.0.0.1:4321
 ```
 
-You can play White or Black, watch two Nabla levels play, or play Stockfish 19
-lite. The judge is the column on the left. The controls, the legend, and the
-recorded self-play results are on the right. Control is drawn under the pieces.
-Arrows and hanging-piece numbers are drawn above them. Hover a mark on the small
-board to read what it is. The pause before a move is a slider.
+The notes are the front page. Play is a second page, one viewport high on a
+desktop. Each colour is a seat. Choosing it opens a roster: you, Nabla,
+Stockfish 19 lite, or Maia, and that model's own settings. The judgement bar
+stands to the left of the board. The right column has a Reading tab and a
+Moves tab. Moves can be undone and replayed. The notes show the recorded
+self-play. Matches against Stockfish and Maia have not been recorded.
+Maia-3 can sit in a seat; its network downloads in the browser the first time
+it moves. Nabla's rims, ticks, and hanging-piece numbers stay on the board
+while the other side thinks, in the same shape as the legend behind the
+question mark. Two Nablas use two colours. Arrows are drawn above the pieces.
+The pause before an engine move is at the top of a seat, and the game waits
+while that seat is open. The bar is cream on White's side of the board and
+grey on Black's.
 
 ### In your own page
 
@@ -210,7 +218,27 @@ for play. It is not that measurement.
 `bench [level]` runs a fixed 16-position suite (Level 2 by default) and prints the
 node count, speed, mean decision time, and a checksum of the chosen moves. On an
 Intel i7-7700HQ (one thread) a decision takes about 0.3 ms at Level 0, 8 ms at
-Level 1, and 15 ms at Level 2 (roughly 7 µs per position visited).
+Level 1, and 15 ms at Level 2 (roughly 7 µs per position visited). The same
+machine, 17 November 2026, Level 2 and temperature 0 with no clock:
+
+| Position | Visits | Time |
+| --- | --- | --- |
+| Starting position | 422 | 2 ms |
+| Middlegame, all pieces still on | 5,269 | 38 ms |
+| King and one pawn | 50 | under 1 ms |
+
+The middlegame figure is that one sharp bench position (captures to seldepth 16),
+not every middlegame. Level 0 on the same three positions stayed under 1 ms
+(20, 50, and 6 visits). The cost follows the number of positions visited.
+Level 0 visits each legal move, plus the forced replies to a check. Level 2
+adds one reply and the captures after it.
+
+Nabla is not a neural network. The energy has 57 named coefficients and four
+fixed constants (pawn unit 1, ray cut-off 0.05, light-cone sharpness 0.1,
+control scale 1). The coefficients shipped here are the hand-set initial
+values. The page plays a committed WebAssembly build,
+`web/src/engine/nabla_wasm_bg.wasm`, 925,960 bytes on 17 November 2026.
+A site build does not compile Rust.
 
 ## Using Nabla
 
