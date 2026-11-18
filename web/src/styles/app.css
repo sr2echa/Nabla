@@ -235,7 +235,10 @@ cg-board square.check {
   pointer-events: none;
 }
 cg-board square { z-index: 2; }
-cg-board piece { z-index: 4 !important; }
+.cg-wrap cg-board piece {
+  z-index: 4 !important;
+  top: -0.4%;
+}
 cg-board piece.dragging { z-index: 8 !important; filter: drop-shadow(0 8px 10px rgb(36 34 32 / 0.16)); }
 #arrows { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 
@@ -664,19 +667,19 @@ code { font-family: var(--mono); font-size: 0.92em; }
   .column { display: block; }
   .stage {
     grid-template-columns: 32px minmax(0, var(--cg, var(--board)));
-    grid-template-rows: 36px var(--cg, var(--board)) 16px 18px 36px;
+    grid-template-rows: 36px var(--cg, var(--board)) 18px 36px 36px;
     grid-template-areas:
       ". far"
       "ranks board"
-      "share bar"
       ". files"
-      ". near";
+      ". near"
+      "share bar";
   }
-  .evalbar { width: auto; height: 14px; justify-self: stretch; align-self: center; }
+  .evalbar { width: auto; height: 14px; justify-self: stretch; align-self: center; margin: 8px 0 4px; }
   .evalbar .fill { transform: scaleX(var(--share, 0.5)); transform-origin: left center; }
   .evalbar.flip .fill { transform-origin: right center; }
   .evalbar::after { width: 2px; height: 20px; transform: translate(-50%, -50%); }
-  .meter-read { justify-self: end; padding-right: 6px; }
+  .meter-read { justify-self: end; align-self: center; padding-right: 6px; }
   .rail.files { width: 100%; }
   .playbar { flex-direction: column; align-items: stretch; gap: 12px; width: 100%; }
   .playbar .transport { width: 100%; max-width: none; }

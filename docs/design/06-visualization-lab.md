@@ -21,7 +21,7 @@ White mates in two, and −M4 when Black mates in four. Captured pieces and the
 material lead sit on the seat that took them. The move controls sit under the
 board, with a gap above them. On a narrow screen the history controls keep
 their own line, and Pause, Undo, Flip, Swap, and PGN sit on the line beneath.
-The judgement bar lies flat under the board. Why that move sits beside Considered, the two
+The judgement bar lies flat under the lower seat, with space around it. Why that move sits beside Considered, the two
 columns the same width: the nine terms of the chosen move, and up to eight
 moves it weighed. The move itself is not named again above those terms. The
 right column does not scroll. Reading holds the layer switches, the nine
