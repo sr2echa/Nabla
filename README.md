@@ -216,16 +216,18 @@ are run with `node tools/gauntlet.mjs`. The page's Stockfish lite opponent is
 for play. It is not that measurement.
 
 `bench [level]` runs a fixed 16-position suite (Level 2 by default) and prints the
-node count, speed, mean decision time, and a checksum of the chosen moves. On an
-Intel i7-7700HQ (one thread) a decision takes about 0.3 ms at Level 0, 8 ms at
-Level 1, and 15 ms at Level 2 (roughly 7 µs per position visited). The same
-machine, 17 November 2026, Level 2 and temperature 0 with no clock:
+node count, speed, mean decision time, and a checksum of the chosen moves. Across
+five repeated runs on an Intel i7-7700HQ (one thread, `120k nps` at Level 2,
+roughly 8.3 µs per position visited), median decisions take **0.36 ms** at
+Level 0, **12.54 ms** at Level 1, and **21.02 ms** at Level 2 (native vs
+WebAssembly bit-identical 48/48, with 1.42× WASM slowdown at Level 2). Three
+bench positions, 21 November 2026, Level 2 and temperature 0 with no clock:
 
 | Position | Visits | Time |
 | --- | --- | --- |
-| Starting position | 422 | 2 ms |
-| Middlegame, all pieces still on | 5,269 | 38 ms |
-| King and one pawn | 50 | under 1 ms |
+| Starting position | 441 | 2 ms |
+| Middlegame, all pieces still on | 5,939 | 49 ms |
+| King and one pawn | 56 | under 1 ms |
 
 The middlegame figure is that one sharp bench position (captures to seldepth 16),
 not every middlegame. Level 0 on the same three positions stayed under 1 ms
@@ -233,12 +235,20 @@ not every middlegame. Level 0 on the same three positions stayed under 1 ms
 Level 0 visits each legal move, plus the forced replies to a check. Level 2
 adds one reply and the captures after it.
 
+Against Stockfish 19 (`UCI_LimitStrength` anchors on the CCRL Blitz scale,
+4,840 pool games with Ordo), Level 2 rates **1607 ± 24 Elo** (scoring 58–40–2
+against `SF-1500`, 137–36–27 against `Maia-1500`, and 105–73–22 against
+depth-matched `AB-PeSTO-2`), Level 1 rates **1337 ± 29 Elo**, and Level 0 rates
+**964 ± 43 Elo** (+844 Elo over 1-ply `AB-PeSTO-0`). Full results, ablations,
+temperature curves, tactical suites, endgame conversions, and figures live in
+[`docs/research/benchmark-report.md`](docs/research/benchmark-report.md).
+
 Nabla is not a neural network. The energy has 57 named coefficients and four
 fixed constants (pawn unit 1, ray cut-off 0.05, light-cone sharpness 0.1,
 control scale 1). The coefficients shipped here are the hand-set initial
-values. The page plays a committed WebAssembly build,
-`web/src/engine/nabla_wasm_bg.wasm`, 925,960 bytes on 17 November 2026.
-A site build does not compile Rust.
+values. A tuner can print a fit. It does not replace them. The page plays a
+committed WebAssembly build, `web/src/engine/nabla_wasm_bg.wasm`, 935,057 bytes
+on 21 November 2026. A site build does not compile Rust.
 
 ## Using Nabla
 
@@ -292,9 +302,9 @@ normally take milliseconds; the budget only matters in rare tactical explosions.
 position fen 1k1r3q/1ppn3p/p4b2/4p3/8/P2N2P1/1PP1R1BP/2K1Q3 w - - 0 1
 explain 3
 move           Q   prob  mat  flux  terr  ex  king  trop  pawn  conf  tempo
-g2d5      +0.738  1.000  +0.00 +0.06 +0.09 +0.00 +0.01 +0.00 +0.00 -0.00 -0.20
-c1b1      +0.643  0.000  +0.00 -0.05 -0.08 +0.00 +0.01 +0.00 +0.00 -0.00 +0.00
-e1b4      +0.625  0.000  +0.00 -0.15 +0.01 +0.00 -0.00 +0.00 +0.00 -0.00 +0.00
+g2d5      +0.742  1.000  +0.00 +0.06 +0.09 +0.00 +0.01 +0.00 +0.00 -0.00 -0.20
+c1b1      +0.653  0.000  +0.00 -0.05 -0.08 +0.00 +0.00 +0.00 +0.00 -0.00 +0.00
+e1b4      +0.645  0.000  +0.00 -0.15 +0.01 +0.00 -0.00 +0.00 +0.00 -0.00 +0.00
 ```
 
 ## Repository layout

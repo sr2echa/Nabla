@@ -1,0 +1,155 @@
+{
+  "compliance_steps": 40,
+  "stability_runs": [
+    {
+      "games": 200,
+      "wins": 96,
+      "losses": 89,
+      "draws": 15,
+      "score": 0.5175,
+      "draw_rate": 0.075,
+      "ptnml": [
+        14,
+        7,
+        55,
+        6,
+        18
+      ],
+      "elo": 12.17,
+      "ci95_low": -28.26,
+      "ci95_high": 52.93,
+      "elo_err": 40.59,
+      "z": 0.5905,
+      "p_value": 0.5548331393496037,
+      "los": 0.722583,
+      "tag": "exp0_gate_L0",
+      "engine_a": "Nabla-L0-A",
+      "engine_b": "Nabla-L0-B",
+      "book": "noob_3moves.epd",
+      "seed": 20261121,
+      "wall_s": 8.96,
+      "pgn": "benchmarks\\raw\\exp0_gate_L0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 112.7,
+      "compute": {
+        "Nabla-L0-A": {
+          "moves": 11268,
+          "mean_nodes": 29.6,
+          "median_nodes": 30.0,
+          "mean_ms": 0.11,
+          "median_ms": 0.0
+        },
+        "Nabla-L0-B": {
+          "moves": 11263,
+          "mean_nodes": 28.7,
+          "median_nodes": 29,
+          "mean_ms": 0.11,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 89,
+      "losses": 101,
+      "draws": 10,
+      "score": 0.47,
+      "draw_rate": 0.05,
+      "ptnml": [
+        27,
+        5,
+        42,
+        5,
+        21
+      ],
+      "elo": -20.87,
+      "ci95_low": -70.0,
+      "ci95_high": 27.43,
+      "elo_err": 48.71,
+      "z": -0.8473,
+      "p_value": 0.3968041400186039,
+      "los": 0.198402,
+      "tag": "exp0_gate_L1",
+      "engine_a": "Nabla-L1-A",
+      "engine_b": "Nabla-L1-B",
+      "book": "noob_3moves.epd",
+      "seed": 20261122,
+      "wall_s": 35.08,
+      "pgn": "benchmarks\\raw\\exp0_gate_L1.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 116.0,
+      "compute": {
+        "Nabla-L1-A": {
+          "moves": 11602,
+          "mean_nodes": 372.7,
+          "median_nodes": 126.0,
+          "mean_ms": 3.43,
+          "median_ms": 1.0
+        },
+        "Nabla-L1-B": {
+          "moves": 11605,
+          "mean_nodes": 370.3,
+          "median_nodes": 128,
+          "mean_ms": 3.45,
+          "median_ms": 1.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 84,
+      "losses": 92,
+      "draws": 24,
+      "score": 0.48,
+      "draw_rate": 0.12,
+      "ptnml": [
+        21,
+        8,
+        45,
+        10,
+        16
+      ],
+      "elo": -13.9,
+      "ci95_low": -58.22,
+      "ci95_high": 29.96,
+      "elo_err": 44.09,
+      "z": -0.6221,
+      "p_value": 0.5338624074211408,
+      "los": 0.266931,
+      "tag": "exp0_gate_L2",
+      "engine_a": "Nabla-L2-A",
+      "engine_b": "Nabla-L2-B",
+      "book": "noob_3moves.epd",
+      "seed": 20261123,
+      "wall_s": 142.62,
+      "pgn": "benchmarks\\raw\\exp0_gate_L2.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 164.8,
+      "compute": {
+        "Nabla-L2-A": {
+          "moves": 16479,
+          "mean_nodes": 1406.1,
+          "median_nodes": 986,
+          "mean_ms": 11.93,
+          "median_ms": 7.0
+        },
+        "Nabla-L2-B": {
+          "moves": 16484,
+          "mean_nodes": 1384.7,
+          "median_nodes": 991.0,
+          "mean_ms": 11.74,
+          "median_ms": 7.0
+        }
+      }
+    }
+  ],
+  "total_games": 600,
+  "time_losses": 0,
+  "illegal_or_crash": 0
+}

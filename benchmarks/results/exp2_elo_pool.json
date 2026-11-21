@@ -1,0 +1,1791 @@
+{
+  "sf_games": 560,
+  "anchors": {
+    "SF-1320": 1320,
+    "SF-1500": 1500,
+    "SF-1700": 1700,
+    "SF-1900": 1900
+  },
+  "ordo_ratings": [
+    {
+      "player": "SF-1900",
+      "rating": 1900.0,
+      "error_95": 0.0,
+      "ci95_low": 1900.0,
+      "ci95_high": 1900.0,
+      "games": 60,
+      "points": 48.0,
+      "score_pct": 80.0,
+      "is_anchor": true
+    },
+    {
+      "player": "SF-1700",
+      "rating": 1700.0,
+      "error_95": 0.0,
+      "ci95_low": 1700.0,
+      "ci95_high": 1700.0,
+      "games": 160,
+      "points": 117.5,
+      "score_pct": 73.4,
+      "is_anchor": true
+    },
+    {
+      "player": "Nabla-L2",
+      "rating": 1607.0,
+      "error_95": 24.2,
+      "ci95_low": 1582.8,
+      "ci95_high": 1631.2,
+      "games": 1700,
+      "points": 1309.0,
+      "score_pct": 77.0,
+      "is_anchor": false
+    },
+    {
+      "player": "AB-PeSTO-2",
+      "rating": 1547.6,
+      "error_95": 34.0,
+      "ci95_low": 1513.6,
+      "ci95_high": 1581.6,
+      "games": 400,
+      "points": 233.0,
+      "score_pct": 58.2,
+      "is_anchor": false
+    },
+    {
+      "player": "SF-1500",
+      "rating": 1500.0,
+      "error_95": 0.0,
+      "ci95_low": 1500.0,
+      "ci95_high": 1500.0,
+      "games": 200,
+      "points": 105.0,
+      "score_pct": 52.5,
+      "is_anchor": true
+    },
+    {
+      "player": "Maia-1900",
+      "rating": 1450.7,
+      "error_95": 31.0,
+      "ci95_low": 1419.7,
+      "ci95_high": 1481.7,
+      "games": 520,
+      "points": 200.5,
+      "score_pct": 38.6,
+      "is_anchor": false
+    },
+    {
+      "player": "Maia-1500",
+      "rating": 1356.0,
+      "error_95": 26.7,
+      "ci95_low": 1329.3,
+      "ci95_high": 1382.7,
+      "games": 1100,
+      "points": 431.5,
+      "score_pct": 39.2,
+      "is_anchor": false
+    },
+    {
+      "player": "Nabla-L1",
+      "rating": 1336.7,
+      "error_95": 29.4,
+      "ci95_low": 1307.3,
+      "ci95_high": 1366.1,
+      "games": 1260,
+      "points": 768.5,
+      "score_pct": 61.0,
+      "is_anchor": false
+    },
+    {
+      "player": "AB-PeSTO-1",
+      "rating": 1334.2,
+      "error_95": 34.2,
+      "ci95_low": 1300.0,
+      "ci95_high": 1368.4,
+      "games": 600,
+      "points": 261.5,
+      "score_pct": 43.6,
+      "is_anchor": false
+    },
+    {
+      "player": "SF-1320",
+      "rating": 1320.0,
+      "error_95": 0.0,
+      "ci95_low": 1320.0,
+      "ci95_high": 1320.0,
+      "games": 160,
+      "points": 46.0,
+      "score_pct": 28.8,
+      "is_anchor": true
+    },
+    {
+      "player": "Maia-1100",
+      "rating": 1235.6,
+      "error_95": 31.7,
+      "ci95_low": 1203.9,
+      "ci95_high": 1267.3,
+      "games": 1000,
+      "points": 398.0,
+      "score_pct": 39.8,
+      "is_anchor": false
+    },
+    {
+      "player": "Nabla-L0",
+      "rating": 963.9,
+      "error_95": 43.4,
+      "ci95_low": 920.5,
+      "ci95_high": 1007.3,
+      "games": 1100,
+      "points": 558.0,
+      "score_pct": 50.7,
+      "is_anchor": false
+    },
+    {
+      "player": "AB-PeSTO-0",
+      "rating": 119.7,
+      "error_95": 155.7,
+      "ci95_low": -36.0,
+      "ci95_high": 275.4,
+      "games": 400,
+      "points": 102.5,
+      "score_pct": 25.6,
+      "is_anchor": false
+    },
+    {
+      "player": "Material-1ply",
+      "rating": 116.6,
+      "error_95": 155.6,
+      "ci95_low": -39.0,
+      "ci95_high": 272.2,
+      "games": 700,
+      "points": 187.5,
+      "score_pct": 26.8,
+      "is_anchor": false
+    },
+    {
+      "player": "Random",
+      "rating": -211.0,
+      "error_95": 169.9,
+      "ci95_low": -380.9,
+      "ci95_high": -41.1,
+      "games": 200,
+      "points": 13.5,
+      "score_pct": 6.8,
+      "is_anchor": false
+    }
+  ],
+  "matches": [
+    {
+      "games": 200,
+      "wins": 174,
+      "losses": 16,
+      "draws": 10,
+      "score": 0.895,
+      "draw_rate": 0.05,
+      "ptnml": [
+        1,
+        1,
+        13,
+        9,
+        76
+      ],
+      "elo": 372.25,
+      "ci95_low": 307.52,
+      "ci95_high": 464.63,
+      "elo_err": 78.56,
+      "z": 19.1098,
+      "p_value": 2.092838070418616e-81,
+      "los": 1.0,
+      "tag": "exp2_00_Nabla-L2_vs_Nabla-L1",
+      "engine_a": "Nabla-L2",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261121,
+      "wall_s": 69.33,
+      "pgn": "benchmarks\\raw\\exp2_00_Nabla-L2_vs_Nabla-L1.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 109.8,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 9424,
+          "mean_nodes": 1830.7,
+          "median_nodes": 1452.0,
+          "mean_ms": 17.5,
+          "median_ms": 12.0
+        },
+        "Nabla-L1": {
+          "moves": 9343,
+          "mean_nodes": 269.5,
+          "median_nodes": 124,
+          "mean_ms": 2.44,
+          "median_ms": 1.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 184,
+      "losses": 13,
+      "draws": 3,
+      "score": 0.9275,
+      "draw_rate": 0.015,
+      "ptnml": [
+        0,
+        0,
+        13,
+        3,
+        84
+      ],
+      "elo": 442.79,
+      "ci95_low": 370.51,
+      "ci95_high": 556.41,
+      "elo_err": 92.95,
+      "z": 25.0524,
+      "p_value": 1.642824562171066e-138,
+      "los": 1.0,
+      "tag": "exp2_01_Nabla-L1_vs_Nabla-L0",
+      "engine_a": "Nabla-L1",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261122,
+      "wall_s": 8.92,
+      "pgn": "benchmarks\\raw\\exp2_01_Nabla-L1_vs_Nabla-L0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 79.4,
+      "compute": {
+        "Nabla-L1": {
+          "moves": 6379,
+          "mean_nodes": 217.1,
+          "median_nodes": 132,
+          "mean_ms": 1.71,
+          "median_ms": 1.0
+        },
+        "Nabla-L0": {
+          "moves": 6293,
+          "mean_nodes": 22.9,
+          "median_nodes": 23,
+          "mean_ms": 0.07,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 197,
+      "losses": 3,
+      "draws": 0,
+      "score": 0.985,
+      "draw_rate": 0.0,
+      "ptnml": [
+        0,
+        0,
+        3,
+        0,
+        97
+      ],
+      "elo": 726.94,
+      "ci95_low": 593.88,
+      "ci95_high": 1041.26,
+      "elo_err": 223.69,
+      "z": 56.8624,
+      "p_value": 0.0,
+      "los": 1.0,
+      "tag": "exp2_02_Nabla-L2_vs_Nabla-L0",
+      "engine_a": "Nabla-L2",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261123,
+      "wall_s": 32.03,
+      "pgn": "benchmarks\\raw\\exp2_02_Nabla-L2_vs_Nabla-L0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 73.9,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 5834,
+          "mean_nodes": 1585.5,
+          "median_nodes": 1212.5,
+          "mean_ms": 13.79,
+          "median_ms": 9.0
+        },
+        "Nabla-L0": {
+          "moves": 5737,
+          "mean_nodes": 22.0,
+          "median_nodes": 22,
+          "mean_ms": 0.07,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 164,
+      "losses": 9,
+      "draws": 27,
+      "score": 0.8875,
+      "draw_rate": 0.135,
+      "ptnml": [
+        1,
+        1,
+        8,
+        22,
+        68
+      ],
+      "elo": 358.81,
+      "ci95_low": 301.25,
+      "ci95_high": 436.58,
+      "elo_err": 67.66,
+      "z": 20.2222,
+      "p_value": 6.247346826955893e-91,
+      "los": 1.0,
+      "tag": "exp2_03_Nabla-L2_vs_Maia-1100",
+      "engine_a": "Nabla-L2",
+      "engine_b": "Maia-1100",
+      "book": "8moves_v3.pgn",
+      "seed": 20261124,
+      "wall_s": 45.1,
+      "pgn": "benchmarks\\raw\\exp2_03_Nabla-L2_vs_Maia-1100.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 90.7,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 7505,
+          "mean_nodes": 1403.1,
+          "median_nodes": 1135,
+          "mean_ms": 12.74,
+          "median_ms": 9.0
+        },
+        "Maia-1100": {
+          "moves": 7426,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 2.67,
+          "median_ms": 2.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 137,
+      "losses": 36,
+      "draws": 27,
+      "score": 0.7525,
+      "draw_rate": 0.135,
+      "ptnml": [
+        1,
+        5,
+        30,
+        20,
+        44
+      ],
+      "elo": 193.17,
+      "ci95_low": 149.49,
+      "ci95_high": 243.25,
+      "elo_err": 46.88,
+      "z": 9.9523,
+      "p_value": 2.4639911887355968e-23,
+      "los": 1.0,
+      "tag": "exp2_04_Nabla-L2_vs_Maia-1500",
+      "engine_a": "Nabla-L2",
+      "engine_b": "Maia-1500",
+      "book": "8moves_v3.pgn",
+      "seed": 20261125,
+      "wall_s": 49.35,
+      "pgn": "benchmarks\\raw\\exp2_04_Nabla-L2_vs_Maia-1500.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 95.1,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 7933,
+          "mean_nodes": 1450.2,
+          "median_nodes": 1186,
+          "mean_ms": 13.25,
+          "median_ms": 9.0
+        },
+        "Maia-1500": {
+          "moves": 7881,
+          "mean_nodes": 1,
+          "median_nodes": 1,
+          "mean_ms": 2.68,
+          "median_ms": 2.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 116,
+      "losses": 34,
+      "draws": 50,
+      "score": 0.705,
+      "draw_rate": 0.25,
+      "ptnml": [
+        2,
+        6,
+        32,
+        28,
+        32
+      ],
+      "elo": 151.35,
+      "ci95_low": 111.62,
+      "ci95_high": 195.2,
+      "elo_err": 41.79,
+      "z": 8.0891,
+      "p_value": 6.009250284187504e-16,
+      "los": 1.0,
+      "tag": "exp2_05_Nabla-L2_vs_Maia-1900",
+      "engine_a": "Nabla-L2",
+      "engine_b": "Maia-1900",
+      "book": "8moves_v3.pgn",
+      "seed": 20261126,
+      "wall_s": 51.17,
+      "pgn": "benchmarks\\raw\\exp2_05_Nabla-L2_vs_Maia-1900.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 93.0,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 7728,
+          "mean_nodes": 1579.9,
+          "median_nodes": 1219.0,
+          "mean_ms": 14.35,
+          "median_ms": 9.0
+        },
+        "Maia-1900": {
+          "moves": 7679,
+          "mean_nodes": 1,
+          "median_nodes": 1,
+          "mean_ms": 2.62,
+          "median_ms": 2.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 118,
+      "losses": 46,
+      "draws": 36,
+      "score": 0.68,
+      "draw_rate": 0.18,
+      "ptnml": [
+        6,
+        8,
+        28,
+        24,
+        34
+      ],
+      "elo": 130.94,
+      "ci95_low": 86.51,
+      "ci95_high": 179.91,
+      "elo_err": 46.7,
+      "z": 6.0816,
+      "p_value": 1.189620965547297e-09,
+      "los": 1.0,
+      "tag": "exp2_06_Nabla-L1_vs_Maia-1100",
+      "engine_a": "Nabla-L1",
+      "engine_b": "Maia-1100",
+      "book": "8moves_v3.pgn",
+      "seed": 20261127,
+      "wall_s": 17.11,
+      "pgn": "benchmarks\\raw\\exp2_06_Nabla-L1_vs_Maia-1100.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 78.3,
+      "compute": {
+        "Nabla-L1": {
+          "moves": 6244,
+          "mean_nodes": 270.5,
+          "median_nodes": 141.0,
+          "mean_ms": 2.55,
+          "median_ms": 1.0
+        },
+        "Maia-1100": {
+          "moves": 6210,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 2.96,
+          "median_ms": 3.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 79,
+      "losses": 74,
+      "draws": 47,
+      "score": 0.5125,
+      "draw_rate": 0.235,
+      "ptnml": [
+        16,
+        16,
+        31,
+        21,
+        16
+      ],
+      "elo": 8.69,
+      "ci95_low": -35.14,
+      "ci95_high": 52.79,
+      "elo_err": 43.96,
+      "z": 0.3895,
+      "p_value": 0.6968732555970634,
+      "los": 0.651563,
+      "tag": "exp2_07_Nabla-L1_vs_Maia-1500",
+      "engine_a": "Nabla-L1",
+      "engine_b": "Maia-1500",
+      "book": "8moves_v3.pgn",
+      "seed": 20261128,
+      "wall_s": 20.15,
+      "pgn": "benchmarks\\raw\\exp2_07_Nabla-L1_vs_Maia-1500.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 85.8,
+      "compute": {
+        "Nabla-L1": {
+          "moves": 6981,
+          "mean_nodes": 250.7,
+          "median_nodes": 134,
+          "mean_ms": 2.51,
+          "median_ms": 1.0
+        },
+        "Maia-1500": {
+          "moves": 6976,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 3.18,
+          "median_ms": 3.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 25,
+      "losses": 137,
+      "draws": 38,
+      "score": 0.22,
+      "draw_rate": 0.19,
+      "ptnml": [
+        46,
+        24,
+        26,
+        4,
+        0
+      ],
+      "elo": -219.87,
+      "ci95_low": -270.08,
+      "ci95_high": -176.69,
+      "elo_err": 46.69,
+      "z": -12.0381,
+      "p_value": 2.239474117513583e-33,
+      "los": 0.0,
+      "tag": "exp2_08_Nabla-L0_vs_Maia-1100",
+      "engine_a": "Nabla-L0",
+      "engine_b": "Maia-1100",
+      "book": "8moves_v3.pgn",
+      "seed": 20261129,
+      "wall_s": 12.19,
+      "pgn": "benchmarks\\raw\\exp2_08_Nabla-L0_vs_Maia-1100.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 76.3,
+      "compute": {
+        "Nabla-L0": {
+          "moves": 6006,
+          "mean_nodes": 23.8,
+          "median_nodes": 26.0,
+          "mean_ms": 0.15,
+          "median_ms": 0.0
+        },
+        "Maia-1100": {
+          "moves": 6060,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 3.15,
+          "median_ms": 3.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 105,
+      "losses": 73,
+      "draws": 22,
+      "score": 0.58,
+      "draw_rate": 0.11,
+      "ptnml": [
+        12,
+        8,
+        42,
+        12,
+        26
+      ],
+      "elo": 56.07,
+      "ci95_low": 12.29,
+      "ci95_high": 101.7,
+      "elo_err": 44.71,
+      "z": 2.516,
+      "p_value": 0.011868782279383826,
+      "los": 0.994066,
+      "tag": "exp2_09_Nabla-L2_vs_AB-PeSTO-2",
+      "engine_a": "Nabla-L2",
+      "engine_b": "AB-PeSTO-2",
+      "book": "8moves_v3.pgn",
+      "seed": 20261130,
+      "wall_s": 53.35,
+      "pgn": "benchmarks\\raw\\exp2_09_Nabla-L2_vs_AB-PeSTO-2.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 127.5,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 11160,
+          "mean_nodes": 1351.6,
+          "median_nodes": 937.5,
+          "mean_ms": 11.73,
+          "median_ms": 6.0
+        },
+        "AB-PeSTO-2": {
+          "moves": 11145,
+          "mean_nodes": 798.6,
+          "median_nodes": 409,
+          "mean_ms": 0.4,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 174,
+      "losses": 16,
+      "draws": 10,
+      "score": 0.895,
+      "draw_rate": 0.05,
+      "ptnml": [
+        0,
+        0,
+        16,
+        10,
+        74
+      ],
+      "elo": 372.25,
+      "ci95_low": 312.79,
+      "ci95_high": 454.18,
+      "elo_err": 70.7,
+      "z": 21.0461,
+      "p_value": 2.4829825596087065e-98,
+      "los": 1.0,
+      "tag": "exp2_10_Nabla-L2_vs_AB-PeSTO-1",
+      "engine_a": "Nabla-L2",
+      "engine_b": "AB-PeSTO-1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261131,
+      "wall_s": 65.25,
+      "pgn": "benchmarks\\raw\\exp2_10_Nabla-L2_vs_AB-PeSTO-1.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 104.8,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 8917,
+          "mean_nodes": 2124.9,
+          "median_nodes": 1768,
+          "mean_ms": 19.76,
+          "median_ms": 15.0
+        },
+        "AB-PeSTO-1": {
+          "moves": 8835,
+          "mean_nodes": 206.1,
+          "median_nodes": 114,
+          "mean_ms": 0.05,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 77,
+      "losses": 102,
+      "draws": 21,
+      "score": 0.4375,
+      "draw_rate": 0.105,
+      "ptnml": [
+        24,
+        13,
+        41,
+        8,
+        14
+      ],
+      "elo": -43.66,
+      "ci95_low": -89.31,
+      "ci95_high": 0.54,
+      "elo_err": 44.93,
+      "z": -1.936,
+      "p_value": 0.052866754031828396,
+      "los": 0.026433,
+      "tag": "exp2_11_Nabla-L1_vs_AB-PeSTO-1",
+      "engine_a": "Nabla-L1",
+      "engine_b": "AB-PeSTO-1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261132,
+      "wall_s": 16.96,
+      "pgn": "benchmarks\\raw\\exp2_11_Nabla-L1_vs_AB-PeSTO-1.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 103.5,
+      "compute": {
+        "Nabla-L1": {
+          "moves": 8750,
+          "mean_nodes": 391.6,
+          "median_nodes": 160.0,
+          "mean_ms": 3.73,
+          "median_ms": 1.0
+        },
+        "AB-PeSTO-1": {
+          "moves": 8756,
+          "mean_nodes": 199.7,
+          "median_nodes": 116.0,
+          "mean_ms": 0.05,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 200,
+      "losses": 0,
+      "draws": 0,
+      "score": 1.0,
+      "draw_rate": 0.0,
+      "ptnml": [
+        0,
+        0,
+        0,
+        0,
+        100
+      ],
+      "elo": 1599.98,
+      "ci95_low": 1041.26,
+      "ci95_high": 1041.26,
+      "elo_err": 0.0,
+      "z": 10.0,
+      "p_value": 1.523970604832119e-23,
+      "los": 1.0,
+      "tag": "exp2_12_Nabla-L1_vs_Material-1ply",
+      "engine_a": "Nabla-L1",
+      "engine_b": "Material-1ply",
+      "book": "8moves_v3.pgn",
+      "seed": 20261133,
+      "wall_s": 4.94,
+      "pgn": "benchmarks\\raw\\exp2_12_Nabla-L1_vs_Material-1ply.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 48.4,
+      "compute": {
+        "Nabla-L1": {
+          "moves": 3290,
+          "mean_nodes": 256.9,
+          "median_nodes": 168.5,
+          "mean_ms": 2.3,
+          "median_ms": 1.0
+        },
+        "Material-1ply": {
+          "moves": 3190,
+          "mean_nodes": 17.4,
+          "median_nodes": 18.0,
+          "mean_ms": 0.0,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 198,
+      "losses": 2,
+      "draws": 0,
+      "score": 0.99,
+      "draw_rate": 0.0,
+      "ptnml": [
+        0,
+        0,
+        2,
+        0,
+        98
+      ],
+      "elo": 798.25,
+      "ci95_low": 645.78,
+      "ci95_high": 1041.26,
+      "elo_err": 197.74,
+      "z": 70.0,
+      "p_value": 0.0,
+      "los": 1.0,
+      "tag": "exp2_13_Nabla-L0_vs_AB-PeSTO-0",
+      "engine_a": "Nabla-L0",
+      "engine_b": "AB-PeSTO-0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261134,
+      "wall_s": 2.91,
+      "pgn": "benchmarks\\raw\\exp2_13_Nabla-L0_vs_AB-PeSTO-0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 50.8,
+      "compute": {
+        "Nabla-L0": {
+          "moves": 3531,
+          "mean_nodes": 45.9,
+          "median_nodes": 45,
+          "mean_ms": 0.24,
+          "median_ms": 0.0
+        },
+        "AB-PeSTO-0": {
+          "moves": 3433,
+          "mean_nodes": 18.3,
+          "median_nodes": 19,
+          "mean_ms": 0.0,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 198,
+      "losses": 1,
+      "draws": 1,
+      "score": 0.9925,
+      "draw_rate": 0.005,
+      "ptnml": [
+        0,
+        0,
+        1,
+        1,
+        98
+      ],
+      "elo": 848.67,
+      "ci95_low": 691.25,
+      "ci95_high": 1041.26,
+      "elo_err": 175.0,
+      "z": 88.9049,
+      "p_value": 0.0,
+      "los": 1.0,
+      "tag": "exp2_14_Nabla-L0_vs_Material-1ply",
+      "engine_a": "Nabla-L0",
+      "engine_b": "Material-1ply",
+      "book": "8moves_v3.pgn",
+      "seed": 20261135,
+      "wall_s": 3.91,
+      "pgn": "benchmarks\\raw\\exp2_14_Nabla-L0_vs_Material-1ply.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 53.6,
+      "compute": {
+        "Nabla-L0": {
+          "moves": 3805,
+          "mean_nodes": 46.9,
+          "median_nodes": 47,
+          "mean_ms": 0.31,
+          "median_ms": 0.0
+        },
+        "Material-1ply": {
+          "moves": 3706,
+          "mean_nodes": 17.8,
+          "median_nodes": 19.0,
+          "mean_ms": 0.0,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 100,
+      "wins": 100,
+      "losses": 0,
+      "draws": 0,
+      "score": 1.0,
+      "draw_rate": 0.0,
+      "ptnml": [
+        0,
+        0,
+        0,
+        0,
+        50
+      ],
+      "elo": 1599.98,
+      "ci95_low": 921.28,
+      "ci95_high": 921.28,
+      "elo_err": 0.0,
+      "z": 10.0,
+      "p_value": 1.523970604832119e-23,
+      "los": 1.0,
+      "tag": "exp2_15_Nabla-L0_vs_Random",
+      "engine_a": "Nabla-L0",
+      "engine_b": "Random",
+      "book": "8moves_v3.pgn",
+      "seed": 20261136,
+      "wall_s": 1.9,
+      "pgn": "benchmarks\\raw\\exp2_15_Nabla-L0_vs_Random.pgn",
+      "terminations": {
+        "normal": 100
+      },
+      "mean_ply": 42.6,
+      "compute": {
+        "Nabla-L0": {
+          "moves": 1357,
+          "mean_nodes": 53.2,
+          "median_nodes": 51,
+          "mean_ms": 0.52,
+          "median_ms": 0.0
+        },
+        "Random": {
+          "moves": 1307,
+          "mean_nodes": 1,
+          "median_nodes": 1,
+          "mean_ms": 0.0,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 133,
+      "losses": 35,
+      "draws": 32,
+      "score": 0.745,
+      "draw_rate": 0.16,
+      "ptnml": [
+        3,
+        6,
+        25,
+        22,
+        44
+      ],
+      "elo": 186.25,
+      "ci95_low": 140.08,
+      "ci95_high": 239.38,
+      "elo_err": 49.65,
+      "z": 8.9476,
+      "p_value": 3.632076108093294e-19,
+      "los": 1.0,
+      "tag": "exp2_16_AB-PeSTO-2_vs_Maia-1500",
+      "engine_a": "AB-PeSTO-2",
+      "engine_b": "Maia-1500",
+      "book": "8moves_v3.pgn",
+      "seed": 20261137,
+      "wall_s": 14.95,
+      "pgn": "benchmarks\\raw\\exp2_16_AB-PeSTO-2_vs_Maia-1500.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 90.5,
+      "compute": {
+        "AB-PeSTO-2": {
+          "moves": 7473,
+          "mean_nodes": 798.0,
+          "median_nodes": 421,
+          "mean_ms": 0.48,
+          "median_ms": 0.0
+        },
+        "Maia-1500": {
+          "moves": 7419,
+          "mean_nodes": 1,
+          "median_nodes": 1,
+          "mean_ms": 2.93,
+          "median_ms": 3.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 105,
+      "losses": 49,
+      "draws": 46,
+      "score": 0.64,
+      "draw_rate": 0.23,
+      "ptnml": [
+        8,
+        10,
+        28,
+        26,
+        28
+      ],
+      "elo": 99.95,
+      "ci95_low": 56.26,
+      "ci95_high": 146.98,
+      "elo_err": 45.36,
+      "z": 4.5933,
+      "p_value": 4.36393639489742e-06,
+      "los": 0.999998,
+      "tag": "exp2_17_AB-PeSTO-1_vs_Maia-1100",
+      "engine_a": "AB-PeSTO-1",
+      "engine_b": "Maia-1100",
+      "book": "8moves_v3.pgn",
+      "seed": 20261138,
+      "wall_s": 13.0,
+      "pgn": "benchmarks\\raw\\exp2_17_AB-PeSTO-1_vs_Maia-1100.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 88.7,
+      "compute": {
+        "AB-PeSTO-1": {
+          "moves": 7282,
+          "mean_nodes": 126.5,
+          "median_nodes": 85.0,
+          "mean_ms": 0.02,
+          "median_ms": 0.0
+        },
+        "Maia-1100": {
+          "moves": 7258,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 2.92,
+          "median_ms": 3.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 51,
+      "losses": 50,
+      "draws": 99,
+      "score": 0.5025,
+      "draw_rate": 0.495,
+      "ptnml": [
+        8,
+        21,
+        40,
+        24,
+        7
+      ],
+      "elo": 1.74,
+      "ci95_low": -33.25,
+      "ci95_high": 36.76,
+      "elo_err": 35.01,
+      "z": 0.0976,
+      "p_value": 0.9222541691200875,
+      "los": 0.538873,
+      "tag": "exp2_18_AB-PeSTO-0_vs_Material-1ply",
+      "engine_a": "AB-PeSTO-0",
+      "engine_b": "Material-1ply",
+      "book": "8moves_v3.pgn",
+      "seed": 20261139,
+      "wall_s": 5.3,
+      "pgn": "benchmarks\\raw\\exp2_18_AB-PeSTO-0_vs_Material-1ply.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 134.5,
+      "compute": {
+        "AB-PeSTO-0": {
+          "moves": 11865,
+          "mean_nodes": 16.4,
+          "median_nodes": 10,
+          "mean_ms": 0.0,
+          "median_ms": 0.0
+        },
+        "Material-1ply": {
+          "moves": 11839,
+          "mean_nodes": 20.2,
+          "median_nodes": 19,
+          "mean_ms": 0.0,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 100,
+      "wins": 73,
+      "losses": 0,
+      "draws": 27,
+      "score": 0.865,
+      "draw_rate": 0.27,
+      "ptnml": [
+        0,
+        0,
+        3,
+        21,
+        26
+      ],
+      "elo": 322.67,
+      "ci95_low": 266.9,
+      "ci95_high": 395.77,
+      "elo_err": 64.44,
+      "z": 17.009,
+      "p_value": 7.0464222501245066e-65,
+      "los": 1.0,
+      "tag": "exp2_19_Material-1ply_vs_Random",
+      "engine_a": "Material-1ply",
+      "engine_b": "Random",
+      "book": "8moves_v3.pgn",
+      "seed": 20261140,
+      "wall_s": 2.94,
+      "pgn": "benchmarks\\raw\\exp2_19_Material-1ply_vs_Random.pgn",
+      "terminations": {
+        "normal": 100
+      },
+      "mean_ply": 77.3,
+      "compute": {
+        "Material-1ply": {
+          "moves": 3075,
+          "mean_nodes": 38.4,
+          "median_nodes": 38,
+          "mean_ms": 0.02,
+          "median_ms": 0.0
+        },
+        "Random": {
+          "moves": 3052,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 0.01,
+          "median_ms": 0.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 51,
+      "losses": 84,
+      "draws": 65,
+      "score": 0.4175,
+      "draw_rate": 0.325,
+      "ptnml": [
+        15,
+        27,
+        37,
+        18,
+        3
+      ],
+      "elo": -57.86,
+      "ci95_low": -94.68,
+      "ci95_high": -22.28,
+      "elo_err": 36.2,
+      "z": -3.2036,
+      "p_value": 0.0013572959810912873,
+      "los": 0.000679,
+      "tag": "exp2_20_Maia-1100_vs_Maia-1500",
+      "engine_a": "Maia-1100",
+      "engine_b": "Maia-1500",
+      "book": "8moves_v3.pgn",
+      "seed": 20261141,
+      "wall_s": 21.03,
+      "pgn": "benchmarks\\raw\\exp2_20_Maia-1100_vs_Maia-1500.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 81.3,
+      "compute": {
+        "Maia-1100": {
+          "moves": 6518,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 3.13,
+          "median_ms": 3.0
+        },
+        "Maia-1500": {
+          "moves": 6540,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 3.21,
+          "median_ms": 3.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 53,
+      "losses": 91,
+      "draws": 56,
+      "score": 0.405,
+      "draw_rate": 0.28,
+      "ptnml": [
+        20,
+        28,
+        28,
+        18,
+        6
+      ],
+      "elo": -66.82,
+      "ci95_low": -109.11,
+      "ci95_high": -26.42,
+      "elo_err": 41.34,
+      "z": -3.2638,
+      "p_value": 0.0010994541832591018,
+      "los": 0.00055,
+      "tag": "exp2_21_Maia-1500_vs_Maia-1900",
+      "engine_a": "Maia-1500",
+      "engine_b": "Maia-1900",
+      "book": "8moves_v3.pgn",
+      "seed": 20261142,
+      "wall_s": 23.14,
+      "pgn": "benchmarks\\raw\\exp2_21_Maia-1500_vs_Maia-1900.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 89.1,
+      "compute": {
+        "Maia-1500": {
+          "moves": 7300,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 3.19,
+          "median_ms": 3.0
+        },
+        "Maia-1900": {
+          "moves": 7323,
+          "mean_nodes": 1,
+          "median_nodes": 1,
+          "mean_ms": 3.29,
+          "median_ms": 3.0
+        }
+      }
+    },
+    {
+      "games": 100,
+      "wins": 74,
+      "losses": 18,
+      "draws": 8,
+      "score": 0.78,
+      "draw_rate": 0.08,
+      "ptnml": [
+        2,
+        1,
+        13,
+        7,
+        27
+      ],
+      "elo": 219.87,
+      "ci95_low": 149.92,
+      "ci95_high": 310.66,
+      "elo_err": 80.37,
+      "z": 7.1537,
+      "p_value": 8.449060766037545e-13,
+      "los": 1.0,
+      "tag": "exp2_22_Nabla-L2_vs_SF-1320",
+      "engine_a": "Nabla-L2",
+      "engine_b": "SF-1320",
+      "book": "8moves_v3.pgn",
+      "seed": 20261143,
+      "wall_s": 499.55,
+      "pgn": "benchmarks\\raw\\exp2_22_Nabla-L2_vs_SF-1320.pgn",
+      "terminations": {
+        "normal": 100
+      },
+      "mean_ply": 99.1,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 4170,
+          "mean_nodes": 2046.6,
+          "median_nodes": 1528.5,
+          "mean_ms": 20.54,
+          "median_ms": 14.0
+        },
+        "SF-1320": {
+          "moves": 4142,
+          "mean_nodes": 95215.4,
+          "median_nodes": 50721.5,
+          "mean_ms": 330.09,
+          "median_ms": 136.5
+        }
+      }
+    },
+    {
+      "games": 100,
+      "wins": 58,
+      "losses": 40,
+      "draws": 2,
+      "score": 0.59,
+      "draw_rate": 0.02,
+      "ptnml": [
+        7,
+        0,
+        26,
+        2,
+        15
+      ],
+      "elo": 63.23,
+      "ci95_low": 0.3,
+      "ci95_high": 130.59,
+      "elo_err": 65.14,
+      "z": 1.9696,
+      "p_value": 0.04888463391618124,
+      "los": 0.975558,
+      "tag": "exp2_23_Nabla-L2_vs_SF-1500",
+      "engine_a": "Nabla-L2",
+      "engine_b": "SF-1500",
+      "book": "8moves_v3.pgn",
+      "seed": 20261144,
+      "wall_s": 502.76,
+      "pgn": "benchmarks\\raw\\exp2_23_Nabla-L2_vs_SF-1500.pgn",
+      "terminations": {
+        "normal": 100
+      },
+      "mean_ply": 103,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 4354,
+          "mean_nodes": 1973.4,
+          "median_nodes": 1528.5,
+          "mean_ms": 20.24,
+          "median_ms": 14.0
+        },
+        "SF-1500": {
+          "moves": 4346,
+          "mean_nodes": 90887.7,
+          "median_nodes": 50727.5,
+          "mean_ms": 317.24,
+          "median_ms": 134.0
+        }
+      }
+    },
+    {
+      "games": 100,
+      "wins": 32,
+      "losses": 68,
+      "draws": 0,
+      "score": 0.32,
+      "draw_rate": 0.0,
+      "ptnml": [
+        24,
+        0,
+        20,
+        0,
+        6
+      ],
+      "elo": -130.94,
+      "ci95_low": -214.9,
+      "ci95_high": -59.6,
+      "elo_err": 77.65,
+      "z": -3.7115,
+      "p_value": 0.00020600418564159677,
+      "los": 0.000103,
+      "tag": "exp2_24_Nabla-L2_vs_SF-1700",
+      "engine_a": "Nabla-L2",
+      "engine_b": "SF-1700",
+      "book": "8moves_v3.pgn",
+      "seed": 20261145,
+      "wall_s": 519.57,
+      "pgn": "benchmarks\\raw\\exp2_24_Nabla-L2_vs_SF-1700.pgn",
+      "terminations": {
+        "normal": 100
+      },
+      "mean_ply": 115.0,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 4939,
+          "mean_nodes": 1669.2,
+          "median_nodes": 1284,
+          "mean_ms": 16.8,
+          "median_ms": 11.0
+        },
+        "SF-1700": {
+          "moves": 4957,
+          "mean_nodes": 83303.1,
+          "median_nodes": 47618,
+          "mean_ms": 289.53,
+          "median_ms": 123.0
+        }
+      }
+    },
+    {
+      "games": 60,
+      "wins": 36,
+      "losses": 24,
+      "draws": 0,
+      "score": 0.6,
+      "draw_rate": 0.0,
+      "ptnml": [
+        5,
+        0,
+        14,
+        0,
+        11
+      ],
+      "elo": 70.44,
+      "ci95_low": -17.85,
+      "ci95_high": 168.99,
+      "elo_err": 93.42,
+      "z": 1.5596,
+      "p_value": 0.11884835135568031,
+      "los": 0.940576,
+      "tag": "exp2_25_Nabla-L1_vs_SF-1320",
+      "engine_a": "Nabla-L1",
+      "engine_b": "SF-1320",
+      "book": "8moves_v3.pgn",
+      "seed": 20261146,
+      "wall_s": 261.14,
+      "pgn": "benchmarks\\raw\\exp2_25_Nabla-L1_vs_SF-1320.pgn",
+      "terminations": {
+        "normal": 60
+      },
+      "mean_ply": 77.9,
+      "compute": {
+        "Nabla-L1": {
+          "moves": 1859,
+          "mean_nodes": 553.9,
+          "median_nodes": 246,
+          "mean_ms": 6.44,
+          "median_ms": 3.0
+        },
+        "SF-1320": {
+          "moves": 1853,
+          "mean_nodes": 98235.6,
+          "median_nodes": 53602,
+          "mean_ms": 408.04,
+          "median_ms": 189.0
+        }
+      }
+    },
+    {
+      "games": 100,
+      "wins": 31,
+      "losses": 59,
+      "draws": 10,
+      "score": 0.36,
+      "draw_rate": 0.1,
+      "ptnml": [
+        16,
+        7,
+        20,
+        3,
+        4
+      ],
+      "elo": -99.95,
+      "ci95_low": -167.95,
+      "ci95_high": -38.74,
+      "elo_err": 64.61,
+      "z": -3.2479,
+      "p_value": 0.0011625238725578085,
+      "los": 0.000581,
+      "tag": "exp2_26_Maia-1500_vs_SF-1500",
+      "engine_a": "Maia-1500",
+      "engine_b": "SF-1500",
+      "book": "8moves_v3.pgn",
+      "seed": 20261147,
+      "wall_s": 462.48,
+      "pgn": "benchmarks\\raw\\exp2_26_Maia-1500_vs_SF-1500.pgn",
+      "terminations": {
+        "normal": 100
+      },
+      "mean_ply": 95.7,
+      "compute": {
+        "Maia-1500": {
+          "moves": 3979,
+          "mean_nodes": 1,
+          "median_nodes": 1,
+          "mean_ms": 4.12,
+          "median_ms": 3.0
+        },
+        "SF-1500": {
+          "moves": 3992,
+          "mean_nodes": 88251.3,
+          "median_nodes": 53232.5,
+          "mean_ms": 332.81,
+          "median_ms": 152.0
+        }
+      }
+    },
+    {
+      "games": 60,
+      "wins": 9,
+      "losses": 48,
+      "draws": 3,
+      "score": 0.175,
+      "draw_rate": 0.05,
+      "ptnml": [
+        19,
+        3,
+        7,
+        0,
+        1
+      ],
+      "elo": -269.37,
+      "ci95_low": -419.21,
+      "ci95_high": -174.7,
+      "elo_err": 122.26,
+      "z": -6.8622,
+      "p_value": 6.780822834705936e-12,
+      "los": 0.0,
+      "tag": "exp2_27_Maia-1900_vs_SF-1700",
+      "engine_a": "Maia-1900",
+      "engine_b": "SF-1700",
+      "book": "8moves_v3.pgn",
+      "seed": 20261148,
+      "wall_s": 289.38,
+      "pgn": "benchmarks\\raw\\exp2_27_Maia-1900_vs_SF-1700.pgn",
+      "terminations": {
+        "normal": 60
+      },
+      "mean_ply": 102.5,
+      "compute": {
+        "Maia-1900": {
+          "moves": 2584,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 3.46,
+          "median_ms": 3.0
+        },
+        "SF-1700": {
+          "moves": 2604,
+          "mean_nodes": 89733.2,
+          "median_nodes": 53708.0,
+          "mean_ms": 318.37,
+          "median_ms": 139.5
+        }
+      }
+    },
+    {
+      "games": 60,
+      "wins": 8,
+      "losses": 44,
+      "draws": 8,
+      "score": 0.2,
+      "draw_rate": 0.133333,
+      "ptnml": [
+        15,
+        8,
+        6,
+        0,
+        1
+      ],
+      "elo": -240.82,
+      "ci95_low": -359.07,
+      "ci95_high": -157.53,
+      "elo_err": 100.77,
+      "z": -6.7082,
+      "p_value": 1.9703444711799316e-11,
+      "los": 0.0,
+      "tag": "exp2_28_Maia-1900_vs_SF-1900",
+      "engine_a": "Maia-1900",
+      "engine_b": "SF-1900",
+      "book": "8moves_v3.pgn",
+      "seed": 20261149,
+      "wall_s": 416.16,
+      "pgn": "benchmarks\\raw\\exp2_28_Maia-1900_vs_SF-1900.pgn",
+      "terminations": {
+        "normal": 60
+      },
+      "mean_ply": 99.0,
+      "compute": {
+        "Maia-1900": {
+          "moves": 2482,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 2.58,
+          "median_ms": 2.0
+        },
+        "SF-1900": {
+          "moves": 2499,
+          "mean_nodes": 113270.1,
+          "median_nodes": 77679,
+          "mean_ms": 319.53,
+          "median_ms": 192.0
+        }
+      }
+    }
+  ],
+  "book_robustness": [
+    {
+      "games": 200,
+      "wins": 178,
+      "losses": 11,
+      "draws": 11,
+      "score": 0.9175,
+      "draw_rate": 0.055,
+      "ptnml": [
+        0,
+        0,
+        11,
+        11,
+        78
+      ],
+      "elo": 418.46,
+      "ci95_low": 354.42,
+      "ci95_high": 511.66,
+      "elo_err": 78.62,
+      "z": 25.1448,
+      "p_value": 1.611525706758141e-139,
+      "los": 1.0,
+      "tag": "exp2_noob_L2_vs_L1",
+      "engine_a": "Nabla-L2",
+      "engine_b": "Nabla-L1",
+      "book": "noob_3moves.epd",
+      "seed": 20261321,
+      "wall_s": 195.68,
+      "pgn": "benchmarks\\raw\\exp2_noob_L2_vs_L1.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 103.9,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 10431,
+          "mean_nodes": 1864.6,
+          "median_nodes": 1517,
+          "mean_ms": 14.81,
+          "median_ms": 11.0
+        },
+        "Nabla-L1": {
+          "moves": 10344,
+          "mean_nodes": 275.8,
+          "median_nodes": 125.0,
+          "mean_ms": 2.08,
+          "median_ms": 1.0
+        }
+      }
+    },
+    {
+      "games": 200,
+      "wins": 121,
+      "losses": 35,
+      "draws": 44,
+      "score": 0.715,
+      "draw_rate": 0.22,
+      "ptnml": [
+        3,
+        11,
+        19,
+        31,
+        36
+      ],
+      "elo": 159.78,
+      "ci95_low": 115.56,
+      "ci95_high": 209.49,
+      "elo_err": 46.96,
+      "z": 7.7218,
+      "p_value": 1.1471389633237556e-14,
+      "los": 1.0,
+      "tag": "exp2_noob_L2_vs_Maia1500",
+      "engine_a": "Nabla-L2",
+      "engine_b": "Maia-1500",
+      "book": "noob_3moves.epd",
+      "seed": 20261322,
+      "wall_s": 167.89,
+      "pgn": "benchmarks\\raw\\exp2_noob_L2_vs_Maia1500.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 89.2,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 8949,
+          "mean_nodes": 1386.2,
+          "median_nodes": 1263,
+          "mean_ms": 12.98,
+          "median_ms": 9.0
+        },
+        "Maia-1500": {
+          "moves": 8900,
+          "mean_nodes": 1,
+          "median_nodes": 1.0,
+          "mean_ms": 3.15,
+          "median_ms": 2.0
+        }
+      }
+    }
+  ],
+  "compute": {
+    "Nabla-L2": {
+      "mean_nodes": 1701.51,
+      "median_nodes": 1325.1,
+      "mean_ms": 16.07,
+      "median_ms": 10.8
+    },
+    "Nabla-L1": {
+      "mean_nodes": 315.74,
+      "median_nodes": 157.93,
+      "mean_ms": 3.1,
+      "median_ms": 1.29
+    },
+    "Nabla-L0": {
+      "mean_nodes": 35.78,
+      "median_nodes": 35.67,
+      "mean_ms": 0.23,
+      "median_ms": 0.0
+    },
+    "Maia-1100": {
+      "mean_nodes": 1,
+      "median_nodes": 1.0,
+      "mean_ms": 2.97,
+      "median_ms": 2.8
+    },
+    "Maia-1500": {
+      "mean_nodes": 1,
+      "median_nodes": 1.0,
+      "mean_ms": 3.22,
+      "median_ms": 2.83
+    },
+    "Maia-1900": {
+      "mean_nodes": 1,
+      "median_nodes": 1.0,
+      "mean_ms": 2.99,
+      "median_ms": 2.5
+    },
+    "AB-PeSTO-2": {
+      "mean_nodes": 798.3,
+      "median_nodes": 415,
+      "mean_ms": 0.44,
+      "median_ms": 0.0
+    },
+    "AB-PeSTO-1": {
+      "mean_nodes": 177.43,
+      "median_nodes": 105.0,
+      "mean_ms": 0.04,
+      "median_ms": 0.0
+    },
+    "Material-1ply": {
+      "mean_nodes": 23.45,
+      "median_nodes": 23.5,
+      "mean_ms": 0.01,
+      "median_ms": 0.0
+    },
+    "AB-PeSTO-0": {
+      "mean_nodes": 17.35,
+      "median_nodes": 14.5,
+      "mean_ms": 0.0,
+      "median_ms": 0.0
+    },
+    "Random": {
+      "mean_nodes": 1,
+      "median_nodes": 1.0,
+      "mean_ms": 0.01,
+      "median_ms": 0.0
+    },
+    "SF-1320": {
+      "mean_nodes": 96725.5,
+      "median_nodes": 52161.75,
+      "mean_ms": 369.06,
+      "median_ms": 162.75
+    },
+    "SF-1500": {
+      "mean_nodes": 89569.5,
+      "median_nodes": 51980.0,
+      "mean_ms": 325.02,
+      "median_ms": 143.0
+    },
+    "SF-1700": {
+      "mean_nodes": 86518.15,
+      "median_nodes": 50663.0,
+      "mean_ms": 303.95,
+      "median_ms": 131.25
+    },
+    "SF-1900": {
+      "mean_nodes": 113270.1,
+      "median_nodes": 77679,
+      "mean_ms": 319.53,
+      "median_ms": 192.0
+    }
+  }
+}

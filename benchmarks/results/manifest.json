@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-11-21T06:36:04.052021+00:00",
+  "git_commit": "4b32220ce634c48c9d25bfadd22a066dbfd77a47",
+  "os": "win32 (nt)",
+  "cpu": "Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",
+  "concurrency": 3,
+  "adjudication": "none",
+  "time_control_main": "10+0.1",
+  "time_control_gate": "4+0.04",
+  "base_seed": 20261121,
+  "tools": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "fastchess": "fastchess alpha 1.8.3 compiled for windows-latest 20261107-d7b47e8 (CI)",
+    "stockfish": "Stockfish 19 by the Stockfish developers (see AUTHORS file)"
+  },
+  "experiments_cached": [
+    "exp0_gate",
+    "exp1_probe",
+    "exp2_elo_pool",
+    "exp3_ablations",
+    "exp4_temperature",
+    "exp5_tactics",
+    "exp6_endgames",
+    "exp7_eval_corr",
+    "exp8_perf"
+  ]
+}

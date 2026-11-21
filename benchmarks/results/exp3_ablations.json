@@ -1,0 +1,838 @@
+{
+  "level1": [
+    {
+      "games": 200,
+      "wins": 87,
+      "losses": 89,
+      "draws": 24,
+      "score": 0.495,
+      "draw_rate": 0.12,
+      "ptnml": [
+        8,
+        8,
+        71,
+        4,
+        9
+      ],
+      "elo": -3.47,
+      "ci95_low": -34.03,
+      "ci95_high": 27.03,
+      "elo_err": 30.53,
+      "z": -0.2237,
+      "p_value": 0.8230197558618708,
+      "los": 0.41151,
+      "tag": "exp3_L1_chi_0",
+      "engine_a": "L1_chi_0",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261421,
+      "wall_s": 62.9,
+      "pgn": "benchmarks\\raw\\exp3_L1_chi_0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 105.0,
+      "compute": {
+        "L1_chi_0": {
+          "moves": 8905,
+          "mean_nodes": 345.6,
+          "median_nodes": 124,
+          "mean_ms": 2.59,
+          "median_ms": 1.0
+        },
+        "Nabla-L1": {
+          "moves": 8905,
+          "mean_nodes": 340.1,
+          "median_nodes": 126,
+          "mean_ms": 2.58,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No X-ray (chi=0)",
+      "slug": "chi_0",
+      "p_holm": 1.0
+    },
+    {
+      "games": 200,
+      "wins": 94,
+      "losses": 88,
+      "draws": 18,
+      "score": 0.515,
+      "draw_rate": 0.09,
+      "ptnml": [
+        11,
+        10,
+        57,
+        6,
+        16
+      ],
+      "elo": 10.43,
+      "ci95_low": -27.49,
+      "ci95_high": 48.6,
+      "elo_err": 38.05,
+      "z": 0.5396,
+      "p_value": 0.5894730784389872,
+      "los": 0.705263,
+      "tag": "exp3_L1_lambda_0",
+      "engine_a": "L1_lambda_0",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261422,
+      "wall_s": 53.76,
+      "pgn": "benchmarks\\raw\\exp3_L1_lambda_0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 102.5,
+      "compute": {
+        "L1_lambda_0": {
+          "moves": 8652,
+          "mean_nodes": 327.5,
+          "median_nodes": 130.0,
+          "mean_ms": 2.15,
+          "median_ms": 1.0
+        },
+        "Nabla-L1": {
+          "moves": 8650,
+          "mean_nodes": 327.0,
+          "median_nodes": 126.5,
+          "mean_ms": 2.21,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No attenuation (lambda=0)",
+      "slug": "lambda_0",
+      "p_holm": 1.0
+    },
+    {
+      "games": 200,
+      "wins": 85,
+      "losses": 92,
+      "draws": 23,
+      "score": 0.4825,
+      "draw_rate": 0.115,
+      "ptnml": [
+        25,
+        9,
+        34,
+        12,
+        20
+      ],
+      "elo": -12.17,
+      "ci95_low": -60.99,
+      "ci95_high": 36.18,
+      "elo_err": 48.59,
+      "z": -0.4943,
+      "p_value": 0.6210626496538478,
+      "los": 0.310531,
+      "tag": "exp3_L1_ablate_flux",
+      "engine_a": "L1_ablate_flux",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261423,
+      "wall_s": 50.72,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_flux.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 111.8,
+      "compute": {
+        "L1_ablate_flux": {
+          "moves": 9582,
+          "mean_nodes": 262.1,
+          "median_nodes": 111.0,
+          "mean_ms": 1.65,
+          "median_ms": 0.0
+        },
+        "Nabla-L1": {
+          "moves": 9585,
+          "mean_nodes": 289.6,
+          "median_nodes": 121,
+          "mean_ms": 1.85,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No Mobility (flux)",
+      "slug": "ablate_flux",
+      "p_holm": 1.0
+    },
+    {
+      "games": 200,
+      "wins": 77,
+      "losses": 99,
+      "draws": 24,
+      "score": 0.445,
+      "draw_rate": 0.12,
+      "ptnml": [
+        22,
+        14,
+        42,
+        8,
+        14
+      ],
+      "elo": -38.37,
+      "ci95_low": -82.99,
+      "ci95_high": 5.01,
+      "elo_err": 44.0,
+      "z": -1.733,
+      "p_value": 0.08309886842318455,
+      "los": 0.041549,
+      "tag": "exp3_L1_ablate_terr",
+      "engine_a": "L1_ablate_terr",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261424,
+      "wall_s": 45.65,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_terr.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 106.0,
+      "compute": {
+        "L1_ablate_terr": {
+          "moves": 8997,
+          "mean_nodes": 320.8,
+          "median_nodes": 117,
+          "mean_ms": 0.99,
+          "median_ms": 0.0
+        },
+        "Nabla-L1": {
+          "moves": 9004,
+          "mean_nodes": 345.8,
+          "median_nodes": 125.0,
+          "mean_ms": 2.32,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No Territory (terr)",
+      "slug": "ablate_terr",
+      "p_holm": 0.581692
+    },
+    {
+      "games": 200,
+      "wins": 75,
+      "losses": 105,
+      "draws": 20,
+      "score": 0.425,
+      "draw_rate": 0.1,
+      "ptnml": [
+        25,
+        10,
+        45,
+        10,
+        10
+      ],
+      "elo": -52.51,
+      "ci95_low": -96.35,
+      "ci95_high": -10.28,
+      "elo_err": 43.04,
+      "z": -2.4414,
+      "p_value": 0.014631842583603371,
+      "los": 0.007316,
+      "tag": "exp3_L1_ablate_ex",
+      "engine_a": "L1_ablate_ex",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261425,
+      "wall_s": 45.68,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_ex.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 105.4,
+      "compute": {
+        "L1_ablate_ex": {
+          "moves": 8929,
+          "mean_nodes": 259.3,
+          "median_nodes": 121,
+          "mean_ms": 1.47,
+          "median_ms": 0.0
+        },
+        "Nabla-L1": {
+          "moves": 8945,
+          "mean_nodes": 273.0,
+          "median_nodes": 121,
+          "mean_ms": 1.74,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No Exchange (ex)",
+      "slug": "ablate_ex",
+      "p_holm": 0.117055
+    },
+    {
+      "games": 200,
+      "wins": 70,
+      "losses": 104,
+      "draws": 26,
+      "score": 0.415,
+      "draw_rate": 0.13,
+      "ptnml": [
+        21,
+        15,
+        50,
+        5,
+        9
+      ],
+      "elo": -59.64,
+      "ci95_low": -100.35,
+      "ci95_high": -20.5,
+      "elo_err": 39.93,
+      "z": -3.0001,
+      "p_value": 0.00269933603366989,
+      "los": 0.00135,
+      "tag": "exp3_L1_ablate_king",
+      "engine_a": "L1_ablate_king",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261426,
+      "wall_s": 51.73,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_king.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 104.8,
+      "compute": {
+        "L1_ablate_king": {
+          "moves": 8871,
+          "mean_nodes": 330.1,
+          "median_nodes": 126,
+          "mean_ms": 1.98,
+          "median_ms": 1.0
+        },
+        "Nabla-L1": {
+          "moves": 8890,
+          "mean_nodes": 316.1,
+          "median_nodes": 137.0,
+          "mean_ms": 2.01,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No King safety (king)",
+      "slug": "ablate_king",
+      "p_holm": 0.024294
+    },
+    {
+      "games": 200,
+      "wins": 84,
+      "losses": 85,
+      "draws": 31,
+      "score": 0.4975,
+      "draw_rate": 0.155,
+      "ptnml": [
+        8,
+        12,
+        62,
+        9,
+        9
+      ],
+      "elo": -1.74,
+      "ci95_low": -33.96,
+      "ci95_high": 30.46,
+      "elo_err": 32.21,
+      "z": -0.106,
+      "p_value": 0.9155777951746354,
+      "los": 0.457789,
+      "tag": "exp3_L1_ablate_trop",
+      "engine_a": "L1_ablate_trop",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261427,
+      "wall_s": 50.71,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_trop.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 111.4,
+      "compute": {
+        "L1_ablate_trop": {
+          "moves": 9535,
+          "mean_nodes": 279.2,
+          "median_nodes": 106,
+          "mean_ms": 1.72,
+          "median_ms": 0.0
+        },
+        "Nabla-L1": {
+          "moves": 9536,
+          "mean_nodes": 275.9,
+          "median_nodes": 104.0,
+          "mean_ms": 1.74,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No Tropism (trop)",
+      "slug": "ablate_trop",
+      "p_holm": 1.0
+    },
+    {
+      "games": 200,
+      "wins": 70,
+      "losses": 110,
+      "draws": 20,
+      "score": 0.4,
+      "draw_rate": 0.1,
+      "ptnml": [
+        29,
+        11,
+        42,
+        7,
+        11
+      ],
+      "elo": -70.44,
+      "ci95_low": -117.06,
+      "ci95_high": -26.2,
+      "elo_err": 45.43,
+      "z": -3.1427,
+      "p_value": 0.0016739913686245936,
+      "los": 0.000837,
+      "tag": "exp3_L1_ablate_pawn",
+      "engine_a": "L1_ablate_pawn",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261428,
+      "wall_s": 56.79,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_pawn.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 107.0,
+      "compute": {
+        "L1_ablate_pawn": {
+          "moves": 9086,
+          "mean_nodes": 345.7,
+          "median_nodes": 124.0,
+          "mean_ms": 2.15,
+          "median_ms": 1.0
+        },
+        "Nabla-L1": {
+          "moves": 9111,
+          "mean_nodes": 340.8,
+          "median_nodes": 122,
+          "mean_ms": 2.22,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No Pawns (pawn)",
+      "slug": "ablate_pawn",
+      "p_holm": 0.01674
+    },
+    {
+      "games": 200,
+      "wins": 94,
+      "losses": 91,
+      "draws": 15,
+      "score": 0.5075,
+      "draw_rate": 0.075,
+      "ptnml": [
+        5,
+        6,
+        78,
+        3,
+        8
+      ],
+      "elo": 5.21,
+      "ci95_low": -21.39,
+      "ci95_high": 31.87,
+      "elo_err": 26.63,
+      "z": 0.3844,
+      "p_value": 0.7006862141620995,
+      "los": 0.649657,
+      "tag": "exp3_L1_ablate_conf",
+      "engine_a": "L1_ablate_conf",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261429,
+      "wall_s": 50.76,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_conf.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 106.1,
+      "compute": {
+        "L1_ablate_conf": {
+          "moves": 9009,
+          "mean_nodes": 301.3,
+          "median_nodes": 124,
+          "mean_ms": 1.88,
+          "median_ms": 1.0
+        },
+        "Nabla-L1": {
+          "moves": 9008,
+          "mean_nodes": 296.4,
+          "median_nodes": 121.0,
+          "mean_ms": 1.88,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No Confinement (conf)",
+      "slug": "ablate_conf",
+      "p_holm": 1.0
+    },
+    {
+      "games": 200,
+      "wins": 98,
+      "losses": 82,
+      "draws": 20,
+      "score": 0.54,
+      "draw_rate": 0.1,
+      "ptnml": [
+        12,
+        7,
+        52,
+        11,
+        18
+      ],
+      "elo": 27.85,
+      "ci95_low": -11.84,
+      "ci95_high": 68.29,
+      "elo_err": 40.06,
+      "z": 1.3748,
+      "p_value": 0.16918659952710377,
+      "los": 0.915407,
+      "tag": "exp3_L1_ablate_tempo",
+      "engine_a": "L1_ablate_tempo",
+      "engine_b": "Nabla-L1",
+      "book": "8moves_v3.pgn",
+      "seed": 20261430,
+      "wall_s": 61.93,
+      "pgn": "benchmarks\\raw\\exp3_L1_ablate_tempo.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 106.2,
+      "compute": {
+        "L1_ablate_tempo": {
+          "moves": 9019,
+          "mean_nodes": 387.3,
+          "median_nodes": 130,
+          "mean_ms": 2.59,
+          "median_ms": 1.0
+        },
+        "Nabla-L1": {
+          "moves": 9013,
+          "mean_nodes": 368.4,
+          "median_nodes": 131,
+          "mean_ms": 2.44,
+          "median_ms": 1.0
+        }
+      },
+      "label": "No Tempo (tempo)",
+      "slug": "ablate_tempo",
+      "p_holm": 1.0
+    }
+  ],
+  "level0": [
+    {
+      "games": 200,
+      "wins": 90,
+      "losses": 99,
+      "draws": 11,
+      "score": 0.4775,
+      "draw_rate": 0.055,
+      "ptnml": [
+        6,
+        2,
+        89,
+        1,
+        2
+      ],
+      "elo": -15.65,
+      "ci95_low": -35.67,
+      "ci95_high": 4.27,
+      "elo_err": 19.97,
+      "z": -1.5392,
+      "p_value": 0.12375729030941478,
+      "los": 0.061879,
+      "tag": "exp3_L0_chi_0",
+      "engine_a": "L0_chi_0",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261471,
+      "wall_s": 12.67,
+      "pgn": "benchmarks\\raw\\exp3_L0_chi_0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 85.8,
+      "compute": {
+        "L0_chi_0": {
+          "moves": 6976,
+          "mean_nodes": 28.7,
+          "median_nodes": 30.0,
+          "mean_ms": 0.03,
+          "median_ms": 0.0
+        },
+        "Nabla-L0": {
+          "moves": 6981,
+          "mean_nodes": 30.6,
+          "median_nodes": 32,
+          "mean_ms": 0.04,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No X-ray (chi=0)",
+      "slug": "chi_0",
+      "p_holm": 0.371272
+    },
+    {
+      "games": 200,
+      "wins": 80,
+      "losses": 105,
+      "draws": 15,
+      "score": 0.4375,
+      "draw_rate": 0.075,
+      "ptnml": [
+        17,
+        8,
+        65,
+        3,
+        7
+      ],
+      "elo": -43.66,
+      "ci95_low": -78.94,
+      "ci95_high": -9.26,
+      "elo_err": 34.84,
+      "z": -2.4907,
+      "p_value": 0.012749982514095388,
+      "los": 0.006375,
+      "tag": "exp3_L0_lambda_0",
+      "engine_a": "L0_lambda_0",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261472,
+      "wall_s": 12.52,
+      "pgn": "benchmarks\\raw\\exp3_L0_lambda_0.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 88.0,
+      "compute": {
+        "L0_lambda_0": {
+          "moves": 7195,
+          "mean_nodes": 28.2,
+          "median_nodes": 29,
+          "mean_ms": 0.03,
+          "median_ms": 0.0
+        },
+        "Nabla-L0": {
+          "moves": 7208,
+          "mean_nodes": 29.9,
+          "median_nodes": 31.0,
+          "mean_ms": 0.03,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No attenuation (lambda=0)",
+      "slug": "lambda_0",
+      "p_holm": 0.051
+    },
+    {
+      "games": 200,
+      "wins": 92,
+      "losses": 100,
+      "draws": 8,
+      "score": 0.48,
+      "draw_rate": 0.04,
+      "ptnml": [
+        27,
+        0,
+        47,
+        6,
+        20
+      ],
+      "elo": -13.9,
+      "ci95_low": -61.89,
+      "ci95_high": 33.55,
+      "elo_err": 47.72,
+      "z": -0.5753,
+      "p_value": 0.5650774089780611,
+      "los": 0.282539,
+      "tag": "exp3_L0_ablate_terr",
+      "engine_a": "L0_ablate_terr",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261473,
+      "wall_s": 11.48,
+      "pgn": "benchmarks\\raw\\exp3_L0_ablate_terr.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 90.6,
+      "compute": {
+        "L0_ablate_terr": {
+          "moves": 7456,
+          "mean_nodes": 28.2,
+          "median_nodes": 29.0,
+          "mean_ms": 0.0,
+          "median_ms": 0.0
+        },
+        "Nabla-L0": {
+          "moves": 7458,
+          "mean_nodes": 29.7,
+          "median_nodes": 31.0,
+          "mean_ms": 0.04,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No Territory (terr)",
+      "slug": "ablate_terr",
+      "p_holm": 1.0
+    },
+    {
+      "games": 200,
+      "wins": 1,
+      "losses": 199,
+      "draws": 0,
+      "score": 0.005,
+      "draw_rate": 0.0,
+      "ptnml": [
+        99,
+        0,
+        1,
+        0,
+        0
+      ],
+      "elo": -919.54,
+      "ci95_low": -1041.26,
+      "ci95_high": -729.89,
+      "elo_err": 155.68,
+      "z": -99.4987,
+      "p_value": 0.0,
+      "los": 0.0,
+      "tag": "exp3_L0_ablate_ex",
+      "engine_a": "L0_ablate_ex",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261474,
+      "wall_s": 7.44,
+      "pgn": "benchmarks\\raw\\exp3_L0_ablate_ex.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 51.5,
+      "compute": {
+        "L0_ablate_ex": {
+          "moves": 3503,
+          "mean_nodes": 19.3,
+          "median_nodes": 20,
+          "mean_ms": 0.01,
+          "median_ms": 0.0
+        },
+        "Nabla-L0": {
+          "moves": 3602,
+          "mean_nodes": 49.1,
+          "median_nodes": 48.0,
+          "mean_ms": 0.08,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No Exchange (ex)",
+      "slug": "ablate_ex",
+      "p_holm": 0.0
+    },
+    {
+      "games": 200,
+      "wins": 93,
+      "losses": 89,
+      "draws": 18,
+      "score": 0.51,
+      "draw_rate": 0.09,
+      "ptnml": [
+        16,
+        7,
+        51,
+        9,
+        17
+      ],
+      "elo": 6.95,
+      "ci95_low": -34.56,
+      "ci95_high": 48.66,
+      "elo_err": 41.61,
+      "z": 0.329,
+      "p_value": 0.7421739437973967,
+      "los": 0.628913,
+      "tag": "exp3_L0_ablate_king",
+      "engine_a": "L0_ablate_king",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261475,
+      "wall_s": 13.6,
+      "pgn": "benchmarks\\raw\\exp3_L0_ablate_king.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 95.0,
+      "compute": {
+        "L0_ablate_king": {
+          "moves": 7896,
+          "mean_nodes": 28.8,
+          "median_nodes": 29.0,
+          "mean_ms": 0.03,
+          "median_ms": 0.0
+        },
+        "Nabla-L0": {
+          "moves": 7896,
+          "mean_nodes": 28.9,
+          "median_nodes": 29.0,
+          "mean_ms": 0.04,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No King safety (king)",
+      "slug": "ablate_king",
+      "p_holm": 1.0
+    },
+    {
+      "games": 200,
+      "wins": 66,
+      "losses": 117,
+      "draws": 17,
+      "score": 0.3725,
+      "draw_rate": 0.085,
+      "ptnml": [
+        30,
+        11,
+        46,
+        6,
+        7
+      ],
+      "elo": -90.59,
+      "ci95_low": -135.17,
+      "ci95_high": -48.77,
+      "elo_err": 43.2,
+      "z": -4.3259,
+      "p_value": 1.5189713107319884e-05,
+      "los": 8e-06,
+      "tag": "exp3_L0_ablate_pawn",
+      "engine_a": "L0_ablate_pawn",
+      "engine_b": "Nabla-L0",
+      "book": "8moves_v3.pgn",
+      "seed": 20261476,
+      "wall_s": 12.52,
+      "pgn": "benchmarks\\raw\\exp3_L0_ablate_pawn.pgn",
+      "terminations": {
+        "normal": 200
+      },
+      "mean_ply": 94.0,
+      "compute": {
+        "L0_ablate_pawn": {
+          "moves": 7783,
+          "mean_nodes": 27.1,
+          "median_nodes": 28,
+          "mean_ms": 0.01,
+          "median_ms": 0.0
+        },
+        "Nabla-L0": {
+          "moves": 7815,
+          "mean_nodes": 28.5,
+          "median_nodes": 30,
+          "mean_ms": 0.02,
+          "median_ms": 0.0
+        }
+      },
+      "label": "No Pawns (pawn)",
+      "slug": "ablate_pawn",
+      "p_holm": 7.6e-05
+    }
+  ]
+}

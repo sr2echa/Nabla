@@ -1,0 +1,45 @@
+{
+  "native_bench": {
+    "L0": {
+      "nodes": 446,
+      "evaluations": 427,
+      "median_decision_ms": 0.36,
+      "iqr_decision_ms": 0.055,
+      "median_nps": 76923,
+      "us_per_node": 13.0,
+      "checksum": "6a47b1a12c5224eb",
+      "param_hash": "c3deee9880eb64dc"
+    },
+    "L1": {
+      "nodes": 24372,
+      "evaluations": 21117,
+      "median_decision_ms": 12.54,
+      "iqr_decision_ms": 1.625,
+      "median_nps": 121505,
+      "us_per_node": 8.23,
+      "checksum": "df8495f55e672e45",
+      "param_hash": "c3deee9880eb64dc"
+    },
+    "L2": {
+      "nodes": 40477,
+      "evaluations": 36164,
+      "median_decision_ms": 21.02,
+      "iqr_decision_ms": 2.88,
+      "median_nps": 120368,
+      "us_per_node": 8.31,
+      "checksum": "8bd5497f52f9efa6",
+      "param_hash": "c3deee9880eb64dc"
+    }
+  },
+  "wasm_mean_ms": {
+    "L0": 1.76,
+    "L1": 15.58,
+    "L2": 29.89
+  },
+  "wasm_slowdown_x": {
+    "L0": 4.89,
+    "L1": 1.24,
+    "L2": 1.42
+  },
+  "bit_identical_48_48": true
+}

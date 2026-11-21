@@ -53,17 +53,17 @@ import Base from "../layouts/Base.astro";
 
     <h2>The model</h2>
     <p>Nabla is not a trained network. The energy is 57 named coefficients, the ones in the design notes, plus four constants that stay fixed: a pawn is the unit of energy, a ray stops once its transmittance falls below 0.05, the light cone has sharpness 0.1, and the control scale is 1. The coefficients in this version are the hand-set starting values. A tuner can print a fit. It does not replace them.</p>
-    <p>The page and the command-line engine are the same program. The page's copy is WebAssembly, committed as <code>web/src/engine/nabla_wasm_bg.wasm</code>. That file is 925,960 bytes, checked 17 November 2026. Building the site does not compile it again.</p>
-    <p>Choosing a move costs one visit per position it looks at. On an Intel i7-7700HQ, one thread, a visit in the 16-position bench averages about 7 microseconds. Level 0 visits each legal move, and the forced replies when the move gives check. Level 2, the default in a seat, also plays one reply and then the captures, so a sharp position costs more than a quiet one.</p>
-    <p>Three positions from that bench, Level 2, temperature 0, no clock, on that machine, 17 November 2026:</p>
+    <p>The page and the command-line engine are the same program. The page's copy is WebAssembly, committed as <code>web/src/engine/nabla_wasm_bg.wasm</code>. That file is 935,057 bytes, checked 21 November 2026. Building the site does not compile it again.</p>
+    <p>Choosing a move costs one visit per position it looks at. On an Intel i7-7700HQ, one thread, a visit in the 16-position bench averages about 8.3 microseconds at Level 2. Level 0 visits each legal move, and the forced replies when the move gives check. Level 2, the default in a seat, also plays one reply and then the captures, so a sharp position costs more than a quiet one.</p>
+    <p>Three positions from that bench, Level 2, temperature 0, no clock, on that machine, 21 November 2026:</p>
     <table class="results">
       <tbody>
-        <tr><td>Starting position</td><td>422 visits, 2 ms</td></tr>
-        <tr><td>Middlegame, all pieces still on</td><td>5,269 visits, 38 ms</td></tr>
-        <tr><td>King and one pawn</td><td>50 visits, under 1 ms</td></tr>
+        <tr><td>Starting position</td><td>441 visits, 2 ms</td></tr>
+        <tr><td>Middlegame, all pieces still on</td><td>5,939 visits, 49 ms</td></tr>
+        <tr><td>King and one pawn</td><td>56 visits, under 1 ms</td></tr>
       </tbody>
     </table>
-    <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions the mean is 0.3 ms at Level 0, 7.8 ms at Level 1, and 14.6 ms at Level 2.</p>
+    <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions (5-run medians) decision latency is 0.36 ms at Level 0, 12.5 ms at Level 1, and 21.0 ms at Level 2 (native vs WebAssembly bit-identical 48/48).</p>
 
     <h2>What the board shows</h2>
     <p>The play page draws the position, not a second board of ornaments. A steel rim means White controls that square more than Black. An olive rim means the opposite. The rim is drawn only where the difference is clear, so an empty centre stays an empty square.</p>
@@ -72,17 +72,18 @@ import Base from "../layouts/Base.astro";
     <p>The column on the right is Nabla's reading of the position, and it stays while the other side thinks. Two Nablas use two colours. Pause the game and hover a mark on the board to see the pieces and squares behind it. The delay before an engine move is at the top of a seat. The game waits while that seat is open.</p>
 
     <h2>Benchmarks</h2>
-    <p>These are Nabla's own self-play games, 17 November 2026. A match against Stockfish or Maia has not been recorded, so those rows are empty on purpose. A short browser game is not this table.</p>
+    <p>Measured 21 November 2026 on native engines using fastchess (4,840 anchored pool games on <code>8moves_v3.pgn</code> at 10+0.1 s, joint Ordo fit against Stockfish 19 <code>UCI_LimitStrength</code> anchors). Browser matches are not this table.</p>
     <table class="results">
       <tbody>
-        <tr><td>Level 1 vs Level 0</td><td>+521 ± 120</td></tr>
-        <tr><td>Level 2 vs Level 1</td><td>+334 ± 76</td></tr>
-        <tr><td>Time losses, 1,000 games a level</td><td>0</td></tr>
-        <tr><td>Against Stockfish</td><td>Not measured</td></tr>
-        <tr><td>Against Maia</td><td>Not measured</td></tr>
+        <tr><td>Level 1 vs Level 0</td><td>+443 ± 93 Elo (184W–13L–3D)</td></tr>
+        <tr><td>Level 2 vs Level 1</td><td>+372 ± 79 Elo (174W–16L–10D)</td></tr>
+        <tr><td>Time losses, 600 stress games (4+0.04 s)</td><td>0 (40/40 UCI compliance)</td></tr>
+        <tr><td>Stockfish 19 anchored rating (Level 2 / 1 / 0)</td><td>1607 ± 24 / 1337 ± 29 / 964 ± 43 Elo</td></tr>
+        <tr><td>Level 2 vs Stockfish 1500 / 1320 (100g each)</td><td>58–40–2 (+63 ± 65) / 74–18–8 (+220 ± 80)</td></tr>
+        <tr><td>Level 2 vs Maia-1500 / AB-PeSTO-2 (200g each)</td><td>+193 ± 47 Elo / +56 ± 45 Elo</td></tr>
       </tbody>
     </table>
-    <p>The first two lines are 200 games, 4+0.04, from the <code>noob_3moves</code> book. The time-loss line is the node budget at 2+0.02. <code>nabla-tune</code> printed a fit and did not change the coefficients. Stockfish's Elo cap, when you play it, is Stockfish's own limit.</p>
+    <p>The anchored pool runs on <code>8moves_v3.pgn</code> at 10+0.1 s with zero adjudication and replicates on <code>noob_3moves.epd</code>. <code>nabla-tune</code> runs MSE coordinate descent on quiet positions without replacing defaults. Stockfish's Elo cap, when you play it in the lab, is Stockfish's own limit.</p>
 
     <h2>License</h2>
     <p>Nabla is free software under the GNU GPL v3 or later.</p>

@@ -1,0 +1,103 @@
+{
+  "probes": [
+    {
+      "games": 20,
+      "wins": 17,
+      "losses": 3,
+      "draws": 0,
+      "score": 0.85,
+      "draw_rate": 0.0,
+      "ptnml": [
+        1,
+        0,
+        1,
+        0,
+        8
+      ],
+      "elo": 301.33,
+      "ci95_low": 108.73,
+      "ci95_high": 645.11,
+      "elo_err": 268.19,
+      "z": 3.4571,
+      "p_value": 0.0005461162375926019,
+      "los": 0.999727,
+      "tag": "exp1_probe_SF1320",
+      "engine_a": "Nabla-L2",
+      "engine_b": "SF-1320",
+      "book": "8moves_v3.pgn",
+      "seed": 101,
+      "wall_s": 97.5,
+      "pgn": "benchmarks\\raw\\exp1_probe_SF1320.pgn",
+      "terminations": {
+        "normal": 20
+      },
+      "mean_ply": 91.0,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 754,
+          "mean_nodes": 1672.3,
+          "median_nodes": 1350.5,
+          "mean_ms": 16.67,
+          "median_ms": 12.0
+        },
+        "SF-1320": {
+          "moves": 747,
+          "mean_nodes": 102212.8,
+          "median_nodes": 56200,
+          "mean_ms": 353.68,
+          "median_ms": 143.0
+        }
+      }
+    },
+    {
+      "games": 20,
+      "wins": 12,
+      "losses": 8,
+      "draws": 0,
+      "score": 0.6,
+      "draw_rate": 0.0,
+      "ptnml": [
+        3,
+        0,
+        2,
+        0,
+        5
+      ],
+      "elo": 70.44,
+      "ci95_low": -123.16,
+      "ci95_high": 330.49,
+      "elo_err": 226.82,
+      "z": 0.7255,
+      "p_value": 0.4681599098544282,
+      "los": 0.76592,
+      "tag": "exp1_probe_SF1500",
+      "engine_a": "Nabla-L2",
+      "engine_b": "SF-1500",
+      "book": "8moves_v3.pgn",
+      "seed": 102,
+      "wall_s": 108.47,
+      "pgn": "benchmarks\\raw\\exp1_probe_SF1500.pgn",
+      "terminations": {
+        "normal": 20
+      },
+      "mean_ply": 111,
+      "compute": {
+        "Nabla-L2": {
+          "moves": 951,
+          "mean_nodes": 1688.3,
+          "median_nodes": 1203,
+          "mean_ms": 16.18,
+          "median_ms": 9.0
+        },
+        "SF-1500": {
+          "moves": 949,
+          "mean_nodes": 88787.5,
+          "median_nodes": 45786,
+          "mean_ms": 301.44,
+          "median_ms": 122.0
+        }
+      }
+    }
+  ],
+  "sf_sec_per_game": 4.875
+}

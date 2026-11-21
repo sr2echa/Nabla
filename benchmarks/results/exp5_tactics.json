@@ -1,0 +1,138 @@
+{
+  "wac300": [
+    {
+      "engine": "Nabla-L0",
+      "solved": 43,
+      "total": 300,
+      "rate": 0.1433,
+      "ci95": [
+        0.1082,
+        0.1875
+      ],
+      "mean_nodes": 46.6
+    },
+    {
+      "engine": "Nabla-L1",
+      "solved": 62,
+      "total": 300,
+      "rate": 0.2067,
+      "ci95": [
+        0.1647,
+        0.2561
+      ],
+      "mean_nodes": 580.5
+    },
+    {
+      "engine": "Nabla-L2",
+      "solved": 85,
+      "total": 300,
+      "rate": 0.2833,
+      "ci95": [
+        0.2353,
+        0.3368
+      ],
+      "mean_nodes": 2549.1
+    },
+    {
+      "engine": "AB-PeSTO-1",
+      "solved": 70,
+      "total": 300,
+      "rate": 0.2333,
+      "ci95": [
+        0.189,
+        0.2844
+      ],
+      "mean_nodes": 283.8
+    },
+    {
+      "engine": "AB-PeSTO-2",
+      "solved": 92,
+      "total": 300,
+      "rate": 0.3067,
+      "ci95": [
+        0.2572,
+        0.361
+      ],
+      "mean_nodes": 1631
+    },
+    {
+      "engine": "Maia-1500",
+      "solved": 39,
+      "total": 300,
+      "rate": 0.13,
+      "ci95": [
+        0.0966,
+        0.1728
+      ],
+      "mean_nodes": 1
+    }
+  ],
+  "bk24": [
+    {
+      "engine": "Nabla-L0",
+      "solved": 1,
+      "total": 24,
+      "rate": 0.0417,
+      "ci95": [
+        0.0074,
+        0.2024
+      ],
+      "mean_nodes": 37.7
+    },
+    {
+      "engine": "Nabla-L1",
+      "solved": 2,
+      "total": 24,
+      "rate": 0.0833,
+      "ci95": [
+        0.0232,
+        0.2585
+      ],
+      "mean_nodes": 306.0
+    },
+    {
+      "engine": "Nabla-L2",
+      "solved": 5,
+      "total": 24,
+      "rate": 0.2083,
+      "ci95": [
+        0.0924,
+        0.4047
+      ],
+      "mean_nodes": 1958.8
+    },
+    {
+      "engine": "AB-PeSTO-1",
+      "solved": 2,
+      "total": 24,
+      "rate": 0.0833,
+      "ci95": [
+        0.0232,
+        0.2585
+      ],
+      "mean_nodes": 206.8
+    },
+    {
+      "engine": "AB-PeSTO-2",
+      "solved": 3,
+      "total": 24,
+      "rate": 0.125,
+      "ci95": [
+        0.0434,
+        0.31
+      ],
+      "mean_nodes": 2266.2
+    },
+    {
+      "engine": "Maia-1500",
+      "solved": 4,
+      "total": 24,
+      "rate": 0.1667,
+      "ci95": [
+        0.0668,
+        0.3585
+      ],
+      "mean_nodes": 1
+    }
+  ]
+}

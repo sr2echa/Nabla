@@ -1,0 +1,213 @@
+{
+  "positions_per_endgame": 200,
+  "results": [
+    {
+      "engine": "Nabla-L0",
+      "kind": "KQK",
+      "games": 200,
+      "converted": 103,
+      "rate": 0.515,
+      "ci95": [
+        0.4461,
+        0.5833
+      ],
+      "mean_plies_to_mate": 47.2,
+      "reasons": {
+        "mate": 103,
+        "fifty": 88,
+        "repetition": 9
+      }
+    },
+    {
+      "engine": "Nabla-L0",
+      "kind": "KRK",
+      "games": 200,
+      "converted": 12,
+      "rate": 0.06,
+      "ci95": [
+        0.0347,
+        0.1019
+      ],
+      "mean_plies_to_mate": 20.3,
+      "reasons": {
+        "mate": 12,
+        "fifty": 121,
+        "repetition": 67
+      }
+    },
+    {
+      "engine": "Nabla-L0",
+      "kind": "KPK",
+      "games": 200,
+      "converted": 56,
+      "rate": 0.28,
+      "ci95": [
+        0.2224,
+        0.3459
+      ],
+      "mean_plies_to_mate": 57.3,
+      "reasons": {
+        "mate": 56,
+        "material": 38,
+        "50move_limit": 91,
+        "repetition": 14,
+        "stalemate": 1
+      }
+    },
+    {
+      "engine": "Nabla-L1",
+      "kind": "KQK",
+      "games": 200,
+      "converted": 103,
+      "rate": 0.515,
+      "ci95": [
+        0.4461,
+        0.5833
+      ],
+      "mean_plies_to_mate": 47.2,
+      "reasons": {
+        "mate": 103,
+        "fifty": 88,
+        "repetition": 9
+      }
+    },
+    {
+      "engine": "Nabla-L1",
+      "kind": "KRK",
+      "games": 200,
+      "converted": 12,
+      "rate": 0.06,
+      "ci95": [
+        0.0347,
+        0.1019
+      ],
+      "mean_plies_to_mate": 20.3,
+      "reasons": {
+        "mate": 12,
+        "fifty": 121,
+        "repetition": 67
+      }
+    },
+    {
+      "engine": "Nabla-L1",
+      "kind": "KPK",
+      "games": 200,
+      "converted": 56,
+      "rate": 0.28,
+      "ci95": [
+        0.2224,
+        0.3459
+      ],
+      "mean_plies_to_mate": 57.3,
+      "reasons": {
+        "mate": 56,
+        "material": 38,
+        "50move_limit": 91,
+        "repetition": 14,
+        "stalemate": 1
+      }
+    },
+    {
+      "engine": "Nabla-L2",
+      "kind": "KQK",
+      "games": 200,
+      "converted": 190,
+      "rate": 0.95,
+      "ci95": [
+        0.9104,
+        0.9726
+      ],
+      "mean_plies_to_mate": 39.8,
+      "reasons": {
+        "mate": 190,
+        "fifty": 10
+      }
+    },
+    {
+      "engine": "Nabla-L2",
+      "kind": "KRK",
+      "games": 200,
+      "converted": 97,
+      "rate": 0.485,
+      "ci95": [
+        0.4167,
+        0.5539
+      ],
+      "mean_plies_to_mate": 50.8,
+      "reasons": {
+        "fifty": 89,
+        "material": 14,
+        "mate": 97
+      }
+    },
+    {
+      "engine": "Nabla-L2",
+      "kind": "KPK",
+      "games": 200,
+      "converted": 149,
+      "rate": 0.745,
+      "ci95": [
+        0.6804,
+        0.8004
+      ],
+      "mean_plies_to_mate": 45.2,
+      "reasons": {
+        "mate": 149,
+        "material": 39,
+        "50move_limit": 11,
+        "stalemate": 1
+      }
+    },
+    {
+      "engine": "Nabla-L2 (no conf)",
+      "kind": "KQK",
+      "games": 200,
+      "converted": 119,
+      "rate": 0.595,
+      "ci95": [
+        0.5258,
+        0.6606
+      ],
+      "mean_plies_to_mate": 44.0,
+      "reasons": {
+        "mate": 119,
+        "fifty": 81
+      }
+    },
+    {
+      "engine": "Nabla-L2 (no conf)",
+      "kind": "KRK",
+      "games": 200,
+      "converted": 15,
+      "rate": 0.075,
+      "ci95": [
+        0.046,
+        0.12
+      ],
+      "mean_plies_to_mate": 46.1,
+      "reasons": {
+        "fifty": 156,
+        "mate": 15,
+        "material": 29
+      }
+    },
+    {
+      "engine": "Nabla-L2 (no conf)",
+      "kind": "KPK",
+      "games": 200,
+      "converted": 77,
+      "rate": 0.385,
+      "ci95": [
+        0.3203,
+        0.454
+      ],
+      "mean_plies_to_mate": 58.2,
+      "reasons": {
+        "50move_limit": 83,
+        "material": 39,
+        "mate": 77,
+        "stalemate": 1
+      }
+    }
+  ]
+}
