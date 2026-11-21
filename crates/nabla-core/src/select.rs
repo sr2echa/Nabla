@@ -509,6 +509,33 @@ pub fn static_eval(pos: &Chess, p: &Params, cfg: &EvalConfig) -> (Terms, f32) {
     (terms, e)
 }
 
+/// White-positive Level 1 quiescence evaluation (03 §4.2, protocol §6.1).
+pub fn qsearch_eval(pos: &Chess, p: &Params) -> f32 {
+    let eval = EvalConfig {
+        realisable_capture: false,
+        disabled: 0,
+    };
+    let field_eval = EvalConfig {
+        realisable_capture: true,
+        disabled: 0,
+    };
+    let mut s = Searcher {
+        p,
+        eval,
+        field_eval,
+        contempt: 0.0,
+        engine: pos.turn(),
+        path: Vec::new(),
+        nodes: 0,
+        evaluations: 0,
+        seldepth: 0,
+        node_limit: None,
+        aborted: false,
+    };
+    let (v, _) = s.qsearch(pos, 0, -INF, INF);
+    sign(pos.turn()) * v
+}
+
 /// Mate distance in moves for a mate score (positive: the mover mates).
 pub fn mate_in(q: f32) -> Option<i32> {
     if q.abs() < M_MATE - MATE_BAND {

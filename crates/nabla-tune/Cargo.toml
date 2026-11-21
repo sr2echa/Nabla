@@ -12,5 +12,6 @@ name = "nabla-tune"
 path = "src/main.rs"
 
 [dependencies]
+libm.workspace = true
 nabla-core.workspace = true
 shakmaty.workspace = true

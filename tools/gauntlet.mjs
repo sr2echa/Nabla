@@ -12,7 +12,7 @@
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { delimiter, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
 const { values } = parseArgs({
@@ -22,6 +22,9 @@ const { values } = parseArgs({
     elo: { type: "string", default: "1320" },
     level: { type: "string", default: "2" },
     "other-level": { type: "string", default: "0" },
+    tc: { type: "string", default: "10+0.1" },
+    seed: { type: "string" },
+    pgnout: { type: "string" },
     nabla: { type: "string" },
     stockfish: { type: "string", default: "stockfish" },
     lc0: { type: "string", default: "lc0" },
@@ -29,8 +32,16 @@ const { values } = parseArgs({
     book: { type: "string" },
     fastchess: { type: "string", default: "fastchess" },
     concurrency: { type: "string", default: "1" },
+    help: { type: "boolean", short: "h", default: false },
   },
 });
+
+if (values.help) {
+  console.log("Usage: node tools/gauntlet.mjs --opponent <stockfish|maia|self> [options]");
+  console.log("  --rounds <N> --tc <10+0.1> --level <0|1|2> --other-level <0|1|2> --elo <1320..3190>");
+  console.log("  --book <path.(pgn|epd)> --seed <N> --pgnout <path> --concurrency <N>");
+  process.exit(0);
+}
 
 const root = resolve(import.meta.dirname, "..");
 const nabla = values.nabla ?? (process.platform === "win32"
@@ -47,7 +58,7 @@ if (!commandExists(values.fastchess)) {
 }
 
 const engines = [
-  ["-engine", `cmd=${nabla}`, "name=Nabla", `option.Level=${values.level}`, "option.Temperature=0", "tc=10+0.1"],
+  ["-engine", `cmd=${nabla}`, "name=Nabla", `option.Level=${values.level}`, "option.Temperature=0", `tc=${values.tc}`],
 ];
 
 if (values.opponent === "stockfish") {
@@ -56,7 +67,7 @@ if (values.opponent === "stockfish") {
   if (!Number.isInteger(elo) || elo < 1320 || elo > 3190) fail("--elo must be an integer from 1320 to 3190.");
   engines.push([
     "-engine", `cmd=${values.stockfish}`, `name=SF${elo}`,
-    "option.UCI_LimitStrength=true", `option.UCI_Elo=${elo}`, "option.Threads=1", "tc=10+0.1",
+    "option.UCI_LimitStrength=true", `option.UCI_Elo=${elo}`, "option.Threads=1", `tc=${values.tc}`,
   ]);
 } else if (values.opponent === "maia") {
   if (!values.weights || !existsSync(values.weights)) fail("--weights must be a Maia network file for lc0.");
@@ -70,7 +81,7 @@ if (values.opponent === "stockfish") {
   if (![0, 1, 2].includes(other)) fail("--other-level must be 0, 1, or 2.");
   engines.push([
     "-engine", `cmd=${nabla}`, `name=NablaL${other}`,
-    `option.Level=${other}`, "option.Temperature=0", "tc=10+0.1",
+    `option.Level=${other}`, "option.Temperature=0", `tc=${values.tc}`,
   ]);
 } else {
   fail("--opponent must be stockfish, maia, or self.");
@@ -79,10 +90,12 @@ if (values.opponent === "stockfish") {
 if (values.book && !existsSync(values.book)) fail(`Opening book not found: ${values.book}`);
 
 mkdirSync(outDir, { recursive: true });
-const pgn = resolve(outDir, "match.pgn");
+const pgn = values.pgnout ? resolve(values.pgnout) : resolve(outDir, "match.pgn");
+const bookFormat = values.book?.toLowerCase().endsWith(".epd") ? "epd" : "pgn";
 const args = [
   ...engines.flat(),
-  ...(values.book ? ["-openings", `file=${values.book}`, "format=pgn", "order=random"] : []),
+  ...(values.book ? ["-openings", `file=${values.book}`, `format=${bookFormat}`, "order=random"] : []),
+  ...(values.seed ? ["-srand", values.seed] : []),
   "-rounds", String(rounds),
   "-repeat",
   "-concurrency", values.concurrency,
@@ -107,10 +120,9 @@ process.exit(result.status ?? 1);
 
 function commandExists(name) {
   if (name.includes("/") || name.includes("\\")) return existsSync(name);
-  const probe = process.platform === "win32" ? "where" : "command";
-  const args = process.platform === "win32" ? [name] : ["-v", name];
-  const found = spawnSync(probe, args, { stdio: "ignore" });
-  return found.status === 0;
+  const dirs = (process.env.PATH ?? "").split(delimiter).filter(Boolean);
+  const exts = process.platform === "win32" ? [".exe", ".cmd", ".bat", ""] : [""];
+  return dirs.some((dir) => exts.some((ext) => existsSync(join(dir, `${name}${ext}`))));
 }
 
 function fail(message) {
