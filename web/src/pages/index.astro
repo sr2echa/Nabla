@@ -1,12 +1,18 @@
 ---
 import "katex/dist/katex.min.css";
 import Base from "../layouts/Base.astro";
-import fig1EloLadder from "../../../benchmarks/figures/fig1_elo_ladder.svg?url";
-import fig2ComputePareto from "../../../benchmarks/figures/fig2_compute_pareto.svg?url";
-import fig3Ablations from "../../../benchmarks/figures/fig3_ablations.svg?url";
-import fig4TemperatureBlunders from "../../../benchmarks/figures/fig4_temperature_blunders.svg?url";
-import fig5TacticsEndgames from "../../../benchmarks/figures/fig5_tactics_endgames.svg?url";
-import fig6EvalCorrelation from "../../../benchmarks/figures/fig6_eval_correlation.svg?url";
+import { ModelLatencyChart } from "../components/charts/ModelLatencyChart";
+import { EloLadderChart } from "../components/charts/EloLadderChart";
+import { ComputeParetoChart } from "../components/charts/ComputeParetoChart";
+import { DiagnosticsCharts } from "../components/charts/DiagnosticsCharts";
+import {
+  ablationsData,
+  eloLadderData,
+  modelLatencyData,
+  staticEvalData,
+  tacticsEndgamesData,
+  temperatureData,
+} from "../data/benchmarks";
 ---
 
 <Base>
@@ -58,22 +64,24 @@ import fig6EvalCorrelation from "../../../benchmarks/figures/fig6_eval_correlati
     <p>Temperature spreads the choice. At 0, Nabla plays the best move it found. A higher temperature sometimes plays a lesser one. The cap is 5 pawns. Each colour can have its own level. You set both from that colour's seat.</p>
 
     <h2>The model</h2>
-    <p>Nabla is not a trained network. The energy is 57 named coefficients, the ones in the design notes, plus four constants that stay fixed: a pawn is the unit of energy, a ray stops once its transmittance falls below 0.05, the light cone has sharpness 0.1, and the control scale is 1. The coefficients in this version are the hand-set starting values. A tuner can print a fit. It does not replace them.</p>
-    <p>The page and the command-line engine are the same program. The page's copy is WebAssembly, committed as <code>web/src/engine/nabla_wasm_bg.wasm</code>. That file is 935,057 bytes, checked 21 November 2026. Building the site does not compile it again.</p>
-    <p>Choosing a move costs one visit per position it looks at. On an Intel i7-7700HQ, one thread, a visit in the 16-position bench averages about 8.3 microseconds at Level 2. Level 0 visits each legal move, and the forced replies when the move gives check. Level 2, the default in a seat, also plays one reply and then the captures, so a sharp position costs more than a quiet one.</p>
-    <p>Three positions from that bench, Level 2, temperature 0, no clock, on that machine, 21 November 2026:</p>
+    <p>Nabla is not a trained network. The energy is 57 named coefficients (parameter hash <code>c3deee9880eb64dc</code>), the ones in the design notes, plus four constants that stay fixed: a pawn is the unit of energy, a ray stops once its transmittance falls below 0.05, the light cone has sharpness 0.1, and the control scale is 1. The coefficients in this version are the hand-set starting values; <code>nabla-tune</code> can print a fit on quiet positions and does not replace them.</p>
+    <p>The page and the command-line engine are the same program. The page's copy is WebAssembly, committed as <code>web/src/engine/nabla_wasm_bg.wasm</code> (935,057 bytes, checked 21 November 2026; 48/48 native-vs-WASM bench decisions bit-identical). Building the site does not compile Rust again.</p>
+    <p>Choosing a move costs one visit per position it looks at. On an Intel Core i7-7700HQ, one thread, the 16-position bench reaches roughly 120k nps at Level 2 (about 8.3 microseconds per visit). Level 0 visits each legal move and the forced replies when the move gives check. Level 2, the default in a seat, also plays one reply and the captures after it, so a sharp position costs more than a quiet one.</p>
+    <p>Three positions from that bench, Level 2, temperature 0, no clock, on that machine (7-run medians), 21 November 2026:</p>
     <table class="results">
       <tbody>
-        <tr><td>Starting position</td><td>441 visits, 2 ms</td></tr>
-        <tr><td>Middlegame, all pieces still on</td><td>5,939 visits, 49 ms</td></tr>
-        <tr><td>King and one pawn</td><td>56 visits, under 1 ms</td></tr>
+        <tr><td>Starting position</td><td>421 visits, 2 ms</td></tr>
+        <tr><td>Middlegame, all pieces still on</td><td>5,889 visits, 46 ms</td></tr>
+        <tr><td>King and one pawn</td><td>50 visits, under 1 ms</td></tr>
       </tbody>
     </table>
-    <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions (5-run medians) decision latency is 0.36 ms at Level 0, 12.5 ms at Level 1, and 21.0 ms at Level 2 (native vs WebAssembly bit-identical 48/48).</p>
+    <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions (5-run native medians), decision latency is 0.36 ms at Level 0, 12.54 ms at Level 1, and 21.02 ms at Level 2.</p>
+
+    <ModelLatencyChart client:load data={modelLatencyData} />
 
     <h2>Rules and scope</h2>
     <p>The engine follows standard FIDE chess rules via <code>shakmaty</code>: castling on both wings, en passant (with SEE removing the captured pawn before X-ray discovery), all four pawn promotions (queen promotions in quiescence), checkmate, stalemate, the fifty-move rule, insufficient material, threefold repetition on the board, and first-recurrence repetition (&plusmn;0.15 pawn contempt) during search. Chess960 is excluded.</p>
-    <p>Only territory and king pressure read the ray field <em>Φ</em><sub><em>c</em></sub>; the other seven terms use exact bitboards and SEE. Static <em>E</em>(<em>S</em>) omits castling rights and SEE ignores pins, and the 57 weights are untuned hand-set defaults (MAE 1.79 pawns vs Stockfish depth 10). Field evaluation costs roughly 8.3 µs per node (~15× slower per node than classical piece-square tables), so Nabla leads PeSTO alpha-beta at equal search depth (+844 Elo at 1-ply, +56 Elo at 2-ply), while deeper classical search wins at equal wall-clock time.</p>
+    <p>Only territory and king pressure read the ray field <em>Φ</em><sub><em>c</em></sub>; the other seven terms use exact bitboards and SEE. Static <em>E</em>(<em>S</em>) omits castling rights, SEE ignores pins, and the hand-set weights sit at MAE 1.79 pawns against Stockfish depth 10. Recomputing the field costs ~8.3 µs per node (~15× slower per node than classical piece-square tables), so Nabla leads PeSTO alpha-beta at equal search depth (+844 Elo at 1-ply, +56 Elo at 2-ply), while deeper classical search wins at equal wall-clock time.</p>
 
     <h2>What the board shows</h2>
     <p>The play page draws the position, not a second board of ornaments. A steel rim means White controls that square more than Black. An olive rim means the opposite. The rim is drawn only where the difference is clear, so an empty centre stays an empty square.</p>
@@ -84,45 +92,9 @@ import fig6EvalCorrelation from "../../../benchmarks/figures/fig6_eval_correlati
     <h2>Benchmarks</h2>
     <p>Measured 21 November 2026 on native builds using <code>fastchess</code> on an Intel Core i7-7700HQ across <strong>11,920 games</strong> (9,520 tournament games plus 2,400 endgame conversion games; zero adjudication; 0 time forfeits, 0 illegal moves, 0 crashes; 40/40 UCI compliance). Joint <code>Ordo</code> v1.0 ratings run over 4,780 pool games on <code>8moves_v3.pgn</code> at 10+0.1 s, pinned to Stockfish 19 <code>UCI_LimitStrength</code> anchors (1320/1500/1700/1900). Browser play uses the same WASM core, while full protocol tables live in the <a href="https://github.com/sr2echa/Nabla/blob/main/docs/research/benchmark-report.md" target="_blank" rel="noreferrer">benchmark report on GitHub</a>.</p>
 
-    <div class="table-wrap">
-      <table class="results wide">
-        <thead>
-          <tr>
-            <th>Engine</th>
-            <th class="num">Ordo Elo (&plusmn;95% CI)</th>
-            <th class="num">Nodes/mv</th>
-            <th class="num">Time/mv</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>SF-1900 (anchor)</td><td class="num">1900.0 (pinned)</td><td class="num">113,270</td><td class="num">319.5 ms</td></tr>
-          <tr><td>SF-1700 (anchor)</td><td class="num">1700.0 (pinned)</td><td class="num">86,518</td><td class="num">304.0 ms</td></tr>
-          <tr class="hl"><td>Nabla-L2</td><td class="num">1607.0 &plusmn; 24.2</td><td class="num">1,702</td><td class="num">16.07 ms</td></tr>
-          <tr><td>AB-PeSTO-2</td><td class="num">1547.6 &plusmn; 34.0</td><td class="num">798</td><td class="num">0.44 ms</td></tr>
-          <tr><td>SF-1500 (anchor)</td><td class="num">1500.0 (pinned)</td><td class="num">89,570</td><td class="num">325.0 ms</td></tr>
-          <tr><td>Maia-1900 (lc0 1n)</td><td class="num">1450.7 &plusmn; 31.0</td><td class="num">1</td><td class="num">2.99 ms</td></tr>
-          <tr><td>Maia-1500 (hold-out)</td><td class="num">1356.0 &plusmn; 26.7</td><td class="num">1</td><td class="num">3.22 ms</td></tr>
-          <tr class="hl"><td>Nabla-L1</td><td class="num">1336.7 &plusmn; 29.4</td><td class="num">316</td><td class="num">3.10 ms</td></tr>
-          <tr><td>AB-PeSTO-1</td><td class="num">1334.2 &plusmn; 34.2</td><td class="num">177</td><td class="num">0.04 ms</td></tr>
-          <tr><td>SF-1320 (anchor)</td><td class="num">1320.0 (pinned)</td><td class="num">96,726</td><td class="num">369.1 ms</td></tr>
-          <tr><td>Maia-1100 (lc0 1n)</td><td class="num">1235.6 &plusmn; 31.7</td><td class="num">1</td><td class="num">2.97 ms</td></tr>
-          <tr class="hl"><td>Nabla-L0</td><td class="num">963.9 &plusmn; 43.4</td><td class="num">36</td><td class="num">0.23 ms</td></tr>
-          <tr><td>AB-PeSTO-0</td><td class="num">119.7 &plusmn; 155.7</td><td class="num">17</td><td class="num">0.00 ms</td></tr>
-          <tr><td>Material-1ply</td><td class="num">116.6 &plusmn; 155.6</td><td class="num">24</td><td class="num">0.01 ms</td></tr>
-          <tr><td>Random</td><td class="num">-211.0 &plusmn; 169.9</td><td class="num">1</td><td class="num">0.01 ms</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <EloLadderChart client:load data={eloLadderData} />
 
-    <figure class="fig">
-      <img src={fig1EloLadder} alt="Anchored Ordo Elo ladder comparing Nabla Levels 0–2 with Stockfish 19 anchors, Maia, and classical PeSTO baselines" />
-      <figcaption>Figure 1. Joint Ordo CCRL-Blitz ratings (95% CIs) across 4,780 pool games pinned to Stockfish 19 anchors.</figcaption>
-    </figure>
-
-    <figure class="fig">
-      <img src={fig2ComputePareto} alt="Elo versus nodes per move and wall-clock time per move comparing Nabla, PeSTO, Maia, and Stockfish" />
-      <figcaption>Figure 2. Strength against mean nodes/move and decision latency: Nabla beats PeSTO at matched search depth, while incremental PSTs remain faster per node.</figcaption>
-    </figure>
+    <ComputeParetoChart client:load data={eloLadderData} />
 
     <p>Across pairwise checks, component ablations, temperature sweeps, tactical puzzles, endgame conversions, and quiet evaluation probes, the strengths and open gaps separate cleanly:</p>
 
@@ -148,27 +120,15 @@ import fig6EvalCorrelation from "../../../benchmarks/figures/fig6_eval_correlati
       </table>
     </div>
 
-    <details class="more-figs">
-      <summary>Additional benchmark figures (ablations, temperature, tactics &amp; endgames, static eval)</summary>
-      <figure class="fig">
-        <img src={fig3Ablations} loading="lazy" alt="Holm-corrected Elo deltas for component ablations at Level 0 and Level 1" />
-        <figcaption>Figure 3. Component ablations (200 games per variant at 30+0.3 s) with Holm-adjusted significance.</figcaption>
-      </figure>
-      <figure class="fig">
-        <img src={fig4TemperatureBlunders} loading="lazy" alt="Elo, policy entropy, ACPL, and blunder rates across Boltzmann temperatures" />
-        <figcaption>Figure 4. Monotonic strength decay, policy entropy growth, and blunder rates against Stockfish depth 10.</figcaption>
-      </figure>
-      <figure class="fig">
-        <img src={fig5TacticsEndgames} loading="lazy" alt="WAC-300 and BK-24 tactical solve rates alongside KQK, KRK, and KPK endgame conversions" />
-        <figcaption>Figure 5. Tactical suite solve rates and verified endgame conversion against Stockfish depth 8 with and without confinement.</figcaption>
-      </figure>
-      <figure class="fig">
-        <img src={fig6EvalCorrelation} loading="lazy" alt="Scatter plot and per-term correlation of Nabla static evaluation against Stockfish depth 10" />
-        <figcaption>Figure 6. Static evaluation correlation across 2,000 quiet middlegame, opening, and endgame positions.</figcaption>
-      </figure>
-    </details>
+    <DiagnosticsCharts
+      client:load
+      ablations={ablationsData}
+      temperature={temperatureData}
+      tacticsEndgames={tacticsEndgamesData}
+      staticEval={staticEvalData}
+    />
 
-    <p><code>nabla-tune</code> runs MSE coordinate descent on quiet positions without replacing defaults. Stockfish's Elo cap, when you play it in the lab, is Stockfish's own limit.</p>
+    <p>Stockfish's Elo cap, when you play it in the lab, is Stockfish's own limit.</p>
 
     <h2>License</h2>
     <p>Nabla is free software under the GNU GPL v3 or later.</p>

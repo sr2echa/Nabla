@@ -1,16 +1,72 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function assertCleanCharts(page: Page, expectedCount: number) {
+  const info = await page.evaluate(() => {
+    const svgs = [...document.querySelectorAll<SVGSVGElement>(".shadcn-chart svg.recharts-surface")];
+    const zeroSized = svgs.filter((s) => {
+      const r = s.getBoundingClientRect();
+      return r.width < 50 || r.height < 50;
+    }).length;
+    const nanAttrs: string[] = [];
+    for (const s of svgs) {
+      for (const el of s.querySelectorAll("*")) {
+        for (const attr of ["d", "cx", "cy", "x", "y", "x1", "x2", "y1", "y2", "width", "height"]) {
+          const v = el.getAttribute(attr);
+          if (v && v.includes("NaN")) nanAttrs.push(`${el.tagName}@${attr}=${v}`);
+        }
+      }
+    }
+    return { count: svgs.length, zeroSized, nanAttrs };
+  });
+  expect(info.count).toBeGreaterThanOrEqual(expectedCount);
+  expect(info.zeroSized).toBe(0);
+  expect(info.nanAttrs).toEqual([]);
+}
 
 test("the notes are the front page and the board fits the play page", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (err) => errors.push(err.message));
+  page.on("console", (msg) => {
+    if (msg.type() === "error") errors.push(msg.text());
+  });
+
   await page.goto("/");
   await expect(page).toHaveTitle(/∇ Nabla/);
   await expect(page.locator("h1")).toContainText("∇");
   await expect(page.getByRole("link", { name: /Try it out/ })).toHaveAttribute("href", "/play");
   await expect(page.locator(".math .katex")).toHaveCount(3);
-  const figsLoaded = await page.evaluate(() => {
-    const imgs = [...document.querySelectorAll<HTMLImageElement>(".paper > figure.fig img")];
-    return imgs.length === 2 && imgs.every((img) => img.complete && img.naturalWidth > 0);
-  });
-  expect(figsLoaded).toBeTruthy();
+  await expect(page.locator(".shadcn-chart svg.recharts-surface")).toHaveCount(4, { timeout: 10000 });
+  await assertCleanCharts(page, 4);
+
+  // Interactive chart toggles & diagnostics tabs
+  await page.getByRole("button", { name: "Data table" }).click();
+  await expect(page.locator(".chart-card table.results tbody tr")).toHaveCount(15);
+  await page.getByRole("button", { name: "Chart", exact: true }).click();
+  await assertCleanCharts(page, 4);
+
+  await page.getByRole("button", { name: "Time / move (ms)" }).click();
+  await assertCleanCharts(page, 4);
+
+  await page.getByRole("button", { name: "Level 0 (6 terms)" }).click();
+  await assertCleanCharts(page, 4);
+
+  await page.getByRole("tab", { name: "Temperature & Blunders" }).click();
+  await assertCleanCharts(page, 4);
+  await page.getByRole("button", { name: "Blunder Rate & ACPL" }).click();
+  await assertCleanCharts(page, 4);
+
+  await page.getByRole("tab", { name: "Tactics & Endgames" }).click();
+  await assertCleanCharts(page, 4);
+  await page.getByRole("button", { name: /WAC-300/ }).click();
+  await assertCleanCharts(page, 4);
+
+  await page.getByRole("tab", { name: "Static Eval" }).click();
+  await assertCleanCharts(page, 4);
+  await page.getByRole("button", { name: "Per-term Spearman ρ" }).click();
+  await assertCleanCharts(page, 4);
+
+  const notesFit = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+  expect(notesFit).toBeTruthy();
 
   await page.goto("/play");
   await expect(page.locator("piece.white.king")).toBeVisible({ timeout: 15000 });
@@ -108,11 +164,13 @@ test("the notes are the front page and the board fits the play page", async ({ p
   await expect(page.locator("#legend-caption")).toContainText("White controls");
   await page.locator("#help-close").click();
   await expect(page.locator("#help .about")).toContainText("Pause the game and hover");
+  expect(errors).toEqual([]);
 });
 
 test("a narrow screen stacks the reading under the board", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
+  await expect(page.locator(".shadcn-chart svg.recharts-surface")).toHaveCount(4, { timeout: 10000 });
   const notesWide = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
   expect(notesWide).toBeTruthy();
 

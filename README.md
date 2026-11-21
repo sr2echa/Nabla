@@ -308,9 +308,9 @@ bench positions, 21 November 2026, Level 2 and temperature 0 with no clock:
 
 | Position | Visits | Time |
 | --- | --- | --- |
-| Starting position | 441 | 2 ms |
-| Middlegame, all pieces still on | 5,939 | 49 ms |
-| King and one pawn | 56 | under 1 ms |
+| Starting position | 421 | 2 ms |
+| Middlegame, all pieces still on | 5,889 | 46 ms |
+| King and one pawn | 50 | under 1 ms |
 
 The middlegame figure is that one sharp bench position (captures to seldepth 16),
 not every middlegame. Level 0 on the same three positions stayed under 1 ms
