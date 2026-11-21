@@ -219,3 +219,61 @@ fn node_budget_is_respected_and_deterministic() {
     cfg.node_limit = None;
     assert!(!decide(&pos, &history(&pos), &p, &cfg).budget_exhausted);
 }
+
+#[test]
+fn node_budget_fallback_uses_realisable_captures() {
+    // Qe2 is attacked by defended Re8. Even under a tiny Level 2 node budget
+    // that forces Level 0 fallback, White must not blunder Qxe8? because beta_1
+    // remains active during fallback scoring.
+    let pos = common::parse("4rrk1/ppp2pp1/7p/8/8/8/PPP1QPPP/R5K1 w - - 0 1");
+    let p = Params::default();
+    let mut cfg = config(Level::Reply);
+    cfg.node_limit = Some(8);
+    let d = decide(&pos, &history(&pos), &p, &cfg);
+    assert!(d.budget_exhausted);
+    let best = d
+        .best
+        .expect("a move")
+        .to_uci(shakmaty::CastlingMode::Standard)
+        .to_string();
+    assert_ne!(best, "e2e8", "budget fallback blundered Qxe8?: {best}");
+}
+
+#[test]
+fn delta_pruning_keeps_checking_captures_and_passer_captures() {
+    let p = Params::default();
+
+    // Level 1 must not delta-prune 2. Qxh7# after 1... Rd4 when White is down
+    // material and 2. Qxd8 raises alpha.
+    let pos = common::parse("q2r2rk/5ppp/8/8/7Q/3B4/R4PPP/3R3K b - - 0 1");
+    let d = decide(&pos, &history(&pos), &p, &config(Level::Quiescent));
+    let rd4 = d
+        .candidates
+        .iter()
+        .find(|c| c.uci == "d8d4")
+        .expect("Rd4 is legal");
+    assert!(
+        rd4.q <= -(M_MATE - 3.0),
+        "Level 1 missed Qxh7# via delta pruning: q = {}",
+        rd4.q
+    );
+
+    // King-and-pawn ending: after 1... hxg2 White is on the move in qsearch.
+    // 2. c8=Q is tried first (raising alpha by ~7 pawns because Kc6 catches Pc7),
+    // and 2. exf7 turns f7 and g6 into two unstoppable passers (outscoring c8=Q).
+    // Delta pruning must keep pawn captures when the opponent has no pieces.
+    let kp = common::parse("8/2P2p2/2k1P1P1/8/8/7p/6Q1/6K1 b - - 0 1");
+    let d_kp = decide(&kp, &history(&kp), &p, &config(Level::Quiescent));
+    let hxg2 = d_kp
+        .candidates
+        .iter()
+        .find(|c| c.uci == "h3g2")
+        .expect("hxg2 is legal");
+    assert!(
+        hxg2.pv
+            .iter()
+            .any(|m| m.to_uci(shakmaty::CastlingMode::Standard).to_string() == "e6f7"),
+        "Level 1 delta-pruned the passer-unlocking pawn capture exf7; pv = {:?}",
+        hxg2.pv
+    );
+}

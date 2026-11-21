@@ -44,18 +44,16 @@ Because $`s_{\text{stm}(S'_m)} = -s_{\text{stm}(S)}`$, the mover's change in ene
 along edge $m$ (from $S$ to $`S'_m`$) is
 
 ```math
-\nabla_m E(S) = s_{\text{stm}(S)} \left[ E(S'_m) - E(S) \right] = -\,e(S'_m) - e(S). \qquad \text{(2)}
+\nabla_m E(S) = s_{\text{stm}(S)} \left[ E(S'_m) - E(S) \right] = -\,e(S'_m) - e(S) = -\,\big[V_\text{mover}(S'_m) - V_\text{mover}(S)\big]. \qquad \text{(2)}
 ```
 
-This is the graph gradient (the oriented incidence operator applied to $`E`$),
-taken from the mover's side. Since $`e(S)`$ is the same for every move, maximising
-$\nabla_m E$ is equivalent to maximising $`-e(S'_m)`$. Level 0 is therefore
-**steepest ascent of the mover's energy over the neighbours of $S$ in the game
-graph**, the precise sense in which Nabla "follows the gradient" (resolves C-4).
+Here $`V_\text{mover}(S) \equiv -e(S) = -s_{\text{stm}(S)} E(S)`$ is the mover's potential energy (negative when the mover stands better), so the energy-lowering sign is consistent: maximising $`\nabla_m E`$ (steepest ascent of the mover's advantage $`-e(S'_m)`$) is equivalent to **steepest descent of $`V_\text{mover}`$** onto the child that leaves the opponent with the lowest side-to-move value $`e(S'_m)`$ (resolves C-4).
 Scoring every child from the mover's side, rather than maximising a White-positive
 score for both colours, is what keeps Black from playing for White (resolves C-5).
 Because $E$ is a sum of terms, so is $\nabla_m E$; the per-term gradients are the
-move's explanation (§6).
+move's explanation (§6). Level 0 implements this single-edge descent directly (with
+forced check evasions); Levels 1 and 2 are shallow adversarial minimax refinements
+that settle captures and one reply before evaluating.
 
 ---
 
@@ -133,7 +131,7 @@ q(S, ply, α, β):
     else:
         moves ← all legal moves                                      # evasions, no stand-pat
     for m in moves:
-        if not in_check and prunable(m) and e(S) + gain(m) + δ_margin < α:  continue
+        if not in_check and not gives_check(S, m) and prunable(m) and e(S) + gain(m) + δ_margin < α:  continue
         s ← −q(S'_m, ply + 1, −β, −α)
         if s > best:
             best ← s
@@ -143,9 +141,11 @@ q(S, ply, α, β):
 ```
 
 - `gain(m)` is the captured piece's SEE value plus 8 for a queen promotion.
-- `prunable(m)` is false for promotions and for captures of the opponent's last
-  non-pawn piece. Those captures switch on large endgame terms (the unstoppable
-  passer bonus $`U`$), which the 2-pawn margin cannot cover.
+- `prunable(m)` is false for promotions, captures of the opponent's last
+  non-pawn piece, and pawn captures when the opponent already has no non-pawn
+  pieces. Those captures can switch on large endgame terms (the unstoppable
+  passer bonus $`U`$), which the 2-pawn margin cannot cover; checking captures are
+  likewise never delta-pruned because checks can mate.
 - Underpromotions are excluded.
 - Repetition is checked through the shared path of Zobrist keys, which spans the
   game history and the search path.
@@ -215,24 +215,27 @@ The root policy maps scores $`Q_L(m)`$ to a move:
 the leaf at the end of its principal variation: $`Q(m) = s_\text{mover} E(\text{leaf})`$.
 The explanation is the per-term decomposition of
 $s_\text{mover}\,[E(\text{leaf}) - E(S)]$, and its terms sum exactly to
-$`Q(m) - e(S)`$. This is tested for all three levels. When the line ends in a
-terminal state (mate, draw), the score is a boundary value rather than an energy,
-and no explanation is given. The tempo term contributes $-2\delta_\text{tempo}$ when
-the leaf has the opponent to move (always at Level 0) and 0 otherwise, and the
-exchange term changes perspective in the same way; comparisons between moves are
-therefore best read relative to the best move. Explanations are exposed by the
-custom UCI command `explain` and by `Lab.analyze` in the WebAssembly API (05 §5).
+$`Q(m) - e(S)`$. At Levels 1 and 2, this decomposition attributes the change over
+the full principal variation (including the opponent's reply and captures) to the
+candidate move rather than only its immediate 1-ply edge. This identity is tested
+for all three levels. When the line ends in a terminal state (mate, draw) or falls
+back to Level 0 after budget exhaustion at Levels 1–2, no explanation is given.
+The tempo term contributes $-2\delta_\text{tempo}$ when the leaf has the opponent
+to move (always at Level 0) and 0 otherwise, and the exchange term changes
+perspective in the same way; comparisons between moves are therefore best read
+relative to the best move. Explanations are exposed by the custom UCI command
+`explain` and by `Lab.analyze` in the WebAssembly API (05 §5).
 
 ---
 
 ## 7. Time management
 
 Average decisions take milliseconds, but quiescence has no natural size limit, and
-a rare tactical position can take far longer. The correctness gate (protocol §3)
-showed this: without a budget, 6 of 1,000 Level 1 games and about 25 of 1,000
-Level 2 games were lost on time at 2 s + 0.02 s per move. Decisions are therefore
-budgeted in **nodes**, not time, which keeps them deterministic and keeps the core
-free of clocks (WebAssembly has none).
+a rare tactical position can take far longer. The v0.1 correctness gate (protocol
+§13) showed this: without a budget, 9 of 1,000 Level 1 games and 38 of 1,000
+Level 2 games were lost on time at 2 s + 0.02 s per move (under `-concurrency 7`
+on a 4-core CPU). Decisions are therefore budgeted in **nodes**, not time, which
+keeps them deterministic and keeps the core free of clocks (WebAssembly has none).
 
 - **Budget.** The UCI layer converts the clock into a node budget:
   $`\min(t/40 + \tfrac34\,\mathrm{inc},\ t/8)`$ minus the overhead reserve (or
@@ -241,10 +244,12 @@ free of clocks (WebAssembly has none).
   is 50 ms, adjustable with the `Move Overhead` option, and the budget uses at
   most an eighth of the remaining clock. `go nodes N` sets the budget directly; `go infinite`, `go ponder`,
   analysis commands, `bench`, and tests have none.
-- **Exhaustion.** Under a budget, root moves are searched in Level 0 order. If the
-  budget runs out, the remaining root moves keep their Level 0 scores, and an
-  `info string` says so. Scores are then a mixture of levels, which is acceptable
-  only as a time emergency.
+- **Exhaustion.** Under a budget, root moves are first scored and ordered at
+  Level 0 (`β₁` active) without aborting the ordering pass. If the subsequent
+  Level 1 or Level 2 budget runs out, any unsearched root moves keep those valid
+  Level 0 fallback scores (with `explain = None` so mixed-level gradients are not
+  shown), and an `info string` says so. Scores are then a mixture of levels,
+  which is acceptable only as a time emergency.
 - **Safeguards.** If the remaining clock time is below 100 ms, Level 2 falls back to
   Level 1. Under `go infinite` and `go ponder`, `bestmove` is held until `stop` or
   `ponderhit`.

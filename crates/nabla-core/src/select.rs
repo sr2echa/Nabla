@@ -145,6 +145,9 @@ pub struct Decision {
 struct Searcher<'a> {
     p: &'a Params,
     eval: EvalConfig,
+    /// Evaluation config for Level 0 ordering and budget-exhaustion fallback
+    /// (realisable captures active so hanging captures are never rewarded).
+    field_eval: EvalConfig,
     contempt: f32,
     engine: Color,
     path: Vec<u64>,
@@ -165,10 +168,16 @@ impl Searcher<'_> {
         }
     }
 
+    /// Side-to-move value $e(S)$ (03 Eq. (1)) using `eval`.
+    fn static_value_with(&mut self, pos: &Chess, eval: &EvalConfig) -> f32 {
+        self.evaluations += 1;
+        sign(pos.turn()) * evaluate(pos, self.p, eval).total()
+    }
+
     /// Side-to-move value $e(S)$ (03 Eq. (1)).
     fn static_value(&mut self, pos: &Chess) -> f32 {
-        self.evaluations += 1;
-        sign(pos.turn()) * evaluate(pos, self.p, &self.eval).total()
+        let eval = self.eval;
+        self.static_value_with(pos, &eval)
     }
 
     /// Draw value $d(S)$ with contempt; the engine is the side to move at the
@@ -217,7 +226,8 @@ impl Searcher<'_> {
             return (t, Line::terminal());
         }
         if !(extend_checks && pos.is_check()) {
-            return (self.static_value(pos), Line::default());
+            let eval = self.field_eval;
+            return (self.static_value_with(pos, &eval), Line::default());
         }
         let mut best = -INF;
         let mut best_line = Line::default();
@@ -261,11 +271,15 @@ impl Searcher<'_> {
         let mut best_line = Line::default();
         self.path.push(hash);
         for m in Self::ordered(&moves, |m| in_check || is_quiescent_candidate(pos, m)) {
-            if !in_check && prunable(pos, m) && stand + gain(m) as f32 + DELTA_MARGIN < alpha {
-                continue;
-            }
             let mut child = pos.clone();
             child.play_unchecked(m);
+            if !in_check
+                && !child.is_check()
+                && prunable(pos, m)
+                && stand + gain(m) as f32 + DELTA_MARGIN < alpha
+            {
+                continue;
+            }
             let (v, line) = self.qsearch(&child, ply + 1, -beta, -alpha);
             let v = -v;
             if v > best {
@@ -320,18 +334,23 @@ fn is_quiescent_candidate(pos: &Chess, m: Move) -> bool {
     }
 }
 
-/// Delta pruning may skip a capture unless it promotes or removes the
-/// opponent's last non-pawn piece, which switches on large endgame terms.
+/// Delta pruning may skip a capture unless it gives check, promotes, removes
+/// the opponent's last non-pawn piece, or captures a pawn in a pawn ending
+/// (which can unblock an unstoppable passer).
 fn prunable(pos: &Chess, m: Move) -> bool {
     if m.is_promotion() {
+        return false;
+    }
+    let their_pieces = pos.them() & !pos.board().pawns() & !pos.board().kings();
+    let piece_count = their_pieces.count();
+    if piece_count == 0 && m.capture() == Some(Role::Pawn) {
         return false;
     }
     let victim_is_piece = matches!(
         m.capture(),
         Some(Role::Knight | Role::Bishop | Role::Rook | Role::Queen)
     );
-    let their_pieces = pos.them() & !pos.board().pawns() & !pos.board().kings();
-    !(victim_is_piece && their_pieces.count() == 1)
+    !(victim_is_piece && piece_count == 1)
 }
 
 /// Material gained by a tactical move, for delta pruning.
@@ -366,6 +385,8 @@ fn order_key(m: Move) -> i32 {
 pub fn decide(root: &Chess, history: &[u64], p: &Params, cfg: &SearchConfig) -> Decision {
     let mut eval = cfg.eval;
     eval.realisable_capture = cfg.level == Level::Field;
+    let mut field_eval = cfg.eval;
+    field_eval.realisable_capture = true;
     let root_hash = board::hash(root);
     let mut path = history.to_vec();
     if path.last() != Some(&root_hash) {
@@ -374,6 +395,7 @@ pub fn decide(root: &Chess, history: &[u64], p: &Params, cfg: &SearchConfig) -> 
     let mut s = Searcher {
         p,
         eval,
+        field_eval,
         contempt: cfg.contempt,
         engine: root.turn(),
         path,
@@ -386,25 +408,38 @@ pub fn decide(root: &Chess, history: &[u64], p: &Params, cfg: &SearchConfig) -> 
 
     let root_terms = evaluate(root, p, &eval);
     let mover = sign(root.turn());
-    let mut root_moves: Vec<Move> = root.legal_moves().into_iter().collect();
-    if cfg.node_limit.is_some() && cfg.level != Level::Field {
-        // Under a budget, search the most promising moves first (Level 0 order),
-        // so an exhausted budget leaves only weak moves at their Level 0 score.
-        let mut keyed: Vec<(f32, Move)> = root_moves
-            .iter()
-            .map(|&m| {
-                let mut child = root.clone();
-                child.play_unchecked(m);
-                (-s.field_leaf(&child, 1, true).0, m)
-            })
-            .collect();
-        keyed.sort_by(|a, b| b.0.total_cmp(&a.0));
-        root_moves = keyed.into_iter().map(|(_, m)| m).collect();
-    }
+    let root_moves: Vec<Move> = root.legal_moves().into_iter().collect();
+    let ordered_roots: Vec<(Move, Option<(f32, Line)>)> =
+        if cfg.node_limit.is_some() && cfg.level != Level::Field {
+            // Under a budget, score every root move at Level 0 first without
+            // aborting so weak moves sort last and an exhausted budget falls
+            // back to valid Level 0 (realisable-capture) scores.
+            s.node_limit = None;
+            let mut keyed: Vec<(f32, Move, (f32, Line))> = root_moves
+                .into_iter()
+                .map(|m| {
+                    let mut child = root.clone();
+                    child.play_unchecked(m);
+                    let res = s.field_leaf(&child, 1, true);
+                    (-res.0, m, res)
+                })
+                .collect();
+            keyed.sort_by(|a, b| b.0.total_cmp(&a.0));
+            s.node_limit = cfg.node_limit;
+            if s.node_limit.is_some_and(|limit| s.nodes > limit) {
+                s.aborted = true;
+            }
+            keyed
+                .into_iter()
+                .map(|(_, m, res)| (m, Some(res)))
+                .collect()
+        } else {
+            root_moves.into_iter().map(|m| (m, None)).collect()
+        };
     let mut budget_exhausted = false;
-    let mut candidates: Vec<Candidate> = root_moves
+    let mut candidates: Vec<Candidate> = ordered_roots
         .into_iter()
-        .map(|m| {
+        .map(|(m, fallback)| {
             let mut child = root.clone();
             child.play_unchecked(m);
             let searched = if s.aborted {
@@ -417,18 +452,20 @@ pub fn decide(root: &Chess, history: &[u64], p: &Params, cfg: &SearchConfig) -> 
                 };
                 (!s.aborted).then_some(result)
             };
+            let fell_back = searched.is_none();
             let (v, line) = searched.unwrap_or_else(|| {
                 budget_exhausted = true;
-                s.field_leaf(&child, 1, true)
+                fallback.unwrap_or_else(|| s.field_leaf(&child, 1, true))
             });
             let line = Line::prepend(m, line);
-            let explain = (!line.terminal).then(|| {
-                let mut leaf = root.clone();
-                for &step in &line.moves {
-                    leaf.play_unchecked(step);
-                }
-                evaluate(&leaf, p, &eval).diff_scaled(&root_terms, mover)
-            });
+            let explain =
+                (!line.terminal && !(fell_back && cfg.level != Level::Field)).then(|| {
+                    let mut leaf = root.clone();
+                    for &step in &line.moves {
+                        leaf.play_unchecked(step);
+                    }
+                    evaluate(&leaf, p, &eval).diff_scaled(&root_terms, mover)
+                });
             Candidate {
                 mv: m,
                 uci: m.to_uci(CastlingMode::Standard).to_string(),
