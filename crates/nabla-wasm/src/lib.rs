@@ -1,13 +1,12 @@
 //! The lab's view of one game. Rules, fields, and move choice all stay in
 //! `nabla-core`; this file only turns them into JSON for the page.
 
-use nabla_core::board;
 use nabla_core::select::decide;
-use nabla_core::{Level, Params, SearchConfig, picture};
+use nabla_core::{EvalConfig, Level, Params, SearchConfig, board, picture_with_config, transport};
 use shakmaty::fen::Fen;
 use shakmaty::san::San;
 use shakmaty::uci::UciMove;
-use shakmaty::{CastlingMode, Chess, EnPassantMode, Move, Position};
+use shakmaty::{CastlingMode, Chess, Color, EnPassantMode, Move, Position, Role, Square};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -79,6 +78,27 @@ impl Lab {
         Ok(())
     }
 
+    /// Rebuild position and repetition history from a starting FEN and UCI
+    /// move sequence without advancing the game counter (used for undo/scrub).
+    pub fn replay(&mut self, start_fen: &str, uci_moves: &str) -> Result<(), JsError> {
+        let mut pos = Fen::from_ascii(start_fen.as_bytes())
+            .map_err(|e| JsError::new(&e.to_string()))?
+            .into_position::<Chess>(CastlingMode::Standard)
+            .map_err(|e| JsError::new(&e.to_string()))?;
+        let mut history = vec![board::hash(&pos)];
+        for token in uci_moves.split_whitespace() {
+            let m = UciMove::from_ascii(token.as_bytes())
+                .map_err(|e| JsError::new(&e.to_string()))?
+                .to_move(&pos)
+                .map_err(|e| JsError::new(&e.to_string()))?;
+            pos.play_unchecked(m);
+            history.push(board::hash(&pos));
+        }
+        self.pos = pos;
+        self.history = history;
+        Ok(())
+    }
+
     /// Legal moves as a JSON array of `{uci, san, from, to}`.
     pub fn moves(&self) -> String {
         let mut out = String::from("[");
@@ -104,7 +124,11 @@ impl Lab {
 
     /// The current position's fields and energy. This does not choose a move.
     pub fn view(&self) -> String {
-        let pic = picture(&self.pos, &self.params);
+        let cfg = EvalConfig {
+            realisable_capture: self.level == Level::Field,
+            disabled: 0,
+        };
+        let pic = picture_with_config(&self.pos, &self.params, &cfg);
         let mut out = String::from("{");
         push_status(&mut out, &self.pos, &self.history);
         out.push_str(",\"energy\":");
@@ -117,6 +141,52 @@ impl Lab {
         push_floats(&mut out, &pic.threats);
         out.push('}');
         out
+    }
+
+    /// Direct and X-ray contributors bearing on LERF square `sq` (0..64).
+    pub fn explain_square(&self, sq: u8) -> Result<String, JsError> {
+        let square =
+            Square::try_from(sq).map_err(|_| JsError::new("square index must be in 0..64"))?;
+        let sources = transport::square_sources(self.pos.board(), &self.params, square);
+        let mut out = String::from("{\"square\":");
+        push_str(&mut out, &square.to_string());
+        for (label, want_xray) in [("direct", false), ("xray", true)] {
+            out.push_str(",\"");
+            out.push_str(label);
+            out.push_str("\":{");
+            for (ci, (cname, color)) in [("white", Color::White), ("black", Color::Black)]
+                .iter()
+                .enumerate()
+            {
+                if ci > 0 {
+                    out.push(',');
+                }
+                out.push('"');
+                out.push_str(cname);
+                out.push_str("\":[");
+                let mut first = true;
+                for s in sources
+                    .iter()
+                    .filter(|s| s.xray == want_xray && s.color == *color)
+                {
+                    if !first {
+                        out.push(',');
+                    }
+                    first = false;
+                    out.push_str("{\"role\":");
+                    push_str(&mut out, role_name(s.role));
+                    out.push_str(",\"square\":");
+                    push_str(&mut out, &s.from.to_string());
+                    out.push_str(",\"weight\":");
+                    push_num(&mut out, s.weight);
+                    out.push('}');
+                }
+                out.push(']');
+            }
+            out.push('}');
+        }
+        out.push('}');
+        Ok(out)
     }
 
     /// Choose a move and explain the candidates.
@@ -232,5 +302,16 @@ fn push_num(out: &mut String, value: f32) {
         out.push_str(&format!("{value:.4}"));
     } else {
         out.push('0');
+    }
+}
+
+fn role_name(role: Role) -> &'static str {
+    match role {
+        Role::Pawn => "pawn",
+        Role::Knight => "knight",
+        Role::Bishop => "bishop",
+        Role::Rook => "rook",
+        Role::Queen => "queen",
+        Role::King => "king",
     }
 }

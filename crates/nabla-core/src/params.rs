@@ -14,7 +14,7 @@ pub const SIGMA_U: f32 = 0.1;
 pub const PHI_0: f32 = 1.0;
 
 macro_rules! params {
-    ($( $(#[$doc:meta])* $name:ident = $default:expr ),* $(,)?) => {
+    ($( $(#[$doc:meta])* $name:ident = $default:expr, [$min:expr, $max:expr] ),* $(,)?) => {
         /// Tunable coefficients of the energy functional, in pawn units where
         /// applicable. Field names match the symbols of 02 §9.
         #[derive(Clone, Debug, PartialEq)]
@@ -47,37 +47,53 @@ macro_rules! params {
                     _ => false,
                 }
             }
+
+            /// Valid `[min, max]` range from 02 §9 for `name`.
+            pub fn range(name: &str) -> Option<(f32, f32)> {
+                match name {
+                    $( stringify!($name) => Some(($min, $max)), )*
+                    _ => None,
+                }
+            }
         }
     };
 }
 
 params! {
     // 02 §9.1 Material.
-    m_n_mg = 3.2, m_n_eg = 3.2,
-    m_b_mg = 3.3, m_b_eg = 3.4,
-    m_r_mg = 5.0, m_r_eg = 5.2,
-    m_q_mg = 9.0, m_q_eg = 9.4,
+    m_n_mg = 3.2, [2.5, 4.0], m_n_eg = 3.2, [2.5, 4.0],
+    m_b_mg = 3.3, [2.5, 4.0], m_b_eg = 3.4, [2.5, 4.0],
+    m_r_mg = 5.0, [4.0, 6.5], m_r_eg = 5.2, [4.0, 6.5],
+    m_q_mg = 9.0, [8.0, 11.0], m_q_eg = 9.4, [8.0, 11.0],
     // 02 §9.2 Ray transport and control.
-    alpha_p = 1.0, alpha_n = 0.8, alpha_b = 0.8, alpha_r = 0.6, alpha_q = 0.4, alpha_k = 0.5,
-    lambda = 0.12,
-    theta_bat = 0.9, theta_fr = 0.25, theta_en = 0.5, theta_ep = 0.1,
-    chi = 0.35,
+    alpha_p = 1.0, [0.0, 2.0], alpha_n = 0.8, [0.0, 2.0], alpha_b = 0.8, [0.0, 2.0],
+    alpha_r = 0.6, [0.0, 2.0], alpha_q = 0.4, [0.0, 2.0], alpha_k = 0.5, [0.0, 2.0],
+    lambda = 0.12, [0.0, 0.5],
+    theta_bat = 0.9, [0.0, 1.0], theta_fr = 0.25, [0.0, 1.0],
+    theta_en = 0.5, [0.0, 1.0], theta_ep = 0.1, [0.0, 1.0],
+    chi = 0.35, [0.0, 1.0],
     // 02 §9.3 Mobility and territory.
-    mu_n = 0.040, mu_b = 0.035, mu_r = 0.025, mu_q = 0.012,
-    w_0 = 0.02, w_c = 0.06,
+    mu_n = 0.040, [0.0, 0.1], mu_b = 0.035, [0.0, 0.1],
+    mu_r = 0.025, [0.0, 0.1], mu_q = 0.012, [0.0, 0.1],
+    w_0 = 0.02, [0.0, 0.1], w_c = 0.06, [0.0, 0.2],
     // 02 §9.4 Exchange.
-    beta_1 = 1.0, beta_2 = 0.6,
+    beta_1 = 1.0, [0.0, 1.0], beta_2 = 0.6, [0.0, 1.0],
     // 02 §9.5 King safety.
-    g_0 = 0.6, gamma_q = 0.5, x_0 = 3.0, sigma_b = 1.0, d_max = 3.0,
-    xi = 0.8, nu_sh = 0.5, omega_chk = 0.5,
+    g_0 = 0.6, [0.0, 4.0], gamma_q = 0.5, [0.0, 2.0], x_0 = 3.0, [0.0, 10.0],
+    sigma_b = 1.0, [0.1, 4.0], d_max = 3.0, [0.5, 10.0],
+    xi = 0.8, [0.0, 3.0], nu_sh = 0.5, [0.0, 1.0], omega_chk = 0.5, [0.0, 2.0],
     // 02 §9.6 Tropism and king activity.
-    g_n = 0.03, g_b = 0.02, g_r = 0.02, g_q = 0.05, a_s = 2.0, g_k = 0.3,
+    g_n = 0.03, [0.0, 0.2], g_b = 0.02, [0.0, 0.2], g_r = 0.02, [0.0, 0.2],
+    g_q = 0.05, [0.0, 0.2], a_s = 2.0, [0.5, 6.0], g_k = 0.3, [0.0, 1.0],
     // 02 §9.7 Pawns.
-    h_max_mg = 0.5, h_max_eg = 1.5, b_rho = 0.6, theta_pp = 1.0, eps_blk = 0.3,
-    u_bonus = 5.0, eps_k = 0.05, psi_b = 0.05, psi_i = 0.15, psi_d = 0.15,
+    h_max_mg = 0.5, [0.0, 3.0], h_max_eg = 1.5, [0.0, 3.0], b_rho = 0.6, [0.0, 1.5],
+    theta_pp = 1.0, [0.5, 1.0], eps_blk = 0.3, [0.0, 1.0],
+    u_bonus = 5.0, [0.0, 8.0], eps_k = 0.05, [0.0, 0.3], psi_b = 0.05, [0.0, 0.3],
+    psi_i = 0.15, [0.0, 0.5], psi_d = 0.15, [0.0, 0.5],
     // 02 §9.8 Confinement and tempo.
-    zeta_1 = 1.0, zeta_2 = 0.3, delta_0 = 2.5, delta_s = 0.5,
-    delta_tempo = 0.1,
+    zeta_1 = 1.0, [0.0, 3.0], zeta_2 = 0.3, [0.0, 1.0],
+    delta_0 = 2.5, [1.0, 5.0], delta_s = 0.5, [0.1, 2.0],
+    delta_tempo = 0.1, [0.0, 0.3],
 }
 
 impl Params {

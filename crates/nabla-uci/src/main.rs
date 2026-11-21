@@ -9,7 +9,7 @@ use std::time::Instant;
 
 use nabla_core::board::{self, COLORS};
 use nabla_core::select::{mate_in, static_eval};
-use nabla_core::{Decision, Level, Params, SearchConfig, Term, decide, transport};
+use nabla_core::{Decision, EvalConfig, Level, Params, SearchConfig, Term, decide, transport};
 use shakmaty::fen::Fen;
 use shakmaty::uci::UciMove;
 use shakmaty::{CastlingMode, Chess, EnPassantMode, Position, Square};
@@ -20,11 +20,12 @@ const AUTHOR: &str = "Sreecharan S.";
 /// Remaining clock time below which Level 2 falls back to Level 1 (03 §7).
 const LOW_TIME_MS: u64 = 100;
 /// Conservative search speed used to turn a time budget into a node budget
-/// (03 §7); measured speed is about 140 nodes/ms on a 2017 laptop CPU.
-const NODES_PER_MS: u64 = 8;
+/// (03 §7); measured single-thread throughput is ~139 nodes/ms on an
+/// i7-7700HQ, so 70 nodes/ms keeps a 2x margin without starving sharp Level 2 moves.
+const NODES_PER_MS: u64 = 70;
 /// Default time reserved for process and protocol overhead per move; the
 /// `Move Overhead` option overrides it.
-const DEFAULT_OVERHEAD_MS: u64 = 50;
+const DEFAULT_OVERHEAD_MS: u64 = 20;
 
 /// Fixed bench suite: opening, middlegame, tactical, and endgame positions.
 const BENCH: &[&str] = &[
@@ -156,7 +157,17 @@ impl Engine {
             }
             (other, _) if other.starts_with("param_") => {
                 let symbol = &name["param_".len()..];
-                int.is_some_and(|v| self.params.set(symbol, v as f32 / 1000.0))
+                match (int, Params::range(symbol)) {
+                    (Some(v), Some((min, max))) => {
+                        let val = v as f32 / 1000.0;
+                        if (min..=max).contains(&val) {
+                            self.params.set(symbol, val)
+                        } else {
+                            false
+                        }
+                    }
+                    _ => false,
+                }
             }
             (other, _) if other.starts_with("ablate_") => {
                 match (Term::from_name(&name["ablate_".len()..]), value.as_str()) {
@@ -219,7 +230,7 @@ impl Engine {
                 (Some(movetime), _) => Some(movetime),
                 (None, Some(time)) => {
                     let inc = my_inc.unwrap_or(0);
-                    Some((time / 40 + inc * 3 / 4).min(time / 8))
+                    Some((time / 30 + inc * 3 / 4).min(time / 5))
                 }
                 (None, None) => None,
             };
@@ -247,7 +258,11 @@ impl Engine {
     }
 
     fn eval(&self) {
-        let (terms, e) = static_eval(&self.pos, &self.params, &self.cfg.eval);
+        let cfg = EvalConfig {
+            realisable_capture: self.cfg.level == Level::Field,
+            disabled: self.cfg.eval.disabled,
+        };
+        let (terms, e) = static_eval(&self.pos, &self.params, &cfg);
         println!("term     energy (pawns, White-positive)");
         for t in Term::ALL {
             println!("{:<8} {:+.3}", t.name(), terms.get(t));

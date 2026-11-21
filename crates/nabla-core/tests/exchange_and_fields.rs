@@ -157,6 +157,25 @@ fn battery_and_blocker_transmission() {
     // White Re2 shoots through Black Ke4 onto e5 in the direct channel.
     assert_eq!(f.direct[w][Square::E5.to_usize()], p.alpha_r * a(3.0));
     assert_eq!(f.xray[w][Square::E5.to_usize()], 0.0);
+
+    // `square_sources` agrees with `Fields::influence` and separates direct vs X-ray.
+    let e4_sources = transport::square_sources(pos.board(), &p, Square::E4);
+    let sum_e4: f32 = e4_sources
+        .iter()
+        .filter(|s| s.color == Color::White)
+        .map(|s| s.weight)
+        .sum();
+    assert!((sum_e4 - f.influence(Color::White, Square::E4)).abs() < 1e-6);
+    assert!(
+        e4_sources
+            .iter()
+            .any(|s| s.from == Square::C2 && s.role == Role::Bishop && s.xray)
+    );
+    assert!(
+        e4_sources
+            .iter()
+            .any(|s| s.from == Square::E2 && s.role == Role::Rook && !s.xray)
+    );
 }
 
 #[test]

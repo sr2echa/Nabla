@@ -18,6 +18,12 @@ function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
 }
 
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_export_0.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
+}
+
 let WASM_VECTOR_LEN = 0;
 
 const cachedTextEncoder = (typeof TextEncoder !== 'undefined' ? new TextEncoder('utf-8') : { encode: () => { throw Error('TextEncoder not available') } } );
@@ -74,12 +80,6 @@ function passStringToWasm0(arg, malloc, realloc) {
     return ptr;
 }
 
-function takeFromExternrefTable0(idx) {
-    const value = wasm.__wbindgen_export_0.get(idx);
-    wasm.__externref_table_dealloc(idx);
-    return value;
-}
-
 const LabFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_lab_free(ptr >>> 0, 1));
@@ -96,6 +96,29 @@ export class Lab {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_lab_free(ptr, 0);
+    }
+    /**
+     * Direct and X-ray contributors bearing on LERF square `sq` (0..64).
+     * @param {number} sq
+     * @returns {string}
+     */
+    explain_square(sq) {
+        let deferred2_0;
+        let deferred2_1;
+        try {
+            const ret = wasm.lab_explain_square(this.__wbg_ptr, sq);
+            var ptr1 = ret[0];
+            var len1 = ret[1];
+            if (ret[3]) {
+                ptr1 = 0; len1 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred2_0 = ptr1;
+            deferred2_1 = len1;
+            return getStringFromWasm0(ptr1, len1);
+        } finally {
+            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+        }
     }
     /**
      * Temperature in pawn units. Zero plays the best move.
@@ -196,6 +219,22 @@ export class Lab {
     }
     reset() {
         wasm.lab_reset(this.__wbg_ptr);
+    }
+    /**
+     * Rebuild position and repetition history from a starting FEN and UCI
+     * move sequence without advancing the game counter (used for undo/scrub).
+     * @param {string} start_fen
+     * @param {string} uci_moves
+     */
+    replay(start_fen, uci_moves) {
+        const ptr0 = passStringToWasm0(start_fen, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(uci_moves, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.lab_replay(this.__wbg_ptr, ptr0, len0, ptr1, len1);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
     }
     /**
      * Choose a move and explain the candidates.

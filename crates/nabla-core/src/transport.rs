@@ -163,10 +163,80 @@ pub fn compute(board: &Board, p: &Params) -> Fields {
     f
 }
 
+/// One piece's direct or X-ray contribution to a target square.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SquareSource {
+    pub color: Color,
+    pub role: Role,
+    pub from: Square,
+    pub xray: bool,
+    /// Weighted contribution to $\Phi_c$ (already scaled by $\chi$ when `xray`).
+    pub weight: f32,
+}
+
+/// All direct and X-ray contributors bearing on `target`, in colour-relative
+/// piece iteration order (02 §4, 06 §4).
+pub fn square_sources(board: &Board, p: &Params, target: Square) -> Vec<SquareSource> {
+    let occupied = board.occupied();
+    let phase = board::phase(board);
+    let mut out = Vec::new();
+    for c in COLORS {
+        for role in ROLES {
+            let piece = Piece { color: c, role };
+            let a = alpha(p, role, phase);
+            for from in rel_squares(c, board.by_piece(piece)) {
+                match role {
+                    Role::Pawn | Role::Knight | Role::King => {
+                        if attacks::attacks(from, piece, occupied).contains(target) {
+                            out.push(SquareSource {
+                                color: c,
+                                role,
+                                from,
+                                xray: false,
+                                weight: a,
+                            });
+                        }
+                    }
+                    Role::Bishop | Role::Rook | Role::Queen => {
+                        let dirs: &[(i32, i32)] = match role {
+                            Role::Bishop => &DIAGONAL,
+                            Role::Rook => &ORTHOGONAL,
+                            _ => &QUEEN,
+                        };
+                        for &(df, dr_rel) in dirs {
+                            trace_ray(
+                                board,
+                                p,
+                                c,
+                                a,
+                                from,
+                                df,
+                                dr_rel * forward(c),
+                                |sq, xray, w| {
+                                    if sq == target {
+                                        out.push(SquareSource {
+                                            color: c,
+                                            role,
+                                            from,
+                                            xray,
+                                            weight: if xray { p.chi * w } else { w },
+                                        });
+                                    }
+                                },
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    out
+}
+
 /// Propagate one ray (Eqs. (2), (5), (6)).
 #[allow(clippy::too_many_arguments)]
-fn walk_ray(
-    f: &mut Fields,
+#[inline]
+fn trace_ray(
     board: &Board,
     p: &Params,
     c: Color,
@@ -174,8 +244,8 @@ fn walk_ray(
     from: Square,
     df: i32,
     dr: i32,
+    mut emit: impl FnMut(Square, bool, f32),
 ) {
-    let ci = idx(c);
     let (mut file, mut rank) = (file_of(from), rank_of(from));
     let mut t = 1.0f32;
     let mut direct = true;
@@ -188,12 +258,12 @@ fn walk_ray(
         };
         let w = a * attenuation(p, k);
         if direct {
-            f.direct[ci][sq.to_usize()] += w;
+            emit(sq, false, w);
         } else {
             if t < T_MIN {
                 break;
             }
-            f.xray[ci][sq.to_usize()] += w * t;
+            emit(sq, true, w * t);
         }
         if let Some(blocker) = board.piece_at(sq)
             && !(blocker.color != c && blocker.role == Role::King)
@@ -203,4 +273,26 @@ fn walk_ray(
         }
         k += 1;
     }
+}
+
+/// Propagate one ray into `Fields` (Eqs. (2), (5), (6)).
+#[allow(clippy::too_many_arguments)]
+fn walk_ray(
+    f: &mut Fields,
+    board: &Board,
+    p: &Params,
+    c: Color,
+    a: f32,
+    from: Square,
+    df: i32,
+    dr: i32,
+) {
+    let ci = idx(c);
+    trace_ray(board, p, c, a, from, df, dr, |sq, xray, w| {
+        if xray {
+            f.xray[ci][sq.to_usize()] += w;
+        } else {
+            f.direct[ci][sq.to_usize()] += w;
+        }
+    });
 }

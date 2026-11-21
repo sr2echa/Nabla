@@ -3,6 +3,10 @@
 export class Lab {
   free(): void;
   /**
+   * Direct and X-ray contributors bearing on LERF square `sq` (0..64).
+   */
+  explain_square(sq: number): string;
+  /**
    * Temperature in pawn units. Zero plays the best move.
    */
   set_temperature(pawns: number): void;
@@ -21,6 +25,11 @@ export class Lab {
   moves(): string;
   reset(): void;
   /**
+   * Rebuild position and repetition history from a starting FEN and UCI
+   * move sequence without advancing the game counter (used for undo/scrub).
+   */
+  replay(start_fen: string, uci_moves: string): void;
+  /**
    * Choose a move and explain the candidates.
    */
   analyze(): string;
@@ -33,21 +42,23 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_lab_free: (a: number, b: number) => void;
   readonly lab_analyze: (a: number) => [number, number];
+  readonly lab_explain_square: (a: number, b: number) => [number, number, number, number];
   readonly lab_fen: (a: number) => [number, number];
   readonly lab_load: (a: number, b: number, c: number) => [number, number];
   readonly lab_moves: (a: number) => [number, number];
   readonly lab_new: () => number;
   readonly lab_push: (a: number, b: number, c: number) => [number, number];
+  readonly lab_replay: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly lab_reset: (a: number) => void;
   readonly lab_set_level: (a: number, b: number) => void;
   readonly lab_set_temperature: (a: number, b: number) => void;
   readonly lab_turn: (a: number) => [number, number];
   readonly lab_view: (a: number) => [number, number];
   readonly __wbindgen_export_0: WebAssembly.Table;
+  readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-  readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_start: () => void;
 }
 

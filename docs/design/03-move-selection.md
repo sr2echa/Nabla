@@ -238,12 +238,13 @@ on a 4-core CPU). Decisions are therefore budgeted in **nodes**, not time, which
 keeps them deterministic and keeps the core free of clocks (WebAssembly has none).
 
 - **Budget.** The UCI layer converts the clock into a node budget:
-  $`\min(t/40 + \tfrac34\,\mathrm{inc},\ t/8)`$ minus the overhead reserve (or
-  `movetime`), times a conservative 8 nodes per millisecond (measured speed is about
-  140), which leaves margin for a loaded machine. The default overhead reserve
-  is 50 ms, adjustable with the `Move Overhead` option, and the budget uses at
-  most an eighth of the remaining clock. `go nodes N` sets the budget directly; `go infinite`, `go ponder`,
-  analysis commands, `bench`, and tests have none.
+  $`\min(t/30 + \tfrac34\,\mathrm{inc},\ t/5)`$ minus the overhead reserve (or
+  `movetime`), times a conservative 70 nodes per millisecond (measured idle
+  throughput is ~140), which leaves a 2× margin for a loaded machine without
+  starving sharp Level 2 decisions. The default overhead reserve is
+  20 ms, adjustable with the `Move Overhead` option, and the budget uses at most
+  a fifth of the remaining clock. `go nodes N` sets the budget directly;
+  `go infinite`, `go ponder`, analysis commands, `bench`, and tests have none.
 - **Exhaustion.** Under a budget, root moves are first scored and ordered at
   Level 0 (`β₁` active) without aborting the ordering pass. If the subsequent
   Level 1 or Level 2 budget runs out, any unsearched root moves keep those valid
