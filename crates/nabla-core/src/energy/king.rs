@@ -30,7 +30,11 @@ fn pressure(ctx: &Ctx, c: Color, king: shakmaty::Square) -> f32 {
 fn safe_checks(ctx: &Ctx, c: Color, king: shakmaty::Square) -> usize {
     let occupied = ctx.board.occupied();
     let them = !c;
-    let excluded = ctx.board.by_color(them) | ctx.fields.attacked[idx(c)];
+    let own_occ = ctx.board.by_color(them);
+    let defended_any = ctx.fields.attacked[idx(c)];
+    let defended_by_piece = ctx.fields.attacked_non_king[idx(c)];
+    let supported = ctx.fields.attacked_twice[idx(them)];
+    let safe = !own_occ & (!defended_any | (!defended_by_piece & supported));
     let mut squares = Bitboard::EMPTY;
     for role in PIECES {
         let piece = Piece { color: them, role };
@@ -39,7 +43,7 @@ fn safe_checks(ctx: &Ctx, c: Color, king: shakmaty::Square) -> usize {
         for sq in pieces(ctx.board, them, role) {
             reach |= attacks::attacks(sq, piece, occupied);
         }
-        squares |= checking & reach & !excluded;
+        squares |= checking & reach & safe;
     }
     squares.count()
 }

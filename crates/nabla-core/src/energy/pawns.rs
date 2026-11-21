@@ -23,7 +23,12 @@ fn side(ctx: &Ctx, c: Color, stm: Color) -> f32 {
     let enemy_king = board.king_of(!c).map(|k| rel(c, k));
     let defender_has_pieces = ctx.npm_mg[idx(!c)] > 0.0;
     let h_max = ctx.taper(p.h_max_mg, p.h_max_eg);
-    let h_norm = libm::expf(6.0 * p.b_rho) - 1.0;
+    let linear_rank = p.b_rho.abs() < 1e-5;
+    let h_norm = if linear_rank {
+        1.0
+    } else {
+        libm::expm1f(6.0 * p.b_rho)
+    };
     let to_move_penalty = if stm == c { 0 } else { 1 };
 
     let mut sum = 0.0;
@@ -64,10 +69,17 @@ fn side(ctx: &Ctx, c: Color, stm: Color) -> f32 {
                 0.0
             };
             // Rank potential, Eq. (22).
-            let h = h_max * (libm::expf(p.b_rho * r as f32) - 1.0) / h_norm;
-            // Light cone, Eq. (23).
+            let h = if linear_rank {
+                h_max * r as f32 / 6.0
+            } else {
+                h_max * libm::expm1f(p.b_rho * r as f32) / h_norm
+            };
+            // Light cone, Eq. (23), strictly gated on exact passedness (n_p = 0).
             let mut u = 0.0;
-            if !defender_has_pieces && let Some(ek) = enemy_king {
+            if opaque == 0
+                && !defender_has_pieces
+                && let Some(ek) = enemy_king
+            {
                 // A defending king next to the pawn, with the move, takes it.
                 let capturable = to_move_penalty == 1 && ek.distance(sq) <= 1;
                 if !capturable {
@@ -83,7 +95,7 @@ fn side(ctx: &Ctx, c: Color, stm: Color) -> f32 {
                 }
                 _ => 0.0,
             };
-            v += t_pass * (1.0 - p.eps_blk * blocked) * (h + p.u_bonus * u + escort);
+            v += (1.0 - p.eps_blk * blocked) * (t_pass * (h + escort) + p.u_bonus * u);
         }
         sum += v;
     }

@@ -29,13 +29,17 @@ pub struct Fields {
     pub direct: [[f32; 64]; 2],
     /// X-ray field $X_c$ (Eq. (6)).
     pub xray: [[f32; 64]; 2],
-    /// Squares attacked by colour $c$: the support of $A_c$.
+    /// Squares attacked by colour $c$.
     pub attacked: [Bitboard; 2],
+    /// Squares attacked by non-king pieces of colour $c$.
+    pub attacked_non_king: [Bitboard; 2],
+    /// Squares attacked by at least two distinct pieces of colour $c$.
+    pub attacked_twice: [Bitboard; 2],
     /// Squares attacked by pawns of colour $c$, $\mathrm{PA}_c$.
     pub pawn_attacks: [Bitboard; 2],
     /// Squares attacked by colour $c$ with the enemy king removed from the
     /// board, so that squares behind a checked king count as attacked
-    /// (used by king-region predicates, 02 §5.8).
+    /// (also the superset of $A_c$'s support, 02 §4.2, §5.8).
     pub attacked_through_king: [Bitboard; 2],
     /// X-ray weight $\chi$ used to form $\Phi_c$.
     pub chi: f32,
@@ -89,8 +93,7 @@ fn transmission(p: &Params, blocker: Piece, emitter: Color, df: i32, dr: i32) ->
             Role::Queen => true,
             Role::Rook => !diagonal,
             Role::Bishop => diagonal,
-            Role::Pawn => diagonal && dr == forward(emitter),
-            Role::Knight | Role::King => false,
+            Role::Pawn | Role::Knight | Role::King => false,
         };
         if compatible { p.theta_bat } else { p.theta_fr }
     } else {
@@ -108,6 +111,8 @@ pub fn compute(board: &Board, p: &Params) -> Fields {
         direct: [[0.0; 64]; 2],
         xray: [[0.0; 64]; 2],
         attacked: [Bitboard::EMPTY; 2],
+        attacked_non_king: [Bitboard::EMPTY; 2],
+        attacked_twice: [Bitboard::EMPTY; 2],
         pawn_attacks: [Bitboard::EMPTY; 2],
         attacked_through_king: [Bitboard::EMPTY; 2],
         chi: p.chi,
@@ -126,7 +131,11 @@ pub fn compute(board: &Board, p: &Params) -> Fields {
             let a = alpha(p, role, phase);
             for sq in rel_squares(c, board.by_piece(piece)) {
                 let att = attacks::attacks(sq, piece, occupied);
+                f.attacked_twice[ci] |= f.attacked[ci] & att;
                 f.attacked[ci] |= att;
+                if role != Role::King {
+                    f.attacked_non_king[ci] |= att;
+                }
                 f.attacked_through_king[ci] |= attacks::attacks(sq, piece, without_enemy_king);
                 match role {
                     Role::Pawn | Role::Knight | Role::King => {
@@ -186,7 +195,9 @@ fn walk_ray(
             }
             f.xray[ci][sq.to_usize()] += w * t;
         }
-        if let Some(blocker) = board.piece_at(sq) {
+        if let Some(blocker) = board.piece_at(sq)
+            && !(blocker.color != c && blocker.role == Role::King)
+        {
             direct = false;
             t *= transmission(p, blocker, c, df, dr);
         }

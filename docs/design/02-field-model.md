@@ -55,7 +55,7 @@ the sequence of squares $i_1, i_2, \dots, i_L$ from $`\sigma(p)`$ to the board e
 The **first-blocker index** is
 
 ```math
-k^\star = \min \lbrace k : i_k \text{ is occupied} \rbrace, \qquad k^\star = L \text{ if the ray is empty.} \qquad \text{(1)}
+k^\star = \min \lbrace k : i_k \text{ is occupied by a piece other than } K_{\bar c} \rbrace, \qquad k^\star = L \text{ if none.} \qquad \text{(1)}
 ```
 
 Knights, kings, and pawns have no rays: each attacked square is a single step
@@ -64,14 +64,14 @@ Knights, kings, and pawns have no rays: each attacked square is a single step
 ### 2.2 Line compatibility
 
 A blocker $b$ on ray square $i_k$ is **line-compatible** with direction $d$ if $b$
-is friendly to the emitter and can itself attack along $d$:
+is a friendly sliding piece that can itself attack along $d$:
 
 - $b \in \lbrace R, Q \rbrace$ and $d$ is orthogonal; or
-- $b \in \lbrace B, Q \rbrace$ and $d$ is diagonal; or
-- $b$ is a pawn and $d$ is one of that pawn's forward capture diagonals.
+- $b \in \lbrace B, Q \rbrace$ and $d$ is diagonal.
 
 Line compatibility is what makes a battery: the rear piece supports the front
-piece along the shared line.
+piece along the shared line. Friendly pawns (which cannot slide along a full
+diagonal) are treated as non-battery friendly blockers ($\theta_\text{fr}$).
 
 ---
 
@@ -118,9 +118,10 @@ $i_k$, relative to the emitter:
 \end{cases} \qquad \text{(3)}
 ```
 
-The enemy king is transparent because squares behind a king on an attacking line
-remain unavailable to it. Propagation along a ray stops when $T_k < T_\text{min}$.
-Influence also decays gently with distance,
+The enemy king is transparent ($\theta(K_{\bar c}) = 1$, and excluded from the
+first-blocker test in Eq. (1)) because squares behind a checked king on an
+attacking line remain unavailable to it. Propagation along a ray stops when
+$T_k < T_\text{min}$. Influence also decays gently with distance,
 
 ```math
 a(k) = \frac{1}{1 + \lambda (k - 1)}, \qquad \text{(4)}
@@ -132,21 +133,23 @@ on a common scale.
 ### 4.2 Per-side fields
 
 The **direct field** of colour $c$ sums each piece's influence over its exact
-attack set:
+attack set (with the enemy king transparent on slider rays, consistent with
+Eq. (1)):
 
 ```math
-A_c(i) = \sum_{p \in \Pi_c} \alpha_{t(p)} \sum_{\text{rays of } p} \ \sum_{k \le k^\star} a(k)\, 𝟙[i_k = i]
+A_c(i) = \sum_{p \in \Pi_c^{B,R,Q}} \alpha_{t(p)} \sum_{\text{rays of } p} \ \sum_{k \le k^\star} a(k)\, 𝟙[i_k = i]
 \;+\; \sum_{p \in \Pi_c^{N,K,P}} \alpha_{t(p)}\, 𝟙[i \in \mathrm{Att}(p)]. \qquad \text{(5)}
 ```
 
 The king's weight is tapered, $\alpha_K(\varphi) = (1 - \varphi)\,\alpha_K$, so the
 king controls squares only as material comes off; in the middlegame its weight is
-zero. For $k \le k^\star$ every intermediate square is empty, so $T_k = 1$: the
-direct channel is unattenuated except by distance. Its support is contained in the
-union of attack sets, with equality whenever every weight is positive. This is
-why set predicates use attack bitboards rather than field values (P1).
+zero. For $k \le k^\star$ every intermediate square is empty or holds $K_{\bar c}$,
+so $T_k = 1$: the direct channel is unattenuated except by distance. Its support
+is contained in $`\mathrm{Att}^{\not K}_c`$, with equality whenever every active
+weight is positive. This is why set predicates use exact attack bitboards rather
+than field values (P1).
 
-The **X-ray field** carries influence beyond the first blocker:
+The **X-ray field** carries influence beyond the first non-king blocker:
 
 ```math
 X_c(i) = \sum_{p \in \Pi_c^{B,R,Q}} \alpha_{t(p)} \sum_{\text{rays of } p} \ \sum_{k > k^\star} a(k)\, T_k\, 𝟙[T_k \ge T_\text{min}]\, 𝟙[i_k = i]. \qquad \text{(6)}
@@ -158,10 +161,11 @@ The **influence field** combines both channels with an X-ray weight $\chi < 1$:
 \Phi_c = A_c + \chi X_c. \qquad \text{(7)}
 ```
 
-Two attack bitboards are kept alongside the fields: $`\mathrm{Att}_c`$, the squares
-colour $c$ attacks, and $`\mathrm{Att}^{\not K}_c`$, the same with the enemy king
-removed from the board, so that squares behind a checked king count as attacked
-(used in §5.8).
+Four attack bitboards are kept alongside the fields: $`\mathrm{Att}_c`$ (squares
+colour $c$ attacks), $`\mathrm{Att}^{\text{non-}K}_c`$ (attacks by pieces of
+colour $c$ other than its king), $`\mathrm{Att}^{(2)}_c`$ (squares attacked by at
+least two distinct pieces of colour $c$), and $`\mathrm{Att}^{\not K}_c`$ (all
+attacks by $c$ with the enemy king removed from the board, used in §5.8).
 
 ### 4.3 Derived fields
 
@@ -287,9 +291,11 @@ P_c = \sum_{i \in Z_c} \Phi_{\bar c}(i) + \omega_\text{chk}\, C_c, \qquad \text{
 
 where $C_c$ counts **safe checking squares**: squares $i$, not occupied by
 $\bar c$, that some piece $p \in \Pi_{\bar c}^{N,B,R,Q}$ attacks, from which a piece
-of type $`t(p)`$ would attack $K_c$, and that $c$ does not attack. Using
-$\Phi_{\bar c}$ (which includes the X-ray channel) makes batteries aimed at the king
-count.
+of type $`t(p)`$ would attack $K_c$, and that are either undefended by $c$
+($`i \notin \mathrm{Att}_c`$) or defended only by $K_c$ while supported by a second
+piece of $\bar c$ ($`i \notin \mathrm{Att}^{\text{non-}K}_c \wedge i \in \mathrm{Att}^{(2)}_{\bar c}`$).
+This ensures defended contact checks are credited. Using $\Phi_{\bar c}$ (which
+includes the X-ray channel) makes batteries aimed at the king count.
 
 The **shelter** is an exponentially weighted count of the king's own pawns in front
 of it, with $\delta_c = +1$ for White and $-1$ for Black:
@@ -316,8 +322,8 @@ E_\text{king} = -\sum_c s_c\, \Gamma_{\bar c}\, D_\text{max} \tanh\!\left( \frac
 - The $\tanh$ bounds the term by $\Gamma_{\bar c} D_\text{max}$ (P7). Without it,
   softplus grows linearly and a single piece parked in the zone could outweigh
   its own value at levels that never search quiet defences.
-- $`\mathrm{NPM}_0`$ is the initial non-pawn material of one side under $m^\text{MG}$
-  (32.0 at the initial values of §9).
+- $`\mathrm{NPM}_{\bar c}`$ and $`\mathrm{NPM}_0`$ use the middlegame rest masses
+  $m^\text{MG}$ (whereas §5.8 gates on the tapered non-pawn mass $m(\varphi)$).
 - Danger scales with the **attacker's** material and queen presence (resolves
   M-4). Pieces are drawn towards the enemy king because moves that raise
   $P_{\bar c}$ lower the opponent's energy (resolves C-1).
@@ -355,8 +361,15 @@ facing one pawn gets partial credit, and redundant blockers compound.
 **Rank potential** (bounded, unlike the proposal's unbounded exponential, M-3):
 
 ```math
-h(\rho) = h_\text{max}(\varphi)\, \frac{e^{b_\rho \rho} - 1}{e^{6 b_\rho} - 1}, \qquad \rho \in \lbrace 1, \dots, 6 \rbrace. \qquad \text{(22)}
+h(\rho) =
+\begin{cases}
+h_\text{max}(\varphi)\, \dfrac{e^{b_\rho \rho} - 1}{e^{6 b_\rho} - 1} & b_\rho > 0 \\
+h_\text{max}(\varphi)\, \dfrac{\rho}{6} & b_\rho = 0
+\end{cases},
+\qquad \rho \in \lbrace 1, \dots, 6 \rbrace, \qquad \text{(22)}
 ```
+
+extended by continuity at $b_\rho = 0$.
 
 **Light cone (rule of the square).** Let $d_P(p) = 7 - \rho(p) - 𝟙[\rho(p) = 1]$ be the
 moves the pawn needs to promote (the first move may be a double step) and
@@ -369,16 +382,22 @@ pawn with the move and can simply take it:
 u_p = 𝟙[\mathrm{NPM}_{\bar c} = 0]\ \big(1 - 𝟙[\text{stm} = \bar c \,\wedge\, d_\infty(K_{\bar c}, \sigma(p)) \le 1]\big)\ \sigma_\text{L}\!\left( \frac{d_K - d_P(p) - 𝟙[\text{stm} = \bar c] - \tfrac12}{\sigma_u} \right). \qquad \text{(23)}
 ```
 
+Because $d_K - d_P(p) - 𝟙[\text{stm} = \bar c]$ is integer-valued, the fixed
+sharpness $\sigma_u = 0.1$ acts as a steep near-step (`0.0067` at `0`, `0.9933`
+at `1`).
+
 **Pawn energy.** With $`c = c(p)`$, $s_p$ the stop square (directly in front of $`p`$),
 and $b_p = 𝟙[s_p \text{ occupied}]$ (blockade),
 
 ```math
 E_\text{pawn} = \sum_{p,\ t(p) = P} s_{c(p)} \Big[
-T^\text{pass}_p \left( 1 - \epsilon_\text{blk}\, b_p \right)
-\Big( h(\rho_p) + U u_p + (1 - \varphi)\, \epsilon_K \big( d_\infty(K_{\bar c}, s_p) - d_\infty(K_c, s_p) \big) \Big)
+\left( 1 - \epsilon_\text{blk}\, b_p \right) \Big( T^\text{pass}_p \big( h(\rho_p) + (1 - \varphi)\, \epsilon_K ( d_\infty(K_{\bar c}, s_p) - d_\infty(K_c, s_p) ) \big) + 𝟙[n_p = 0]\, U u_p \Big)
 + \psi_b\, 𝟙[\sigma(p) \in \mathrm{PA}_c] - \psi_i\, 𝟙[p \text{ isolated}] - \psi_d\, 𝟙[p \text{ doubled}]
 \Big]. \qquad \text{(24)}
 ```
+
+Gating $U u_p$ strictly on exact passedness ($n_p = 0$) prevents the
+unstoppable-passer bonus from leaking onto non-passed pawns when $\theta_\text{pp} < 1$.
 
 A pawn is *isolated* if no friendly pawn stands on an adjacent file, and *doubled*
 if a friendly pawn stands in front of it on the same file (only the rear pawn is
@@ -484,11 +503,12 @@ WebAssembly builds agree bit for bit (05 §6).
 These quantities are computed for visualisation and analysis. **None enters $E$.**
 
 **Flux vectors (lines of force).** Each piece contributes its influence along the
-unit direction $\hat{𝐝}$ of travel (for leapers and pawns, the unit vector from
-$`\sigma(p)`$ to the target):
+unit direction $\hat{𝐝}$ of travel (for leapers and pawns, $k = 1$ and $`T^\text{eff}_1 = 1`$
+along the unit vector from $`\sigma(p)`$ to each square in $`\mathrm{Att}(p)`$):
 
 ```math
-𝐉_c(i) = \sum_{p \in \Pi_c} \alpha_{t(p)} \sum_{\text{rays}} \sum_{k} a(k)\, T^\text{eff}_k\, \hat{𝐝}\, 𝟙[i_k = i],
+𝐉_c(i) = \sum_{p \in \Pi_c^{B,R,Q}} \alpha_{t(p)} \sum_{\text{rays}} \sum_{k} a(k)\, T^\text{eff}_k\, \hat{𝐝}\, 𝟙[i_k = i]
+\;+\; \sum_{p \in \Pi_c^{N,K,P}} \alpha_{t(p)} \sum_{j \in \mathrm{Att}(p)} \hat{𝐝}_{pj}\, 𝟙[j = i],
 \qquad
 T^\text{eff}_k = \begin{cases} 1 & k \le k^\star \\ \chi\, T_k & k > k^\star \end{cases} \qquad \text{(28)}
 ```
@@ -552,6 +572,10 @@ $\Phi_0$ is fixed because the energy is exactly invariant under scaling
 $`(\alpha_t, \Phi_0, x_0, \sigma_b, \xi, \omega_\text{chk})`$ by $k$ and $G_0$ by $1/k$
 (with $D_\text{max}$ scaled accordingly). Without fixing one of them, Texel tuning
 would face a singular Hessian and the coefficients would not be identifiable.
+Note also a near-collinearity between $\chi$ and $(\theta_\text{bat}, \theta_\text{fr}, \theta_\text{en}, \theta_\text{ep})$:
+beyond a single blocker, only the products $\chi\theta_\ast$ enter $\Phi_c$; the
+individual factors separate only along multi-blocker rays. Fix $\chi$ (or apply
+light regularisation) if joint Texel fits drift along that ridge.
 
 ### 9.3 Mobility and territory (6 tunable)
 
@@ -633,12 +657,15 @@ constants (contempt, mate value, score cap, temperature) are specified in 03 and
 | $E_\text{trop}$ | (as defined) | King tropism |
 | $`T^\text{pass}_p`$ | $\theta_\text{pp} = 1$ | Passed-pawn predicate (exact) |
 | $u_p$ | $\sigma_u \to 0$ | Rule of the square |
-| $E_\text{conf}$ | $\zeta_1 = 0$ | Mop-up evaluation |
+| $E_\text{conf}$ | $\zeta_1 = 0$ | King-proximity component of mop-up evaluation |
 
 The contribution is therefore not that these terms are new (most have classical
-counterparts) but that the positional terms are functionals of **one** transport
-model with shared, interpretable coefficients, which makes them explainable,
-visualisable, and jointly tunable.
+counterparts), nor that every term derives from the transport field alone (only
+$E_\text{terr}$ and the zone-pressure component of $E_\text{king}$ read $\Phi_c$;
+the other seven terms and safe-check/shelter subterms use exact bitboard geometry
+and SEE). Rather, the model pairs a single two-channel ray-transport field with
+compact, exact-geometry terms using shared, interpretable coefficients, making
+every evaluation explainable, visualisable, and jointly tunable.
 
 ---
 
@@ -678,9 +705,7 @@ paper reports them and the protocol measures them.
 5. The light-cone term ignores obstruction by the attacker's own king, protected
    promotion squares, blocked double steps, and races between two unstoppable
    passers (they cancel instead of being decided by who queens first).
-6. The pawn-battery rule credits X-ray influence beyond the pawn's single
-   capture square.
-7. Safe checks are computed with the checking piece on its origin square, and
+6. Safe checks are computed with the checking piece on its origin square, and
    pawn and discovered checks are omitted.
 
 Levels 1 and 2 (03 §4) mitigate items 1 and 2; the rest remain and are measured by

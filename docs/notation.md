@@ -42,6 +42,8 @@
 | $`\mathrm{Occ}_c`$ | Set of squares occupied by colour $c$. |
 | $`\mathrm{PA}_c`$ | Set of squares attacked by pawns of colour $c$. |
 | $`\mathrm{Att}_c`$ | Set of squares attacked by colour $c$ (exact attack bitboard). |
+| $`\mathrm{Att}^{\text{non-}K}_c`$ | Set of squares attacked by non-king pieces of colour $c$ (02 §4.2). |
+| $`\mathrm{Att}^{(2)}_c`$ | Set of squares attacked by at least two distinct pieces of colour $c$ (02 §4.2). |
 | $`\mathrm{Att}^{\not K}_c`$ | As $`\mathrm{Att}_c`$, with the enemy king removed from the board (02 §4.2). |
 | $K_c$ | Square of the king of colour $c$. |
 | $`\rho(p)`$ | Relative rank of a pawn: $1$ on its second rank, $6$ on its seventh rank. |

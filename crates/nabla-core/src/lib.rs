@@ -20,4 +20,6 @@ pub mod transport;
 pub use energy::{EvalConfig, Term, Terms, evaluate};
 pub use params::Params;
 pub use select::{Candidate, Decision, Level, SearchConfig, decide};
-pub use snapshot::{Outcome, Picture, is_quiet, outcome, picture, turn_name, white_energy};
+pub use snapshot::{
+    Outcome, Picture, is_quiet, outcome, picture, picture_with_config, turn_name, white_energy,
+};

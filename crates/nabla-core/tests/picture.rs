@@ -20,6 +20,11 @@ fn a_free_queen_is_marked_as_a_threat() {
     let pic = picture(&pos, &Params::default());
     let queen = shakmaty::Square::D4.to_usize();
     assert!(pic.threats[queen] >= 9.0, "{}", pic.threats[queen]);
+
+    // A checked king must never appear in `threats`.
+    let check = common::parse("4k3/8/8/8/8/8/4R3/4K3 b - - 0 1");
+    let pic_check = picture(&check, &Params::default());
+    assert_eq!(pic_check.threats[shakmaty::Square::E8.to_usize()], 0.0);
 }
 
 #[test]

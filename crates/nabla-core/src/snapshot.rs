@@ -1,7 +1,7 @@
 //! The position picture the lab draws: energy, control, tension, and threats.
 //! None of these change move selection; `decide` does that.
 
-use shakmaty::{Chess, Color, Position, Square};
+use shakmaty::{Chess, Color, Position, Role, Square};
 
 use crate::energy::{EvalConfig, Terms, evaluate};
 use crate::params::Params;
@@ -19,9 +19,14 @@ pub struct Picture {
     pub threats: [f32; 64],
 }
 
-/// Paint `pos` for the lab. Threats are from the opponent of the piece that
-/// stands on the square, so a ring means "this piece can be taken for a gain".
+/// Paint `pos` for the lab with default evaluation settings.
 pub fn picture(pos: &Chess, params: &Params) -> Picture {
+    picture_with_config(pos, params, &EvalConfig::default())
+}
+
+/// Paint `pos` for the lab using `cfg`. Threats exclude the king and reflect
+/// material the opponent can win by capturing on each square.
+pub fn picture_with_config(pos: &Chess, params: &Params, cfg: &EvalConfig) -> Picture {
     let fields = transport::compute(pos.board(), params);
     let mut control = [0.0; 64];
     let mut tension = [0.0; 64];
@@ -30,7 +35,9 @@ pub fn picture(pos: &Chess, params: &Params) -> Picture {
         let i = sq.to_usize();
         control[i] = fields.control(sq);
         tension[i] = fields.tension(sq);
-        if let Some(piece) = pos.board().piece_at(sq) {
+        if let Some(piece) = pos.board().piece_at(sq)
+            && piece.role != Role::King
+        {
             let gain = see_square(pos.board(), sq, !piece.color);
             if gain > 0 {
                 threats[i] = gain as f32;
@@ -38,7 +45,7 @@ pub fn picture(pos: &Chess, params: &Params) -> Picture {
         }
     }
     Picture {
-        energy: evaluate(pos, params, &EvalConfig::default()),
+        energy: evaluate(pos, params, cfg),
         control,
         tension,
         threats,
@@ -81,24 +88,45 @@ pub struct Outcome {
 
 pub fn outcome(pos: &Chess, history: &[u64]) -> Outcome {
     if pos.is_checkmate() {
-        return Outcome { state: "checkmate", detail: "checkmate" };
+        return Outcome {
+            state: "checkmate",
+            detail: "checkmate",
+        };
     }
     if pos.is_stalemate() {
-        return Outcome { state: "draw", detail: "stalemate" };
+        return Outcome {
+            state: "draw",
+            detail: "stalemate",
+        };
     }
     if pos.is_insufficient_material() {
-        return Outcome { state: "draw", detail: "material" };
+        return Outcome {
+            state: "draw",
+            detail: "material",
+        };
     }
     if pos.halfmoves() >= 100 {
-        return Outcome { state: "draw", detail: "fifty" };
+        return Outcome {
+            state: "draw",
+            detail: "fifty",
+        };
     }
     let hash = crate::board::hash(pos);
     if history.iter().filter(|h| **h == hash).count() >= 3 {
-        return Outcome { state: "draw", detail: "repetition" };
+        return Outcome {
+            state: "draw",
+            detail: "repetition",
+        };
     }
     if pos.is_check() {
-        Outcome { state: "check", detail: "check" }
+        Outcome {
+            state: "check",
+            detail: "check",
+        }
     } else {
-        Outcome { state: "play", detail: "play" }
+        Outcome {
+            state: "play",
+            detail: "play",
+        }
     }
 }
