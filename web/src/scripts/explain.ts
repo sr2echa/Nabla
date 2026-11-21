@@ -3,6 +3,13 @@
 export type Side = "white" | "black";
 type Role = "pawn" | "knight" | "bishop" | "rook" | "queen" | "king";
 
+export type SquareSource = { role: Role; square: string; weight: number };
+export type SquareExplain = {
+  square: string;
+  direct: Record<Side, SquareSource[]>;
+  xray: Record<Side, SquareSource[]>;
+};
+
 type Piece = { side: Side; role: Role; index: number };
 
 const ROLE_OF: Record<string, Role> = {
@@ -35,66 +42,14 @@ function piecesOf(fen: string): Piece[] {
   return pieces;
 }
 
-function occupied(pieces: Piece[]): boolean[] {
-  const squares = Array.from({ length: 64 }, () => false);
-  for (const piece of pieces) squares[piece.index] = true;
-  return squares;
-}
-
-function ray(from: number, fileStep: number, rankStep: number, blocks: boolean[]): number[] {
-  const hits: number[] = [];
-  let file = from % 8;
-  let rank = Math.floor(from / 8);
-  for (;;) {
-    file += fileStep;
-    rank += rankStep;
-    if (file < 0 || file > 7 || rank < 0 || rank > 7) break;
-    const index = rank * 8 + file;
-    hits.push(index);
-    if (blocks[index]) break;
-  }
-  return hits;
-}
-
-function attacks(piece: Piece, blocks: boolean[]): number[] {
-  const file = piece.index % 8;
-  const rank = Math.floor(piece.index / 8);
-  if (piece.role === "pawn") {
-    const next = piece.side === "white" ? rank + 1 : rank - 1;
-    return [file - 1, file + 1].filter((f) => f >= 0 && f <= 7 && next >= 0 && next <= 7).map((f) => next * 8 + f);
-  }
-  if (piece.role === "knight") {
-    const jumps = [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]];
-    return jumps
-      .map(([df, dr]) => [file + df, rank + dr])
-      .filter(([f, r]) => f >= 0 && f <= 7 && r >= 0 && r <= 7)
-      .map(([f, r]) => r * 8 + f);
-  }
-  if (piece.role === "king") {
-    const hits: number[] = [];
-    for (let df = -1; df <= 1; df++) {
-      for (let dr = -1; dr <= 1; dr++) {
-        if (df === 0 && dr === 0) continue;
-        const f = file + df;
-        const r = rank + dr;
-        if (f >= 0 && f <= 7 && r >= 0 && r <= 7) hits.push(r * 8 + f);
-      }
-    }
-    return hits;
-  }
-  const dirs = piece.role === "bishop"
-    ? [[1, 1], [1, -1], [-1, 1], [-1, -1]]
-    : piece.role === "rook"
-      ? [[1, 0], [-1, 0], [0, 1], [0, -1]]
-      : [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]];
-  return dirs.flatMap(([df, dr]) => ray(piece.index, df, dr, blocks));
-}
-
-function bearers(pieces: Piece[], index: number, side: Side): string[] {
-  const blocks = occupied(pieces);
-  return pieces
-    .filter((piece) => piece.side === side && attacks(piece, blocks).includes(index))
-    .map((piece) => `${piece.role} on ${squareName(piece.index)}`);
+function formatSources(sources: SquareExplain, side: Side): string[] {
+  const direct = sources.direct[side]
+    .filter((s) => s.weight > 0)
+    .map((s) => `${s.role} on ${s.square}`);
+  const xray = sources.xray[side]
+    .filter((s) => s.weight > 0)
+    .map((s) => `${s.role} on ${s.square} (X-ray)`);
+  return [...direct, ...xray];
 }
 
 function list(names: string[]): string {
@@ -103,11 +58,10 @@ function list(names: string[]): string {
   return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
 }
 
-export function explainControl(fen: string, index: number, value: number): string {
-  const pieces = piecesOf(fen);
-  const white = bearers(pieces, index, "white");
-  const black = bearers(pieces, index, "black");
-  const square = squareName(index);
+export function explainControl(info: SquareExplain, value: number): string {
+  const white = formatSources(info, "white");
+  const black = formatSources(info, "black");
+  const square = info.square;
   const holder = value >= 0 ? "White" : "Black";
   const own = value >= 0 ? white : black;
   const other = value >= 0 ? black : white;
@@ -117,24 +71,21 @@ export function explainControl(fen: string, index: number, value: number): strin
   return `${holder} controls ${square}.${lead}${also}`;
 }
 
-export function explainTension(fen: string, index: number): string {
-  const pieces = piecesOf(fen);
-  const square = squareName(index);
-  const white = bearers(pieces, index, "white");
-  const black = bearers(pieces, index, "black");
-  const parts = [`Both sides bear on ${square}.`];
+export function explainTension(info: SquareExplain): string {
+  const white = formatSources(info, "white");
+  const black = formatSources(info, "black");
+  const parts = [`Both sides bear on ${info.square}.`];
   if (white.length) parts.push(`White's ${list(white)}.`);
   if (black.length) parts.push(`Black's ${list(black)}.`);
   return parts.join(" ");
 }
 
-export function explainHang(fen: string, index: number, gain: number): string {
-  const pieces = piecesOf(fen);
-  const piece = pieces.find((item) => item.index === index);
-  const square = squareName(index);
+export function explainHang(fen: string, index: number, gain: number, info: SquareExplain): string {
+  const piece = piecesOf(fen).find((item) => item.index === index);
+  const square = info.square;
   if (!piece) return `Nabla's exchange sees ${gain.toFixed(1)} pawn${gain === 1 ? "" : "s"} on ${square}.`;
-  const taker = piece.side === "white" ? "black" : "white";
-  const takers = bearers(pieces, index, taker);
+  const taker: Side = piece.side === "white" ? "black" : "white";
+  const takers = info.direct[taker].map((s) => `${s.role} on ${s.square}`);
   const who = taker === "white" ? "White" : "Black";
   const by = takers.length ? ` ${who}'s ${list(takers)} can take it.` : "";
   const pawns = gain === 1 ? "1 pawn" : `${gain.toFixed(1)} pawns`;
@@ -159,11 +110,11 @@ function tally(fen: string): Record<Side, Record<Exclude<Role, "king">, number>>
 }
 
 /** Pieces the mover took between two positions. A promotion is not a capture. */
-export function took(before: string, after: string, mover: Side): Role[] {
+export function took(before: string, after: string, mover: Side): Array<Exclude<Role, "king">> {
   const victim: Side = mover === "white" ? "black" : "white";
   const from = tally(before);
   const to = tally(after);
-  const taken: Role[] = [];
+  const taken: Array<Exclude<Role, "king">> = [];
   for (const role of ORDER) {
     const lost = from[victim][role] - to[victim][role];
     for (let i = 0; i < lost; i++) taken.push(role);

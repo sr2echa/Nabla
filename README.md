@@ -264,6 +264,7 @@ fastchess -engine cmd=./target/release/nabla name=Nabla \
 | `Contempt` | −100–100 cp | 15 | How much Nabla dislikes draws. |
 | `Seed` | 0–2³¹−1 | 0 | Seed for temperature sampling. |
 | `MultiPV` | 1–256 | 1 | Number of candidate lines reported. |
+| `Move Overhead` | 0–5000 ms | 20 | Time reserved per move for process and UCI overhead. |
 
 Time is handled automatically: Nabla turns the clock (or `go movetime`, or
 `go nodes`) into a node budget, so moves stay deterministic and the engine

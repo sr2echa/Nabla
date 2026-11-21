@@ -27,10 +27,10 @@ Games; ICGA Journal; IEEE Conference on Games (CoG); Advances in Computer Games 
 > its exact attack rays and is attenuated by blocking pieces, separating direct
 > control from X-ray influence. A nine-term energy functional over these fields,
 > with 57 tuned coefficients, scores positions; every evaluation decomposes exactly
-> into named terms. Moves are chosen by steepest ascent of the energy on the game
-> graph, optionally refined by capture-only quiescence or a single reply. Against an
-> anchored engine pool, Nabla reaches ⟨R: H4⟩ Elo without lookahead and ⟨R: H4⟩ with
-> one reply; ablations attribute ⟨R: H1–H3⟩ to ray transport and exchange modelling.
+> into named terms. Moves are chosen by steepest descent of the mover's potential
+> $V_\text{mover} = -e(S)$ on the game graph, optionally refined by capture-only
+> quiescence or a single reply. Against an anchored engine pool, Nabla reaches
+> ⟨R: H4⟩ Elo without lookahead and ⟨R: H4⟩ with one reply; ablations attribute ⟨R: H1–H3⟩ to ray transport and exchange modelling.
 > A Boltzmann temperature controls strength with a calibration error of ⟨R: H6⟩ Elo.
 
 ---

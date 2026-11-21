@@ -193,8 +193,8 @@ is essential rather than optional.
 - **wasm-bindgen / wasm-pack**: moved from the archived `rustwasm` organisation to
   the `wasm-bindgen` organisation; wasm-pack 0.15.1 released 2026-10-30.
   **[V 2026-11-16]**
-- **Chessground** (lichess-org), `@lichess-org/chessground` v10.5.0,
-  GPL-3.0-or-later. **[V 2026-11-17]**
+- **Chessground** (lichess-org), `chessground` `^9.2.1`,
+  GPL-3.0-or-later (as installed in `web/package.json`). **[V 2026-11-21]**
 
 ---
 

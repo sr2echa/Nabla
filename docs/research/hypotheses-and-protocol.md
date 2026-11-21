@@ -31,7 +31,7 @@
 | H4 | Strength increases with level at $\tau = 0$: Elo(L2) > Elo(L1) > Elo(L0). | Gauntlet ratings | Each adjacent difference has a 95 % CI excluding 0 |
 | H5 | Texel-tuned coefficients beat the initial values of 02 §9. | SPRT at Level 1 | SPRT accepts H₁ with bounds [0, 10] |
 | H6 | Rating decreases monotonically in $\tau$ for each level, and the calibrated `UCI_Elo` is accurate. | Calibration (04 §4) | Isotonic fit without violations beyond CI overlap; RMS error ≤ 50 Elo in the anchored range |
-| H7 | The momentum term adds no strength once repetition-aware boundary conditions exist. | Equivalence test (TOST), about 4,600 games for 80 % power | 90 % CI of the difference within ±15 Elo |
+| H7 | The momentum term adds no strength once repetition-aware boundary conditions exist. | Equivalence test (TOST), about 7,700 games for 80 % power at Holm–Bonferroni $\alpha = 0.00625$ | 98.75 % CI of the difference within ±15 Elo |
 | H9 | Nabla at Level 0 beats FFCE (default settings). | Head-to-head, ≥ 400 games | Elo difference > 0, 95 % CI excludes 0 |
 
 ### 2.2 Exploratory
@@ -105,7 +105,8 @@ with Nabla at temperature 0:
 Without it, every game is the opening position, and the result is only a check
 that the engines move. The script prints the 95 % half-width from Eq. (1) for
 the game count it asks for. The browser's Stockfish 19 lite is a different
-program from the native binary in this table, and the page does not load Maia.
+program from the native binary in this table, and the `/play` UI does not
+expose Maia in its opponent roster (even though `onnxruntime-web` is in `web/package.json`).
 Neither browser game is a row in §13.
 
 ---
@@ -138,14 +139,19 @@ between two separately rated configurations is wider by a factor of about $\sqrt
 
 **Sequential tests.** A/B changes (H2, H3, H5) use Wald's SPRT on logistic Elo with
 bounds $`[\mathrm{elo}_0, \mathrm{elo}_1] = [0, 10]`$ and the pentanomial model over
-game pairs (fastchess `-sprt elo0=0 elo1=10 alpha=… beta=… model=logistic`, always
-with an explicit `-rounds`). The SPRT error rates are set in advance to the
-Holm-adjusted levels below, not adjusted afterwards.
+game pairs (fastchess `-sprt elo0=0 elo1=10 alpha=0.00625 beta=0.05 model=logistic`,
+always with an explicit `-rounds`), setting $\alpha = 0.05 / 8 = 0.00625$ in
+advance for the eight confirmatory tests rather than adjusting afterwards.
 
-**Equivalence.** H7 uses two one-sided tests with a ±15 Elo margin.
+**Equivalence.** H7 uses two one-sided tests (TOST) with a ±15 Elo margin at the
+Holm–Bonferroni adjusted level $\alpha = 0.00625$ per side (requiring the
+$`1 - 2\alpha = 98.75\%`$ two-sided confidence interval to lie within `[-15, +15]`
+Elo, about $n \approx 7{,}700$ games for 80 % power at $p = \tfrac12$).
 
 **Multiple comparisons.** Holm–Bonferroni correction across the eight confirmatory
-hypotheses (H1–H7, H9). Exploratory results are labelled as such and not corrected.
+hypotheses (H1–H7, H9), with worst-case family-wise significance level
+$`\alpha_{\text{adj}} = 0.05 / 8 = 0.00625`$ fixed upfront for sequential/TOST
+designs. Exploratory results are labelled as such and not corrected.
 
 ---
 
@@ -180,9 +186,9 @@ parameter set.
 | A1 | As-proposed functional (Nabla-P) | H1 | 0 |
 | A2 | No X-ray channel ($`\chi = 0`$) | H2 | 0, 1 |
 | A3 | Summed SEE over both colours in place of Eq. (16) | H3 | 0 |
-| A4 | Linear king pressure ($`x_0 \to -\infty`$) | RQ2 | 0, 1 |
+| A4 | Linear king pressure ($`x_0 = 0, D_\text{max} \to \infty`$) | RQ2 | 0, 1 |
 | A5 | No tropism ($`g_t = 0`$) | RQ2 | 0, 1 |
-| A6 | Passage opacity fixed at $\theta_\text{pp} = 1$ | RQ2 | 1 |
+| A6 | Passage opacity fixed at $\theta_\text{pp} = 1$ (effective post-tuning, since default $\theta_\text{pp} = 1.0$) | RQ2 | 1 |
 | A7 | No confinement ($`\zeta_1 = \zeta_2 = 0`$) | RQ2, endgame suite | 0, 1 |
 | A8 | Momentum term enabled | H7 | 0 |
 | A9 | Charge-proportional control weights ($`\alpha_t \propto q_t`$) | RQ2 | 0, 1 |
@@ -252,12 +258,15 @@ ladder steps are reported alongside, not instead of, the leave-one-out results.
 | 2026-11-16 | Initial version. | — |
 | 2026-11-17 | Added H11 with a fair compute axis; TOST sample size; the √2 note for differences; SPRT error rates fixed in advance under Holm; additive ladder as a complement; motif suites; preliminary observations (§13). No confirmatory hypothesis or success criterion changed. | Audits of the second proposal (01b). |
 | 2026-11-17 | Added §4.2, the `tools/gauntlet.mjs` runner. No confirmatory hypothesis, success criterion, or opponent configuration changed. | The lab can play Stockfish lite. Rating matches stay on the native engines named in §4.1. |
+| 2026-11-21 | Specified Holm–Bonferroni $\alpha = 0.05 / 8 = 0.00625$ for pre-planned SPRT and H7 TOST (98.75 % CI, $n \approx 7{,}700$); clarified A4 ($`x_0 = 0, D_\text{max} \to \infty`$); tagged 2026-11-17 §13 rows as pre-fix (`8ef4857`). | Audit reconciliation and statistical consistency across core, UCI, WASM, lab, and tuner fixes. |
 
 ---
 
 ## 13. Preliminary observations (exploratory)
 
-Recorded for transparency; none of these is a confirmatory test.
+Recorded for transparency; none of these is a confirmatory test. Rows dated
+2026-11-17 reflect the pre-fix baseline (`8ef4857`, before the SEE, ray-transport,
+selection-fallback, delta-pruning, and UCI node-budget fixes).
 
 | Date | Observation | Conditions |
 | --- | --- | --- |

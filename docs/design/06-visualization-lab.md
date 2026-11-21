@@ -191,8 +191,12 @@ the board, redrawn after each move. Streamlines are not computed in this build.
 
 ## 9. Technology
 
-Astro serves one page. A client script uses Chessground 9.2.1 (lichess-org,
+Astro serves two pages: `/` (the explanatory notes) and `/play` (the
+interactive board). A client script uses Chessground 9.2.1 (lichess-org,
 GPL-3.0-or-later) for the pieces and drag-and-drop, and a canvas for the HUD.
-The engine is `nabla-wasm`. Stockfish 19 lite (`stockfish` 19.0.1, GPL-3.0) is
-loaded only when that match is selected. Type is Geist (SIL Open Font License).
-There is no React and no server. Decision D-012.
+The engine is `nabla-wasm` (using `Lab::replay` to preserve repetition history on
+undo/scrub and `Lab::explain_square` for square hover tooltips). The right-panel
+term bars use fixed ±5.0 pawn (static energy) and ±2.0 pawn (candidate delta)
+scales per §5. Stockfish 19 lite (`stockfish` 19.0.1, GPL-3.0) is loaded only when
+that match is selected. Type is Geist (SIL Open Font License). There is no React
+and no server. Decision D-012.

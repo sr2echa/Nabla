@@ -77,6 +77,7 @@
 | $`E(S)`$ | Total energy functional (static evaluation), White-positive. | 02, Eq. (11) |
 | $E_\text{mat}, E_\text{flux}, \dots$ | Additive energy terms (see 02, §5). | 02 |
 | $`e(S)`$ | Side-to-move value, $`s_\text{stm} E(S)`$. | 03, Eq. (1) |
+| $`V_\text{mover}(S)`$ | Mover potential, $`-e(S)`$; Nabla selects moves by steepest descent of $`V_\text{mover}`$. | 03, §2 |
 | $`G^{(1)}_c, G^{(2)}_c`$ | Largest and second-largest SEE gains available to colour $c$. | 02, Eq. (16) |
 | $D_c$ | Breakdown (king danger before saturation) of king $c$. | 02, Eq. (19) |
 | $D_\text{max}$ | Saturation level of king danger. | 02, Eq. (19) |

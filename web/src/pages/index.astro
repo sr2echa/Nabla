@@ -19,7 +19,7 @@ import Base from "../layouts/Base.astro";
     <p><a class="go" href="/play">Try it out <span aria-hidden="true">→</span></a></p>
 
     <h2>The rays</h2>
-    <p>The science here is ray transport, in the sense of the Beer-Lambert law. A sliding piece sends influence along each ray it can travel. The direct channel is exactly the squares it attacks, and the ray stops at the first piece in the way. A second channel, the X-ray, continues past that piece, weaker, and only when the piece can share the line, as a battery does. Knights, kings, and pawns are single steps, not long rays.</p>
+    <p>The science here is ray transport, in the sense of the Beer-Lambert law. A sliding piece sends influence along each ray it can travel. The direct channel is exactly the squares it attacks, stopping at the first piece in the way. A second channel, the X-ray, attenuates past blockers according to what stands there — nearly transparent through a battery mate, partial through enemy pieces, and nearly opaque through enemy pawns — stopping once transmittance falls below the cutoff. Knights, kings, and pawns are single steps, not long rays.</p>
     <p>An electrostatic picture of the board was tried and was not kept. Permittivity let influence pass through enemy pieces and treated every friendly blocker the same. The model that remains is the two-channel ray.</p>
     <h2>Why chess</h2>
     <p>The long-range pieces already move on rays, and the words players use for a position (a file, a pin, a battery, control of a square) are statements about those rays. Nabla turns the rays into two fields for each side, then into one energy, white-positive and in pawns. It plays the legal move that raises its own energy the most. The point is that the reason for a move can be read back as those fields, term by term, rather than as a number from a search.</p>
@@ -47,7 +47,7 @@ import Base from "../layouts/Base.astro";
     </dl>
 
     <h2>How a move is chosen</h2>
-    <p>Nabla looks at the legal moves and picks the one that raises its own energy the most. That is the descent: down the game graph, toward the lower energy for the opponent.</p>
+    <p>Nabla evaluates the legal moves by steepest descent of the mover's potential <em>V</em><sub>mover</sub> = −<em>e</em> (equivalently raising its own energy <em>e</em> the most, toward lower energy for the opponent).</p>
     <p>Level 0 scores the move itself, and the forced replies if the move gives check. Level 1 also plays out the captures that follow. Level 2 looks at one full reply, then the captures. That is a little lookahead, not a deep search. The seats use Level 2 unless you change them. How long a decision takes is in the next section.</p>
     <p>Temperature spreads the choice. At 0, Nabla plays the best move it found. A higher temperature sometimes plays a lesser one. The cap is 5 pawns. Each colour can have its own level. You set both from that colour's seat.</p>
 

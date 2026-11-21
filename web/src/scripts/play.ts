@@ -1,7 +1,7 @@
 import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Key } from "chessground/types";
-import { explainArrow, explainControl, explainHang, explainTension, materialLead, sanParts, took } from "./explain";
+import { explainArrow, explainControl, explainHang, explainTension, materialLead, sanParts, took, type SquareExplain } from "./explain";
 import { drawFields, drawOverlay, layerState, mountLegend, setLayer, type Candidate, type HudArrow } from "./hud";
 import type { Fish } from "./stockfish";
 
@@ -22,8 +22,10 @@ type Lab = {
   fen(): string;
   moves(): string;
   view(): string;
+  explain_square(sq: number): string;
   analyze(): string;
   push(uci: string): void;
+  replay(start_fen: string, uci_moves: string): void;
   load(fen: string): void;
   reset(): void;
   set_level(level: number): void;
@@ -410,7 +412,7 @@ function undo(): void {
   cursor = steps.length;
   arrowsOn = false;
   arrows = [];
-  lab.load(cursor === 0 ? startFen : steps[cursor - 1].fen);
+  lab.replay(startFen, steps.slice(0, cursor).map((step) => step.uci).join(" "));
   const step = cursor === 0 ? undefined : steps[cursor - 1];
   lastMove = step ? [step.uci.slice(0, 2) as Key, step.uci.slice(2, 4) as Key] : undefined;
   refresh();
@@ -462,7 +464,7 @@ function recall(next: number): void {
   arrows = [];
   candidates = [];
   cursor = Math.max(0, Math.min(steps.length, next));
-  lab.load(cursor === 0 ? startFen : steps[cursor - 1].fen);
+  lab.replay(startFen, steps.slice(0, cursor).map((step) => step.uci).join(" "));
   const step = cursor === 0 ? undefined : steps[cursor - 1];
   lastMove = step ? [step.uci.slice(0, 2) as Key, step.uci.slice(2, 4) as Key] : undefined;
   refresh();
@@ -710,14 +712,14 @@ function drawEnergy(energy: Terms): void {
   const host = document.querySelector("#energy");
   if (!host) return;
   host.replaceChildren();
-  const max = Math.max(0.2, ...TERMS.map((term) => Math.abs(energy[term.key] ?? 0)));
+  const energyScale = 5.0;
   for (const term of TERMS) {
     const value = energy[term.key] ?? 0;
     const row = document.createElement("div");
     row.className = "bar";
     const fill = document.createElement("i");
     fill.dataset.sign = value < 0 ? "neg" : "pos";
-    fill.style.width = `${(Math.abs(value) / max) * 50}%`;
+    fill.style.width = `${Math.min(1, Math.abs(value) / energyScale) * 50}%`;
     const name = document.createElement("span");
     name.textContent = term.label;
     const track = document.createElement("span");
@@ -761,7 +763,7 @@ function drawHist(terms: Terms | null, title: string): void {
   }
   const split = document.createElement("div");
   split.className = "split";
-  const max = Math.max(0.05, ...TERMS.map((term) => Math.abs(terms?.[term.key] ?? 0)));
+  const deltaScale = 2.0;
   for (const term of TERMS) {
     const value = terms?.[term.key] ?? 0;
     const row = document.createElement("div");
@@ -773,7 +775,7 @@ function drawHist(terms: Terms | null, title: string): void {
     track.className = "track";
     const fill = document.createElement("i");
     fill.dataset.sign = value < 0 ? "neg" : "pos";
-    fill.style.width = terms ? `${(Math.abs(value) / max) * 50}%` : "0%";
+    fill.style.width = terms ? `${Math.min(1, Math.abs(value) / deltaScale) * 50}%` : "0%";
     track.append(fill);
     const number = document.createElement("b");
     number.textContent = signed(value);
@@ -1112,14 +1114,15 @@ function markText(event: PointerEvent): string {
   const rank = orientation === "white" ? 7 - Math.floor(y) : Math.floor(y);
   const index = rank * 8 + file;
   const fen = lab.fen();
+  const explain = () => JSON.parse(lab.explain_square(index)) as SquareExplain;
   if (layers.threats) {
     const gain = view.threats[index] ?? 0;
-    if (gain > 0 && gain < 100) return explainHang(fen, index, gain);
+    if (gain > 0 && gain < 100) return explainHang(fen, index, gain, explain());
   }
-  if (layers.tension && (view.tension[index] ?? 0) > 0.2) return explainTension(fen, index);
+  if (layers.tension && (view.tension[index] ?? 0) > 0.2) return explainTension(explain());
   if (layers.control) {
     const value = view.control[index] ?? 0;
-    if (Math.abs(value) > 0.28) return explainControl(fen, index, value);
+    if (Math.abs(value) > 0.28) return explainControl(explain(), value);
   }
   return "";
 }

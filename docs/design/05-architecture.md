@@ -131,8 +131,10 @@ Level 2 opening decision is a few milliseconds, so a worker is not used yet.
 | `set_level(0\|1\|2)`, `set_temperature(pawns)` | The next analysis uses these. |
 | `fen()`, `turn()`, `moves()` | Position, side to move, and legal moves as JSON `{uci, san, from, to}`. |
 | `push(uci)` | Play a legal move, including a promotion such as `e7e8q`. |
+| `replay(start_fen, uci_moves)` | Rebuild position and repetition history from `start_fen` and space-separated UCI moves without advancing the policy's game counter (used for undo and move scrubbing). |
 | `reset()`, `load(fen)` | New game, or a FEN. Each one advances the policy's game counter. |
-| `view()` | JSON for the HUD: turn, `state`, `detail` (play, check, checkmate, stalemate, material, fifty, or repetition), the nine energy terms, and 64-length `control`, `tension`, and `threats` arrays (a1 = 0). |
+| `view()` | JSON for the HUD (using `realisable_capture = true` only at Level 0, matching selection): turn, `state`, `detail` (play, check, checkmate, stalemate, material, fifty, or repetition), the nine energy terms, and 64-length `control`, `tension`, and `threats` arrays (a1 = 0). |
+| `explain_square(sq)` | JSON `{square, direct: {white, black}, xray: {white, black}}` listing ray-transport and attack contributors (`role`, `square`, `weight`) bearing on LERF square `sq`. |
 | `analyze()` | JSON `{best, level, nodes, candidates}`. Each candidate has `uci`, `san`, `q`, `prob`, and `terms` (null when the line is mate or a draw). |
 
 `view` is the current position. `analyze` is the move choice. The page draws
@@ -160,7 +162,7 @@ rest on six rules, all followed by the v0.1 code:
    iteration occurs on evaluation paths.
 3. **Per-side accumulation.** Each term is computed as a White part minus a Black
    part with identical code paths.
-4. **Portable transcendental functions.** `exp`, `log1p`, and `tanh` come from the
+4. **Portable transcendental functions.** `exp`, `expm1`, `log1p`, and `tanh` come from the
    `libm` crate, never from `std`, whose implementations differ between native
    targets and WebAssembly. `powi` is not used; `sqrt` and the basic operations are
    correctly rounded everywhere.
@@ -179,18 +181,19 @@ debug builds).
 
 | Layer | Test (v0.1) | File |
 | --- | --- | --- |
-| Parameters | 57 tunable coefficients; hash changes with any coefficient; $`\mathrm{NPM}_0 = 32`$ | `tests/params.rs` |
-| SEE | Reference positions (undefended capture; defended capture losing 2 through X-ray recaptures); the king cannot capture a defended piece | `tests/exchange_and_fields.rs` |
-| Transport | Field support within the attack sets; battery and blocker transmission values | `tests/exchange_and_fields.rs` |
-| Pawns | Front-span predicate equals the attack-based characterisation of Eq. (21) on random positions; an adjacent defending king with the move stops an unstoppable passer | `tests/exchange_and_fields.rs`, `tests/selection.rs` |
+| Parameters | 57 tunable coefficients; valid `Params::range` bounds from 02 §9; hash changes with any coefficient; $`\mathrm{NPM}_0 = 32`$ | `tests/params.rs` |
+| Classical limits | Six analytical limit checks of 02 §10 (no-ray material limit, weak-attenuation limit, `b_rho = 0` continuity, etc.) | `tests/classical_limits.rs` |
+| SEE | Reference positions (undefended capture; defended capture losing 2 through X-ray recaptures; multi-ply swap; en passant; promotion capture); the king cannot capture a defended piece | `tests/exchange_and_fields.rs` |
+| Transport | Field support within the attack sets; battery and blocker transmission values; `square_sources` ray attributions | `tests/exchange_and_fields.rs` |
+| Pawns | Front-span predicate equals the attack-based characterisation of Eq. (21) on random positions; an adjacent defending king with the move stops an unstoppable passer; `n_p = 0` gate on unstoppable-passer bonus | `tests/exchange_and_fields.rs`, `tests/selection.rs` |
 | Exchange | Capture and parry are exclusive; a side in check cannot parry; Level ≥ 1 reduces to the fork term | `src/energy/exchange.rs` (unit) |
 | Symmetry | Exact per-term colour antisymmetry on more than 10,000 random positions, with and without the realisable-capture term; file-mirror invariance to $10^{-4}$ | `tests/symmetry.rs` |
-| Selection | Mate in one found at every level; no stalemate when winning; Level 2 never allows an avoidable mate in one; Level 0 finds a checking fork; repetition scored as a draw with contempt; a node budget is respected and deterministic | `tests/selection.rs` |
-| Explanations | Per-term gradients sum to $`Q(m) - e(S)`$ at every level | `tests/selection.rs` |
+| Selection | Mate in one found at every level; no stalemate when winning; Level 2 never allows an avoidable mate in one; Level 0 finds a checking fork; repetition scored as a draw with contempt; node-budget fallback uses Level 0 with `realisable_capture = true`; qsearch exempts checking captures and pawn-endgame passer captures | `tests/selection.rs` |
+| Explanations | Per-term gradients sum to $`Q(m) - e(S)`$ at every level (and `None` on node-budget fallback) | `tests/selection.rs` |
 | Policy | Deterministic at $\tau = 0$; reproducible with a seed; sample frequencies match $\pi_\tau$; the gap cap keeps mate distances ordered | `tests/selection.rs` |
 | Protocol | UCI compliance: `fastchess --compliance` passes all 40 checks (fastchess 1.8.3) | Run manually; CI from Milestone 1 close |
 | Regression | Level 2 `bench` checksum stated in behaviour-changing commits | Commit messages |
-| Cross-target | Native and WebAssembly analyses bit-identical on a golden set | Milestone 6 |
+| Cross-target | Native (`nabla-core` / `nabla`) and WebAssembly (`nabla-wasm`) `view` and `analyze` outputs bit-identical across all bench positions × Levels 0–2 | `tools/check_wasm_parity.mjs` |
 | Calibration | `elo-map.toml` hash equals the current parameter hash | Milestone 5 |
 
 `cargo fmt --all` and `cargo clippy --all-targets -- -D warnings` must pass. The
