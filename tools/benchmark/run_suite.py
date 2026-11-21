@@ -568,7 +568,7 @@ def exp2_elo_pool(probe: dict[str, Any]) -> dict[str, Any]:
     ]
 
     return {
-        "sf_games": 560,
+        "sf_games": sum(m["games"] for m in matches if "SF-" in m["tag"]),
         "anchors": dict(anchors),
         "ordo_ratings": ordo_rows,
         "matches": matches,

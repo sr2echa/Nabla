@@ -8,9 +8,9 @@
 
 ## 1. Executive Summary
 
-Across **9,740 completed benchmark games**, **324 tactical test positions**, **2,400 endgame conversion games**, and **2,000 static evaluation probes** on a post-audit build (`Bench L2: 8bd5497f52f9efa6`), Nabla achieves the following anchored performance without a neural network, learned weights, or deep minimax search:
+Across **9,520 fastchess tournament games** (**11,920 total games** including endgames), **324 tactical test positions**, **2,400 endgame conversion games**, and **2,000 static evaluation probes** on a post-audit build (`Bench L2: 8bd5497f52f9efa6`), Nabla achieves the following anchored performance without a neural network, learned weights, or deep minimax search:
 
-- **CCRL-Blitz Stockfish-anchored Ordo ratings** (4,840 clean pool games, 4 fixed Stockfish 19 anchors):
+- **CCRL-Blitz Stockfish-anchored Ordo ratings** (4,780 clean pool games, 4 fixed Stockfish 19 anchors):
   - **Nabla Level 2** (`mean 1,701.5 nodes/move`, `16.1 ms/move`): **`1607.0 ± 24.2` Elo** (95% CI `[1582.8, 1631.2]`), scoring **74–18–8** (`+219.9 ± 80.4` Elo) vs `SF-1320`, **58–40–2** (`+63.2 ± 65.1` Elo, LOS 97.6%) vs `SF-1500`, **32–68–0** vs `SF-1700`, **137–36–27** vs `Maia-1500`, **116–34–50** vs `Maia-1900`, and **105–73–22** (`+56.1 ± 44.7` Elo, LOS 99.4%) vs depth-matched `AB-PeSTO-2`.
   - **Nabla Level 1** (`mean 315.7 nodes/move`, `3.1 ms/move`): **`1336.7 ± 29.4` Elo** (95% CI `[1307.3, 1366.1]`), statistically indistinguishable from depth-matched `AB-PeSTO-1` (`1334.2 ± 34.2`), above `SF-1320` (`36–24–0` head-to-head) and `Maia-1100` (`1235.6 ± 31.7`).
   - **Nabla Level 0** (`mean 35.8 nodes/move`, `0.23 ms/move`): **`963.9 ± 43.4` Elo** (95% CI `[920.5, 1007.3]`), outperforming classical `AB-PeSTO-0` (`119.7 ± 155.7`, `198–2–0` head-to-head) and `Material-1ply` (`116.6 ± 155.6`, `198–1–1`) by over **+840 Elo** at pure 1-ply field evaluation.
@@ -52,7 +52,7 @@ Across **9,740 completed benchmark games**, **324 tactical test positions**, **2
 
 ![Anchored Rating Pool](../../benchmarks/figures/fig1_elo_ladder.png)
 
-### 4.1 Joint Ordo Ratings (4,840 Pool Games, 560 Stockfish Anchor Games)
+### 4.1 Joint Ordo Ratings (4,780 Pool Games, 580 Stockfish Anchor Games)
 
 | Rank | Engine | Ordo Rating | 95% CI | Played | Score (%) | Mean Nodes / Move | Mean ms / Move |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -241,4 +241,4 @@ All **48/48 native-vs-WASM cross-target checks are bit-identical** (`Parameter h
 1. **Per-node computational cost (36× slower/node than PeSTO):** Recomputing ray transport and 9 spatial terms from scratch every node (~8.3 µs/node vs ~0.55 µs/node for PeSTO) means `AB-PeSTO-2` runs in `0.44 ms/move` vs Nabla's `16.1 ms/move` (`Exp 2`). At equal CPU *wall-clock* (H11), deeper classical alpha-beta with incremental PSTs outsearches fixed-horizon Nabla.
 2. **Hand-set untuned weights (`MAE = 1.79` pawns vs SF; `A2 chi=0` weak):** X-ray attenuation (`-3.5` to `-15.7` Elo at `n=200`), tropism (`-1.7` Elo), and constant tempo (`+27.9` Elo) are currently under-calibrated; formal M4 Texel + SPSA tuning on held-out Lichess data is required before testing H2/H5.
 3. **2-ply tactical & KRK opposition ceiling:** `WAC-300` caps at `28.3%`, `KRK` hits `48.5%` (`89/200` 50-move draws), and `static_eval` misses castling rights and SEE pins (`02 §12`).
-4. **Protocol & threat caveats:** Stockfish 19's `UCI_Elo` is nominal on the CCRL-Blitz scale; `exp2_29` (`AB-PeSTO-2 vs SF-1500`) was excluded after Windows CPU starvation forfeits; `exp3`/`exp4`/`noob_3moves` ran at `30+0.3 s` (`c=1`) rather than `10+0.1 s` (`c=3`) for the same host-CPU reason, whereas all 4,840 Ordo pool games (`exp2_00..28`) used strict `10+0.1 s`.
+4. **Protocol & threat caveats:** Stockfish 19's `UCI_Elo` is nominal on the CCRL-Blitz scale; `exp2_29` (`AB-PeSTO-2 vs SF-1500`) was excluded after Windows CPU starvation forfeits; `exp3`/`exp4`/`noob_3moves` ran at `30+0.3 s` (`c=1`) rather than `10+0.1 s` (`c=3`) for the same host-CPU reason, whereas all 4,780 Ordo pool games (`exp2_00..28`) used strict `10+0.1 s`.

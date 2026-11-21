@@ -236,7 +236,7 @@ Level 0 visits each legal move, plus the forced replies to a check. Level 2
 adds one reply and the captures after it.
 
 Against Stockfish 19 (`UCI_LimitStrength` anchors on the CCRL Blitz scale,
-4,840 pool games with Ordo), Level 2 rates **1607 ± 24 Elo** (scoring 58–40–2
+4,780 pool games with Ordo), Level 2 rates **1607 ± 24 Elo** (scoring 58–40–2
 against `SF-1500`, 137–36–27 against `Maia-1500`, and 105–73–22 against
 depth-matched `AB-PeSTO-2`), Level 1 rates **1337 ± 29 Elo**, and Level 0 rates
 **964 ± 43 Elo** (+844 Elo over 1-ply `AB-PeSTO-0`). Full results, ablations,
