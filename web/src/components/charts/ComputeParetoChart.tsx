@@ -298,9 +298,9 @@ export function ComputeParetoChart({ data }: { data: EloLadderRow[] }) {
         <strong>Nabla-L2</strong> scores 58–40–2 against <code>SF-1500</code>{" "}
         using <strong>53× fewer nodes</strong> (1,702 vs 89,570) and{" "}
         <strong>20× less time</strong> (16.1 ms vs 325.0 ms). Conversely,{" "}
-        <code>AB-PeSTO-2</code> computes incremental PSTs in{" "}
+        <code>AB-PeSTO-2</code> computes incremental piece-square tables in{" "}
         <code>0.44 ms/mv</code> (36× lower latency than Nabla-L2 at 1-ply–2-ply depths;{" "}
-        <code>AB-PeSTO-0</code>&apos;s <code>0.00 ms</code> is plotted at <code>0.005 ms</code> on log scale).
+        <code>AB-PeSTO-0</code>&apos;s sub-0.01 ms latency is plotted at <code>0.005 ms</code> on the log axis).
       </figcaption>
     </figure>
   );

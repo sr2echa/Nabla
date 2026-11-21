@@ -518,10 +518,10 @@ export function DiagnosticsCharts({
           </div>
 
           <figcaption className="chart-foot">
-            Figure 3 (200 games/variant at 30+0.3 s). At Level 0, removing{" "}
-            <code>ex</code> collapses play by <strong>−919.5 ± 155.7 Elo</strong>;
-            at Level 1, <code>pawn</code> (−70.4) and <code>king</code> (−59.6) are
-            Holm-significant, while untuned X-ray (<code>χ = 0</code>) stays within noise (−3.5 to −15.7 Elo).
+            Figure 3 (200 games/variant at 30+0.3 s). At Level 0, removing
+            exchange evaluation collapses play by <strong>−919.5 ± 155.7 Elo</strong>;
+            at Level 1, pawns (−70.4) and king safety (−59.6) are
+            Holm-significant, while untuned X-ray pressure stays within noise (−3.5 to −15.7 Elo).
           </figcaption>
         </>
       )}
@@ -704,10 +704,10 @@ export function DiagnosticsCharts({
           </div>
 
           <figcaption className="chart-foot">
-            Figure 4. Strength drops strictly monotonically from <code>τ = 0</code> to{" "}
-            <code>τ = 2.00</code> pawns (open circle at −921 is the 0/100 score bound) while
+            Figure 4. Strength drops strictly monotonically from temperature{" "}
+            <code>τ = 0</code> to <code>2.00</code> pawns (open circle at −921 is the 0/100 score bound) while
             entropy rises 0 → 2.785 nats. Deterministic <code>Nabla-L2</code> records{" "}
-            <strong>7.8% blunders</strong> (≥200 cp vs Stockfish d10) vs <strong>10.5%</strong> for <code>Maia-1500</code>.
+            <strong>7.8% blunders</strong> (≥200 cp vs Stockfish depth 10) vs <strong>10.5%</strong> for <code>Maia-1500</code>.
           </figcaption>
         </>
       )}
@@ -840,7 +840,7 @@ export function DiagnosticsCharts({
             Figure 5. Confinement lifts <strong>Nabla-L2</strong> vs Stockfish depth 8 from
             59.5% → <strong>95.0%</strong> (KQK), 7.5% → <strong>48.5%</strong> (KRK), and
             38.5% → <strong>74.5%</strong> (KPK), while 2-ply lookahead caps deep KRK
-            triangulation (89 50-move draws) and deep <code>WAC-300</code> combinations (28.3%).
+            triangulation (89 50-move draws) and deep Win at Chess (<code>WAC-300</code>) combinations (28.3%).
           </figcaption>
         </>
       )}
@@ -1035,8 +1035,8 @@ export function DiagnosticsCharts({
 
           <figcaption className="chart-foot">
             Figure 6. Summary metrics cover all <strong>2,000</strong> quiet non-check
-            positions (ply ≥ 12) vs Stockfish 19 depth 10; scatter displays a deterministic{" "}
-            {staticEval.scatterSampleCount}-point stride sample clipped to [−15, +15] pawns.
+            positions (ply ≥ 12) vs Stockfish 19 depth 10; the scatter plots a{" "}
+            {staticEval.scatterSampleCount}-position sample clipped to [−15, +15] pawns.
           </figcaption>
         </>
       )}

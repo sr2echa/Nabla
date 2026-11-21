@@ -126,7 +126,7 @@ export function EloLadderChart({ data }: { data: EloLadderRow[] }) {
         <div className="chart-head-copy">
           <h3 className="chart-title">Figure 1. Anchored Ordo Elo ladder</h3>
           <p className="chart-sub">
-            4,780 pool games on <code>8moves_v3.pgn</code> at 10+0.1 s, pinned to Stockfish 19 (95% CIs)
+            4,780 pool games from an 8-move opening book at 10+0.1 s, pinned to Stockfish 19 (95% CIs)
           </p>
         </div>
         <div className="chart-seg" role="group" aria-label="View Elo ladder as chart or table">

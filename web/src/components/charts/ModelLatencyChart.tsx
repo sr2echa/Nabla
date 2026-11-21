@@ -32,9 +32,9 @@ export function ModelLatencyChart({ data }: { data: ModelLatencyRow[] }) {
     <figure className="chart-figure">
       <div className="chart-head">
         <div className="chart-head-copy">
-          <h3 className="chart-title">Bench decision latency across levels</h3>
+          <h3 className="chart-title">Benchmark decision latency across levels</h3>
           <p className="chart-sub">
-            16-position suite, single-thread Intel i7-7700HQ (native 5-run medians vs browser WASM means)
+            16-position suite, single-thread Intel i7-7700HQ (native 5-run medians vs browser WebAssembly means)
           </p>
         </div>
       </div>
@@ -130,8 +130,7 @@ export function ModelLatencyChart({ data }: { data: ModelLatencyRow[] }) {
       </div>
 
       <figcaption className="chart-foot">
-        48/48 native-vs-WebAssembly bench decisions are bit-identical (parameter hash{" "}
-        <code>c3deee9880eb64dc</code>). At Level 0 (&lt;0.4 ms), sub-millisecond JS–WASM call overhead dominates the 4.89× ratio; at Levels 1–2, WASM runs within 1.24×–1.42× of native.
+        All 48 native-vs-WebAssembly benchmark decisions are bit-identical. At Level 0 (&lt;0.4 ms), JavaScript-to-WebAssembly call overhead dominates the 4.89× ratio; at Levels 1–2, WebAssembly runs within 1.24×–1.42× of native.
       </figcaption>
     </figure>
   );

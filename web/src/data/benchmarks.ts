@@ -476,15 +476,15 @@ function toSliceStats(s: typeof exp7.level1_static.all): EvalSliceStats {
 }
 
 const TERM_NAMES: Record<string, string> = {
-  mat: "Material (mat)",
-  conf: "Confinement (conf)",
-  terr: "Territory (terr)",
-  flux: "Mobility (flux)",
-  king: "King safety (king)",
-  pawn: "Pawns (pawn)",
-  trop: "Tropism (trop)",
-  ex: "Exchange (ex)",
-  tempo: "Tempo (tempo)",
+  mat: "Material",
+  conf: "Confinement",
+  terr: "Territory",
+  flux: "Mobility",
+  king: "King safety",
+  pawn: "Pawns",
+  trop: "Tropism",
+  ex: "Exchange",
+  tempo: "Tempo",
 };
 
 const clamp15 = (v: number) => Math.max(-15, Math.min(15, +v.toFixed(2)));

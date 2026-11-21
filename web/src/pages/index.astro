@@ -37,11 +37,11 @@ import {
     <p>The long-range pieces already move on rays, and the words players use for a position (a file, a pin, a battery, control of a square) are statements about those rays. Nabla turns the rays into two fields for each side, then into one energy, white-positive and in pawns. It plays the legal move that raises its own energy the most. The point is that the reason for a move can be read back as those fields, term by term, rather than as a number from a search.</p>
 
     <h2>The energy</h2>
-    <p>Every position has one number, <em>E</em>. It is white-positive and measured in pawns. Positive means the position favours White. The number is a sum of nine terms, equation (11):</p>
+    <p>Every position has one number, <em>E</em>. It is white-positive and measured in pawns. Positive means the position favours White. It is the sum of nine terms:</p>
     <p class="math"></p>
-    <p>The terms are not all the same size in an endgame as they are in a middlegame. A phase, <em>φ</em>, moves the weights between those two regimes. Equation (12):</p>
+    <p>The terms do not all carry the same weight in an endgame as in a middlegame. A phase, <em>φ</em>, interpolates between those two regimes:</p>
     <p class="math"></p>
-    <p>Turn the board around, swap the colours, and the number changes sign. That is colour antisymmetry, equation (27), and it holds bit for bit:</p>
+    <p>Turn the board around, swap the colours, and the number changes sign. That is colour antisymmetry, and it holds bit for bit:</p>
     <p class="math"></p>
     <p><em>E</em> depends only on the position in front of it. Checkmate, stalemate, and repetition are boundary conditions on the move, not extra terms in the sum.</p>
 
@@ -59,15 +59,15 @@ import {
     </dl>
 
     <h2>How a move is chosen</h2>
-    <p>Nabla evaluates the legal moves by steepest descent of the mover's potential <em>V</em><sub>mover</sub> = −<em>e</em> (equivalently raising its own energy <em>e</em> the most, toward lower energy for the opponent).</p>
-    <p>Level 0 scores the move itself, and the forced replies if the move gives check. Level 1 also plays out the captures that follow. Level 2 looks at one full reply, then the captures. That is a little lookahead, not a deep search. The seats use Level 2 unless you change them. How long a decision takes is in the next section.</p>
-    <p>Temperature spreads the choice. At 0, Nabla plays the best move it found. A higher temperature sometimes plays a lesser one. The cap is 5 pawns. Each colour can have its own level. You set both from that colour's seat.</p>
+    <p>Nabla evaluates legal moves by steepest descent of the mover's potential <em>V</em><sub>mover</sub> = −<em>e</em>, where <em>e</em> is the position's energy from the mover's side (+<em>E</em> for White, −<em>E</em> for Black). Equivalently, it picks the move that raises its own energy the most.</p>
+    <p>Level 0 scores the move itself, and the forced replies if the move gives check. Level 1 also plays out the captures that follow. Level 2 looks at one full reply, then the captures. That is a little lookahead, not a deep search. On the play page, Nabla defaults to Level 2. How long a decision takes is in the next section.</p>
+    <p>Temperature spreads the choice. At 0, Nabla plays the best move it found. A higher temperature sometimes plays a lesser one. The cap is 5 pawns. Each side's level and temperature can be configured independently on the play page.</p>
 
     <h2>The model</h2>
-    <p>Nabla is not a trained network. The energy is 57 named coefficients (parameter hash <code>c3deee9880eb64dc</code>), the ones in the design notes, plus four constants that stay fixed: a pawn is the unit of energy, a ray stops once its transmittance falls below 0.05, the light cone has sharpness 0.1, and the control scale is 1. The coefficients in this version are the hand-set starting values; <code>nabla-tune</code> can print a fit on quiet positions and does not replace them.</p>
-    <p>The page and the command-line engine are the same program. The page's copy is WebAssembly, committed as <code>web/src/engine/nabla_wasm_bg.wasm</code> (935,057 bytes, checked 21 November 2026; 48/48 native-vs-WASM bench decisions bit-identical). Building the site does not compile Rust again.</p>
-    <p>Choosing a move costs one visit per position it looks at. On an Intel Core i7-7700HQ, one thread, the 16-position bench reaches roughly 120k nps at Level 2 (about 8.3 microseconds per visit). Level 0 visits each legal move and the forced replies when the move gives check. Level 2, the default in a seat, also plays one reply and the captures after it, so a sharp position costs more than a quiet one.</p>
-    <p>Three positions from that bench, Level 2, temperature 0, no clock, on that machine, 21 November 2026:</p>
+    <p>Nabla is not a trained network. Its energy is built from 57 named coefficients plus four fixed constants: a pawn is the unit of energy, a ray stops once its transmittance falls below 0.05, the passed-pawn light cone has sharpness 0.1, and the control scale is 1. The coefficients used here are hand-set starting values, not learned weights.</p>
+    <p>The browser version and the native engine run the exact same Rust core, compiled to WebAssembly (935 KB). Across a 16-position benchmark suite at all three levels, all 48 browser decisions match the native binary bit for bit.</p>
+    <p>Choosing a move costs one visit per position it inspects. On a single thread of an Intel Core i7-7700HQ, the 16-position benchmark averages roughly 120,000 nodes per second at Level 2 (about 8.3 microseconds per visit). Level 0 visits each legal move and the forced replies when the move gives check; Level 2, the default on the play page, also looks at one reply and the captures after it, so a sharp position takes more work than a quiet one.</p>
+    <p>Three positions from that benchmark (Level 2, temperature 0, no time cap, measured 21 November 2026):</p>
     <table class="results">
       <tbody>
         <tr><td>Starting position</td><td>421 visits, 2 ms</td></tr>
@@ -75,13 +75,13 @@ import {
         <tr><td>King and one pawn</td><td>50 visits, under 1 ms</td></tr>
       </tbody>
     </table>
-    <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions (5-run medians) decision latency is 0.36 ms at Level 0, 12.54 ms at Level 1, and 21.02 ms at Level 2.</p>
+    <p>The middlegame above is a sharp tactical position whose capture sequences run sixteen plies deep. On the same three positions, Level 0 stays under a millisecond (20, 50, and 6 visits). Across all sixteen benchmark positions (5-run medians), decision latency is 0.36 ms at Level 0, 12.54 ms at Level 1, and 21.02 ms at Level 2.</p>
 
     <ModelLatencyChart client:load data={modelLatencyData} />
 
     <h2>Rules and scope</h2>
-    <p>The engine follows standard FIDE chess rules via <code>shakmaty</code>: castling on both wings, en passant (with SEE removing the captured pawn before X-ray discovery), all four pawn promotions (queen promotions in quiescence), checkmate, stalemate, the fifty-move rule, insufficient material, threefold repetition on the board, and first-recurrence repetition (&plusmn;0.15 pawn contempt) during search. Chess960 is excluded.</p>
-    <p>Only territory and king pressure read the ray field <em>Φ</em><sub><em>c</em></sub>; the other seven terms use exact bitboards and SEE. Static <em>E</em>(<em>S</em>) omits castling rights and SEE ignores pins, and the 57 weights are untuned hand-set defaults (MAE 1.79 pawns vs Stockfish depth 10). Field evaluation costs roughly 8.3 µs per node (~15× slower per node than classical piece-square tables), so Nabla leads PeSTO alpha-beta at equal search depth (+844 Elo at 1-ply, +56 Elo at 2-ply), while deeper classical search wins at equal wall-clock time.</p>
+    <p>Nabla implements standard FIDE chess rules: castling on both wings, en passant (with static exchange evaluation removing the captured pawn before X-ray discovery), all four pawn promotions (queen promotions in quiescence), checkmate, stalemate, the fifty-move rule, insufficient material, threefold repetition on the board, and first-recurrence repetition (&plusmn;0.15 pawn contempt) during search. Chess960 is excluded.</p>
+    <p>Only territory and king pressure read the ray field <em>Φ</em><sub><em>c</em></sub>; the other seven terms use exact bitboards and static exchange evaluation (SEE). Static evaluation omits castling rights and SEE ignores pins, and the 57 weights are untuned defaults (mean absolute error 1.79 pawns vs Stockfish depth 10). Field evaluation costs roughly 8.3 µs per node (~15× slower per node than classical piece-square tables), so Nabla leads a classical piece-square-table alpha-beta baseline (AB-PeSTO) at equal search depth (+844 Elo at 1-ply, +56 Elo at 2-ply), while deeper classical search wins at equal wall-clock time.</p>
 
     <h2>What the board shows</h2>
     <p>The play page draws the position, not a second board of ornaments. A steel rim means White controls that square more than Black. An olive rim means the opposite. The rim is drawn only where the difference is clear, so an empty centre stays an empty square.</p>
@@ -90,7 +90,7 @@ import {
     <p>The column on the right is Nabla's reading of the position, and it stays while the other side thinks. Two Nablas use two colours. Pause the game and hover a mark on the board to see the pieces and squares behind it. The delay before an engine move is at the top of a seat. The game waits while that seat is open.</p>
 
     <h2>Benchmarks</h2>
-    <p>Measured 21 November 2026 on native builds using <code>fastchess</code> on an Intel Core i7-7700HQ across <strong>11,920 games</strong> (9,520 tournament games plus 2,400 endgame conversion games; zero adjudication; 0 time forfeits, 0 illegal moves, 0 crashes; 40/40 UCI compliance). Joint <code>Ordo</code> v1.0 ratings run over 4,780 pool games on <code>8moves_v3.pgn</code> at 10+0.1 s, pinned to Stockfish 19 <code>UCI_LimitStrength</code> anchors (1320/1500/1700/1900). Browser play uses the same WASM core, while full protocol tables live in the <a href="https://github.com/sr2echa/Nabla/blob/main/docs/research/benchmark-report.md" target="_blank" rel="noreferrer">benchmark report on GitHub</a>.</p>
+    <p>Measured 21 November 2026 on native builds using <code>fastchess</code> on an Intel Core i7-7700HQ across <strong>11,920 games</strong> (9,520 tournament games plus 2,400 endgame conversion games; zero adjudication; 0 time forfeits, 0 illegal moves, 0 crashes; 40/40 UCI protocol checks). Joint <code>Ordo</code> ratings run over 4,780 pool games from an 8-move opening book at 10+0.1 s, pinned to strength-limited Stockfish 19 anchors (1320/1500/1700/1900). The browser board runs the same WebAssembly core; full data tables are published in the <a href="https://github.com/sr2echa/Nabla/blob/main/docs/research/benchmark-report.md" target="_blank" rel="noreferrer">benchmark report on GitHub</a>.</p>
 
     <EloLadderChart client:load data={eloLadderData} />
 
@@ -107,15 +107,15 @@ import {
           </tr>
         </thead>
         <tbody>
-          <tr><td>Level scaling</td><td>L0→L1 +443 &plusmn; 93 Elo; L1→L2 +372 &plusmn; 79 Elo (<code>noob_3moves</code>: +419 &plusmn; 79)</td></tr>
+          <tr><td>Level scaling</td><td>L0→L1 +443 &plusmn; 93 Elo; L1→L2 +372 &plusmn; 79 Elo (3-move book: +419 &plusmn; 79)</td></tr>
           <tr><td>vs Stockfish 19</td><td>L2 vs SF-1500: 58–40–2 (+63 &plusmn; 65, 53× fewer nodes, 20× less time); vs SF-1320: +220 &plusmn; 80; vs SF-1700: −131 &plusmn; 78</td></tr>
           <tr><td>vs Maia &amp; PeSTO</td><td>L2 beats Maia-1100/1500/1900 (+359 / +193 / +151 Elo); L0 +798 &plusmn; 198 vs AB-PeSTO-0; L2 +56 &plusmn; 45 vs AB-PeSTO-2</td></tr>
-          <tr><td>Ablations (3,200 games)</td><td>L0: Exchange −920, Pawns −91, <em>λ</em> = 0 −44; L1: Pawns −70, King −60, Exchange −53; untuned <em>χ</em> = 0 within noise</td></tr>
-          <tr><td>Temperature &amp; blunders</td><td>T = 0.10 → 2.00 monotonic drop, entropy 1.50 → 2.79 nats, blunders 8.2% → 20.2%; L2 (T = 0) ACPL 67.1, blunders 7.8% vs Maia-1500 10.5%</td></tr>
+          <tr><td>Ablations (3,200 games)</td><td>L0: Exchange −920, Pawns −91, no attenuation −44; L1: Pawns −70, King −60, Exchange −53; untuned no X-ray within noise</td></tr>
+          <tr><td>Temperature &amp; blunders</td><td>T = 0.10 → 2.00 monotonic drop, entropy 1.50 → 2.79 nats, blunders 8.2% → 20.2%; L2 (T = 0) avg cp loss 67.1, blunders 7.8% vs Maia-1500 10.5%</td></tr>
           <tr><td>Tactics (WAC-300 / BK-24)</td><td>L2: 85/300 (28.3%) and 5/24 (20.8%), vs AB-PeSTO-2 30.7% / 12.5% and Maia-1500 13.0% / 16.7%</td></tr>
-          <tr><td>Endgames vs SF d8 (<em>n</em> = 200)</td><td>L2 with vs without confinement: KQK 95.0% vs 59.5%, KRK 48.5% vs 7.5%, KPK 74.5% vs 38.5%</td></tr>
-          <tr><td>Static eval vs SF d10 (<em>n</em> = 2,000)</td><td>Spearman <em>ρ</em> = 0.865, Pearson <em>r</em> = 0.907, sign agreement 87.5%, MAE 1.79 pawns (Middlegame <em>ρ</em> = 0.979)</td></tr>
-          <tr><td>Stability &amp; WASM parity</td><td>0 time losses across 9,520 games; 40/40 UCI compliance; 48/48 native–WASM bit-identical (1.42× at L2)</td></tr>
+          <tr><td>Endgames vs Stockfish d8 (<em>n</em> = 200)</td><td>L2 with vs without confinement: KQK 95.0% vs 59.5%, KRK 48.5% vs 7.5%, KPK 74.5% vs 38.5%</td></tr>
+          <tr><td>Static eval vs Stockfish d10 (<em>n</em> = 2,000)</td><td>Spearman <em>ρ</em> = 0.865, Pearson <em>r</em> = 0.907, sign agreement 87.5%, MAE 1.79 pawns (Middlegame <em>ρ</em> = 0.979)</td></tr>
+          <tr><td>Stability &amp; WASM parity</td><td>0 time losses across 9,520 games; 40/40 UCI protocol checks; 48/48 native–WASM bit-identical (1.42× at L2)</td></tr>
         </tbody>
       </table>
     </div>
@@ -127,8 +127,6 @@ import {
       tacticsEndgames={tacticsEndgamesData}
       staticEval={staticEvalData}
     />
-
-    <p>Stockfish's Elo cap, when you play it in the lab, is Stockfish's own limit.</p>
 
     <h2>License</h2>
     <p>Nabla is free software under the GNU GPL v3 or later.</p>
