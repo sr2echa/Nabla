@@ -83,7 +83,8 @@ function EloTooltip({
         <div className="shadcn-tooltip-item">
           <span className="shadcn-tooltip-key">Compute / move</span>
           <span className="shadcn-tooltip-value">
-            {Math.round(row.meanNodes).toLocaleString()} n · {row.meanMs.toFixed(2)} ms
+            {Math.round(row.meanNodes).toLocaleString()} n ·{" "}
+            {row.meanMs === 0 ? "< 0.01 ms" : `${row.meanMs.toFixed(2)} ms`}
           </span>
         </div>
       </div>
@@ -95,7 +96,7 @@ export function EloLadderChart({ data }: { data: EloLadderRow[] }) {
   const [view, setView] = useState<"chart" | "table">("chart");
 
   return (
-    <div className="chart-card">
+    <figure className="chart-figure">
       <div className="chart-head">
         <div className="chart-head-copy">
           <h3 className="chart-title">Figure 1. Anchored Ordo Elo ladder</h3>
@@ -103,10 +104,10 @@ export function EloLadderChart({ data }: { data: EloLadderRow[] }) {
             4,780 pool games on <code>8moves_v3.pgn</code> at 10+0.1 s, pinned to Stockfish 19 (95% CIs)
           </p>
         </div>
-        <div className="chart-tabs" role="group" aria-label="View Elo ladder as chart or table">
+        <div className="chart-seg" role="group" aria-label="View Elo ladder as chart or table">
           <button
             type="button"
-            className="chart-tab"
+            className="chart-seg-btn"
             aria-pressed={view === "chart"}
             onClick={() => setView("chart")}
           >
@@ -114,7 +115,7 @@ export function EloLadderChart({ data }: { data: EloLadderRow[] }) {
           </button>
           <button
             type="button"
-            className="chart-tab"
+            className="chart-seg-btn"
             aria-pressed={view === "table"}
             onClick={() => setView("table")}
           >
@@ -230,12 +231,12 @@ export function EloLadderChart({ data }: { data: EloLadderRow[] }) {
         </div>
       )}
 
-      <p className="chart-foot">
+      <figcaption className="chart-foot">
         Untuned <strong>Nabla-L2</strong> rates <strong>1607.0 ± 24.2 Elo</strong>{" "}
         (+59.4 Elo above depth-matched <code>AB-PeSTO-2</code> and +107 Elo above{" "}
         <code>SF-1500</code>); <strong>Nabla-L0</strong> reaches{" "}
         <strong>963.9 ± 43.4 Elo</strong> (+844 Elo over 1-ply <code>AB-PeSTO-0</code>).
-      </p>
-    </div>
+      </figcaption>
+    </figure>
   );
 }

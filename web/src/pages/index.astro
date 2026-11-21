@@ -67,7 +67,7 @@ import {
     <p>Nabla is not a trained network. The energy is 57 named coefficients (parameter hash <code>c3deee9880eb64dc</code>), the ones in the design notes, plus four constants that stay fixed: a pawn is the unit of energy, a ray stops once its transmittance falls below 0.05, the light cone has sharpness 0.1, and the control scale is 1. The coefficients in this version are the hand-set starting values; <code>nabla-tune</code> can print a fit on quiet positions and does not replace them.</p>
     <p>The page and the command-line engine are the same program. The page's copy is WebAssembly, committed as <code>web/src/engine/nabla_wasm_bg.wasm</code> (935,057 bytes, checked 21 November 2026; 48/48 native-vs-WASM bench decisions bit-identical). Building the site does not compile Rust again.</p>
     <p>Choosing a move costs one visit per position it looks at. On an Intel Core i7-7700HQ, one thread, the 16-position bench reaches roughly 120k nps at Level 2 (about 8.3 microseconds per visit). Level 0 visits each legal move and the forced replies when the move gives check. Level 2, the default in a seat, also plays one reply and the captures after it, so a sharp position costs more than a quiet one.</p>
-    <p>Three positions from that bench, Level 2, temperature 0, no clock, on that machine (7-run medians), 21 November 2026:</p>
+    <p>Three positions from that bench, Level 2, temperature 0, no clock, on that machine, 21 November 2026:</p>
     <table class="results">
       <tbody>
         <tr><td>Starting position</td><td>421 visits, 2 ms</td></tr>
@@ -75,13 +75,13 @@ import {
         <tr><td>King and one pawn</td><td>50 visits, under 1 ms</td></tr>
       </tbody>
     </table>
-    <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions (5-run native medians), decision latency is 0.36 ms at Level 0, 12.54 ms at Level 1, and 21.02 ms at Level 2.</p>
+    <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions (5-run medians) decision latency is 0.36 ms at Level 0, 12.54 ms at Level 1, and 21.02 ms at Level 2.</p>
 
     <ModelLatencyChart client:load data={modelLatencyData} />
 
     <h2>Rules and scope</h2>
     <p>The engine follows standard FIDE chess rules via <code>shakmaty</code>: castling on both wings, en passant (with SEE removing the captured pawn before X-ray discovery), all four pawn promotions (queen promotions in quiescence), checkmate, stalemate, the fifty-move rule, insufficient material, threefold repetition on the board, and first-recurrence repetition (&plusmn;0.15 pawn contempt) during search. Chess960 is excluded.</p>
-    <p>Only territory and king pressure read the ray field <em>Φ</em><sub><em>c</em></sub>; the other seven terms use exact bitboards and SEE. Static <em>E</em>(<em>S</em>) omits castling rights, SEE ignores pins, and the hand-set weights sit at MAE 1.79 pawns against Stockfish depth 10. Recomputing the field costs ~8.3 µs per node (~15× slower per node than classical piece-square tables), so Nabla leads PeSTO alpha-beta at equal search depth (+844 Elo at 1-ply, +56 Elo at 2-ply), while deeper classical search wins at equal wall-clock time.</p>
+    <p>Only territory and king pressure read the ray field <em>Φ</em><sub><em>c</em></sub>; the other seven terms use exact bitboards and SEE. Static <em>E</em>(<em>S</em>) omits castling rights and SEE ignores pins, and the 57 weights are untuned hand-set defaults (MAE 1.79 pawns vs Stockfish depth 10). Field evaluation costs roughly 8.3 µs per node (~15× slower per node than classical piece-square tables), so Nabla leads PeSTO alpha-beta at equal search depth (+844 Elo at 1-ply, +56 Elo at 2-ply), while deeper classical search wins at equal wall-clock time.</p>
 
     <h2>What the board shows</h2>
     <p>The play page draws the position, not a second board of ornaments. A steel rim means White controls that square more than Black. An olive rim means the opposite. The rim is drawn only where the difference is clear, so an empty centre stays an empty square.</p>

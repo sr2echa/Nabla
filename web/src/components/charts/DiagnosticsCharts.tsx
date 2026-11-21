@@ -365,7 +365,7 @@ export function DiagnosticsCharts({
   const activeAblations = ablations[ablationLevel];
 
   return (
-    <div className="chart-card">
+    <figure className="chart-figure">
       <div className="chart-head">
         <div className="chart-head-copy">
           <h3 className="chart-title">Diagnostic experiments</h3>
@@ -373,37 +373,37 @@ export function DiagnosticsCharts({
             Component ablations, temperature policy, tactics/endgames, and static evaluation correlation
           </p>
         </div>
-        <div className="chart-tabs" role="tablist" aria-label="Diagnostic benchmark views">
-          {(
-            [
-              ["ablations", "Ablations"],
-              ["temperature", "Temperature & Blunders"],
-              ["tacticsEndgames", "Tactics & Endgames"],
-              ["staticEval", "Static Eval"],
-            ] as const
-          ).map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={tab === id}
-              aria-pressed={tab === id}
-              className="chart-tab"
-              onClick={() => setTab(id)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      </div>
+
+      <div className="chart-tabs" role="tablist" aria-label="Diagnostic benchmark views">
+        {(
+          [
+            ["ablations", "Ablations"],
+            ["temperature", "Temperature & Blunders"],
+            ["tacticsEndgames", "Tactics & Endgames"],
+            ["staticEval", "Static Eval"],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={tab === id}
+            className="chart-tab"
+            onClick={() => setTab(id)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {tab === "ablations" && (
         <>
           <div className="chart-subcontrols">
-            <div className="chart-pills" role="group" aria-label="Ablation level">
+            <div className="chart-seg" role="group" aria-label="Ablation level">
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={ablationLevel === "level1"}
                 onClick={() => setAblationLevel("level1")}
               >
@@ -411,7 +411,7 @@ export function DiagnosticsCharts({
               </button>
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={ablationLevel === "level0"}
                 onClick={() => setAblationLevel("level0")}
               >
@@ -489,22 +489,22 @@ export function DiagnosticsCharts({
             </ChartContainer>
           </div>
 
-          <p className="chart-foot">
+          <figcaption className="chart-foot">
             Figure 3 (200 games/variant at 30+0.3 s). At Level 0, removing{" "}
             <code>ex</code> collapses play by <strong>−919.5 ± 155.7 Elo</strong>;
             at Level 1, <code>pawn</code> (−70.4) and <code>king</code> (−59.6) are
             Holm-significant, while untuned X-ray (<code>χ = 0</code>) stays within noise (−3.5 to −15.7 Elo).
-          </p>
+          </figcaption>
         </>
       )}
 
       {tab === "temperature" && (
         <>
           <div className="chart-subcontrols">
-            <div className="chart-pills" role="group" aria-label="Temperature view">
+            <div className="chart-seg" role="group" aria-label="Temperature view">
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={tempView === "curve"}
                 onClick={() => setTempView("curve")}
               >
@@ -512,7 +512,7 @@ export function DiagnosticsCharts({
               </button>
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={tempView === "blunders"}
                 onClick={() => setTempView("blunders")}
               >
@@ -676,22 +676,22 @@ export function DiagnosticsCharts({
             </ChartContainer>
           </div>
 
-          <p className="chart-foot">
+          <figcaption className="chart-foot">
             Figure 4. Strength drops strictly monotonically from <code>τ = 0</code> to{" "}
             <code>τ = 2.00</code> pawns (open circle at −921 is the 0/100 score bound) while
             entropy rises 0 → 2.785 nats. Deterministic <code>Nabla-L2</code> records{" "}
             <strong>7.8% blunders</strong> (≥200 cp vs Stockfish d10) vs <strong>10.5%</strong> for <code>Maia-1500</code>.
-          </p>
+          </figcaption>
         </>
       )}
 
       {tab === "tacticsEndgames" && (
         <>
           <div className="chart-subcontrols">
-            <div className="chart-pills" role="group" aria-label="Tactics and endgames view">
+            <div className="chart-seg" role="group" aria-label="Tactics and endgames view">
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={teView === "endgames"}
                 onClick={() => setTeView("endgames")}
               >
@@ -699,7 +699,7 @@ export function DiagnosticsCharts({
               </button>
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={teView === "tactics"}
                 onClick={() => setTeView("tactics")}
               >
@@ -810,22 +810,22 @@ export function DiagnosticsCharts({
             </ChartContainer>
           </div>
 
-          <p className="chart-foot">
+          <figcaption className="chart-foot">
             Figure 5. Confinement lifts <strong>Nabla-L2</strong> vs Stockfish depth 8 from
             59.5% → <strong>95.0%</strong> (KQK), 7.5% → <strong>48.5%</strong> (KRK), and
             38.5% → <strong>74.5%</strong> (KPK), while 2-ply lookahead caps deep KRK
             triangulation (89 50-move draws) and deep <code>WAC-300</code> combinations (28.3%).
-          </p>
+          </figcaption>
         </>
       )}
 
       {tab === "staticEval" && (
         <>
           <div className="chart-subcontrols">
-            <div className="chart-pills" role="group" aria-label="Static evaluation view">
+            <div className="chart-seg" role="group" aria-label="Static evaluation view">
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={evalView === "scatter"}
                 onClick={() => setEvalView("scatter")}
               >
@@ -833,7 +833,7 @@ export function DiagnosticsCharts({
               </button>
               <button
                 type="button"
-                className="chart-pill"
+                className="chart-seg-btn"
                 aria-pressed={evalView === "terms"}
                 onClick={() => setEvalView("terms")}
               >
@@ -858,41 +858,41 @@ export function DiagnosticsCharts({
             )}
           </div>
 
-          <div className="chart-kpis">
+          <div className="chart-stats">
             {evalView === "scatter" ? (
               <>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>Probes</span>
                   <strong>n = {staticEval.summary.all.n.toLocaleString()}</strong>
                 </div>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>Spearman ρ</span>
                   <strong>{staticEval.summary.all.spearmanRho.toFixed(3)}</strong>
                 </div>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>Pearson r (±15)</span>
                   <strong>{staticEval.summary.all.pearsonRCap15.toFixed(3)}</strong>
                 </div>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>Sign agreement</span>
                   <strong>{staticEval.summary.all.signAgreementPct.toFixed(1)}%</strong>
                 </div>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>MAE</span>
                   <strong>{staticEval.summary.all.maePawns.toFixed(2)} p</strong>
                 </div>
               </>
             ) : (
               <>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>Opening</span>
                   <strong>ρ = {staticEval.summary.opening.spearmanRho.toFixed(3)}</strong>
                 </div>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>Middlegame</span>
                   <strong>ρ = {staticEval.summary.middlegame.spearmanRho.toFixed(3)}</strong>
                 </div>
-                <div className="chart-kpi">
+                <div className="chart-stat">
                   <span>Endgame</span>
                   <strong>ρ = {staticEval.summary.endgame.spearmanRho.toFixed(3)}</strong>
                 </div>
@@ -1007,13 +1007,13 @@ export function DiagnosticsCharts({
             </ChartContainer>
           </div>
 
-          <p className="chart-foot">
+          <figcaption className="chart-foot">
             Figure 6. Summary metrics cover all <strong>2,000</strong> quiet non-check
             positions (ply ≥ 12) vs Stockfish 19 depth 10; scatter displays a deterministic{" "}
             {staticEval.scatterSampleCount}-point stride sample clipped to [−15, +15] pawns.
-          </p>
+          </figcaption>
         </>
       )}
-    </div>
+    </figure>
   );
 }

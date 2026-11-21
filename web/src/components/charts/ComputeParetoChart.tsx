@@ -133,7 +133,9 @@ function ParetoTooltip({
         <div className="shadcn-tooltip-item">
           <span className="shadcn-tooltip-key">Time / move</span>
           <span className="shadcn-tooltip-value">
-            {row.meanMs.toFixed(2)} ms
+            {row.meanMs === 0
+              ? "< 0.01 ms (plotted at 0.005 ms)"
+              : `${row.meanMs.toFixed(2)} ms`}
           </span>
         </div>
       </div>
@@ -161,7 +163,7 @@ export function ComputeParetoChart({ data }: { data: EloLadderRow[] }) {
   const labelRenderer = renderPointLabel(metric);
 
   return (
-    <div className="chart-card">
+    <figure className="chart-figure">
       <div className="chart-head">
         <div className="chart-head-copy">
           <h3 className="chart-title">
@@ -171,10 +173,10 @@ export function ComputeParetoChart({ data }: { data: EloLadderRow[] }) {
             Ordo Elo against log-scale mean nodes or latency per move (pooled benchmark games)
           </p>
         </div>
-        <div className="chart-tabs" role="group" aria-label="Pareto x-axis metric">
+        <div className="chart-seg" role="group" aria-label="Pareto x-axis metric">
           <button
             type="button"
-            className="chart-tab"
+            className="chart-seg-btn"
             aria-pressed={metric === "nodes"}
             onClick={() => setMetric("nodes")}
           >
@@ -182,7 +184,7 @@ export function ComputeParetoChart({ data }: { data: EloLadderRow[] }) {
           </button>
           <button
             type="button"
-            className="chart-tab"
+            className="chart-seg-btn"
             aria-pressed={metric === "time"}
             onClick={() => setMetric("time")}
           >
@@ -286,14 +288,14 @@ export function ComputeParetoChart({ data }: { data: EloLadderRow[] }) {
         </ChartContainer>
       </div>
 
-      <p className="chart-foot">
+      <figcaption className="chart-foot">
         <strong>Nabla-L2</strong> scores 58–40–2 against <code>SF-1500</code>{" "}
         using <strong>53× fewer nodes</strong> (1,702 vs 89,570) and{" "}
         <strong>20× less time</strong> (16.1 ms vs 325.0 ms). Conversely,{" "}
         <code>AB-PeSTO-2</code> computes incremental PSTs in{" "}
         <code>0.44 ms/mv</code> (36× lower latency than Nabla-L2 at 1-ply–2-ply depths;{" "}
-        <code>AB-PeSTO-0</code>’s <code>0.00 ms</code> is plotted at <code>0.005 ms</code> on log scale).
-      </p>
-    </div>
+        <code>AB-PeSTO-0</code>&apos;s <code>0.00 ms</code> is plotted at <code>0.005 ms</code> on log scale).
+      </figcaption>
+    </figure>
   );
 }

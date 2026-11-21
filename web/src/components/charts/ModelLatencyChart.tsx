@@ -29,7 +29,7 @@ const chartConfig = {
 
 export function ModelLatencyChart({ data }: { data: ModelLatencyRow[] }) {
   return (
-    <div className="chart-card">
+    <figure className="chart-figure">
       <div className="chart-head">
         <div className="chart-head-copy">
           <h3 className="chart-title">Bench decision latency across levels</h3>
@@ -39,9 +39,9 @@ export function ModelLatencyChart({ data }: { data: ModelLatencyRow[] }) {
         </div>
       </div>
 
-      <div className="chart-kpis">
+      <div className="chart-stats">
         {data.map((row) => (
-          <div key={row.level} className="chart-kpi">
+          <div key={row.level} className="chart-stat">
             <span>{row.level}</span>
             <strong>
               {row.nodes.toLocaleString()} n · {row.usPerNode.toFixed(1)} µs/n ·{" "}
@@ -129,10 +129,10 @@ export function ModelLatencyChart({ data }: { data: ModelLatencyRow[] }) {
         </ChartContainer>
       </div>
 
-      <p className="chart-foot">
+      <figcaption className="chart-foot">
         48/48 native-vs-WebAssembly bench decisions are bit-identical (parameter hash{" "}
         <code>c3deee9880eb64dc</code>). At Level 0 (&lt;0.4 ms), sub-millisecond JS–WASM call overhead dominates the 4.89× ratio; at Levels 1–2, WASM runs within 1.24×–1.42× of native.
-      </p>
-    </div>
+      </figcaption>
+    </figure>
   );
 }
