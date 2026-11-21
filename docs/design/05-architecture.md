@@ -93,7 +93,7 @@ reply is `bestmove 0000`.
 
 **Public options:** as listed in 04 §5.
 
-**Hidden options** (not shown by `uci`, accepted by `setoption`):
+**Research and tuning options** (advertised by `uci` so strict UCI runners such as fastchess and Cute Chess transmit them):
 
 | Option | Purpose | Status |
 | --- | --- | --- |

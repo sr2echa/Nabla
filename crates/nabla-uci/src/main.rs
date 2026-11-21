@@ -116,6 +116,20 @@ impl Engine {
         println!(
             "option name Move Overhead type spin default {DEFAULT_OVERHEAD_MS} min 0 max 5000"
         );
+        for t in Term::ALL {
+            println!("option name Ablate_{} type check default false", t.name());
+        }
+        let defaults = Params::default();
+        for &name in Params::NAMES {
+            if let (Some(def), Some((min, max))) = (defaults.get(name), Params::range(name)) {
+                println!(
+                    "option name Param_{name} type spin default {} min {} max {}",
+                    (def * 1000.0).round() as i64,
+                    (min * 1000.0).round() as i64,
+                    (max * 1000.0).round() as i64
+                );
+            }
+        }
         println!("uciok");
     }
 
