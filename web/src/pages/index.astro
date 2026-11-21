@@ -1,6 +1,12 @@
 ---
 import "katex/dist/katex.min.css";
 import Base from "../layouts/Base.astro";
+import fig1EloLadder from "../../../benchmarks/figures/fig1_elo_ladder.svg?url";
+import fig2ComputePareto from "../../../benchmarks/figures/fig2_compute_pareto.svg?url";
+import fig3Ablations from "../../../benchmarks/figures/fig3_ablations.svg?url";
+import fig4TemperatureBlunders from "../../../benchmarks/figures/fig4_temperature_blunders.svg?url";
+import fig5TacticsEndgames from "../../../benchmarks/figures/fig5_tactics_endgames.svg?url";
+import fig6EvalCorrelation from "../../../benchmarks/figures/fig6_eval_correlation.svg?url";
 ---
 
 <Base>
@@ -65,6 +71,10 @@ import Base from "../layouts/Base.astro";
     </table>
     <p>The middlegame is the sharp one: the captures run sixteen plies deep. The same three positions at Level 0 stayed under a millisecond (20, 50, and 6 visits). Across all sixteen bench positions (5-run medians) decision latency is 0.36 ms at Level 0, 12.5 ms at Level 1, and 21.0 ms at Level 2 (native vs WebAssembly bit-identical 48/48).</p>
 
+    <h2>Rules and scope</h2>
+    <p>The engine follows standard FIDE chess rules via <code>shakmaty</code>: castling on both wings, en passant (with SEE removing the captured pawn before X-ray discovery), all four pawn promotions (queen promotions in quiescence), checkmate, stalemate, the fifty-move rule, insufficient material, threefold repetition on the board, and first-recurrence repetition (&plusmn;0.15 pawn contempt) during search. Chess960 is excluded.</p>
+    <p>Only territory and king pressure read the ray field <em>Φ</em><sub><em>c</em></sub>; the other seven terms use exact bitboards and SEE. Static <em>E</em>(<em>S</em>) omits castling rights and SEE ignores pins, and the 57 weights are untuned hand-set defaults (MAE 1.79 pawns vs Stockfish depth 10). Field evaluation costs roughly 8.3 µs per node (~15× slower per node than classical piece-square tables), so Nabla leads PeSTO alpha-beta at equal search depth (+844 Elo at 1-ply, +56 Elo at 2-ply), while deeper classical search wins at equal wall-clock time.</p>
+
     <h2>What the board shows</h2>
     <p>The play page draws the position, not a second board of ornaments. A steel rim means White controls that square more than Black. An olive rim means the opposite. The rim is drawn only where the difference is clear, so an empty centre stays an empty square.</p>
     <p>Corner ticks mean both sides bear on the square. A number in the corner is the pawns the opponent wins by taking the piece there. An arrow is a move about to be played. A paler arrow is another move that was considered. The question mark on the play page opens a small board with each of these marks, and the switches that turn them on.</p>
@@ -72,18 +82,93 @@ import Base from "../layouts/Base.astro";
     <p>The column on the right is Nabla's reading of the position, and it stays while the other side thinks. Two Nablas use two colours. Pause the game and hover a mark on the board to see the pieces and squares behind it. The delay before an engine move is at the top of a seat. The game waits while that seat is open.</p>
 
     <h2>Benchmarks</h2>
-    <p>Measured 21 November 2026 on native engines using fastchess (4,780 anchored pool games on <code>8moves_v3.pgn</code> at 10+0.1 s, joint Ordo fit against Stockfish 19 <code>UCI_LimitStrength</code> anchors). Browser matches are not this table.</p>
-    <table class="results">
-      <tbody>
-        <tr><td>Level 1 vs Level 0</td><td>+443 ± 93 Elo (184W–13L–3D)</td></tr>
-        <tr><td>Level 2 vs Level 1</td><td>+372 ± 79 Elo (174W–16L–10D)</td></tr>
-        <tr><td>Time losses, 600 stress games (4+0.04 s)</td><td>0 (40/40 UCI compliance)</td></tr>
-        <tr><td>Stockfish 19 anchored rating (Level 2 / 1 / 0)</td><td>1607 ± 24 / 1337 ± 29 / 964 ± 43 Elo</td></tr>
-        <tr><td>Level 2 vs Stockfish 1500 / 1320 (100g each)</td><td>58–40–2 (+63 ± 65) / 74–18–8 (+220 ± 80)</td></tr>
-        <tr><td>Level 2 vs Maia-1500 / AB-PeSTO-2 (200g each)</td><td>+193 ± 47 Elo / +56 ± 45 Elo</td></tr>
-      </tbody>
-    </table>
-    <p>The anchored pool runs on <code>8moves_v3.pgn</code> at 10+0.1 s with zero adjudication and replicates on <code>noob_3moves.epd</code>. <code>nabla-tune</code> runs MSE coordinate descent on quiet positions without replacing defaults. Stockfish's Elo cap, when you play it in the lab, is Stockfish's own limit.</p>
+    <p>Measured 21 November 2026 on native builds using <code>fastchess</code> on an Intel Core i7-7700HQ across <strong>11,920 games</strong> (9,520 tournament games plus 2,400 endgame conversion games; zero adjudication; 0 time forfeits, 0 illegal moves, 0 crashes; 40/40 UCI compliance). Joint <code>Ordo</code> v1.0 ratings run over 4,780 pool games on <code>8moves_v3.pgn</code> at 10+0.1 s, pinned to Stockfish 19 <code>UCI_LimitStrength</code> anchors (1320/1500/1700/1900). Browser play uses the same WASM core, while full protocol tables live in the <a href="https://github.com/sr2echa/Nabla/blob/main/docs/research/benchmark-report.md" target="_blank" rel="noreferrer">benchmark report on GitHub</a>.</p>
+
+    <div class="table-wrap">
+      <table class="results wide">
+        <thead>
+          <tr>
+            <th>Engine</th>
+            <th class="num">Ordo Elo (&plusmn;95% CI)</th>
+            <th class="num">Nodes/mv</th>
+            <th class="num">Time/mv</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>SF-1900 (anchor)</td><td class="num">1900.0 (pinned)</td><td class="num">113,270</td><td class="num">319.5 ms</td></tr>
+          <tr><td>SF-1700 (anchor)</td><td class="num">1700.0 (pinned)</td><td class="num">86,518</td><td class="num">304.0 ms</td></tr>
+          <tr class="hl"><td>Nabla-L2</td><td class="num">1607.0 &plusmn; 24.2</td><td class="num">1,702</td><td class="num">16.07 ms</td></tr>
+          <tr><td>AB-PeSTO-2</td><td class="num">1547.6 &plusmn; 34.0</td><td class="num">798</td><td class="num">0.44 ms</td></tr>
+          <tr><td>SF-1500 (anchor)</td><td class="num">1500.0 (pinned)</td><td class="num">89,570</td><td class="num">325.0 ms</td></tr>
+          <tr><td>Maia-1900 (lc0 1n)</td><td class="num">1450.7 &plusmn; 31.0</td><td class="num">1</td><td class="num">2.99 ms</td></tr>
+          <tr><td>Maia-1500 (hold-out)</td><td class="num">1356.0 &plusmn; 26.7</td><td class="num">1</td><td class="num">3.22 ms</td></tr>
+          <tr class="hl"><td>Nabla-L1</td><td class="num">1336.7 &plusmn; 29.4</td><td class="num">316</td><td class="num">3.10 ms</td></tr>
+          <tr><td>AB-PeSTO-1</td><td class="num">1334.2 &plusmn; 34.2</td><td class="num">177</td><td class="num">0.04 ms</td></tr>
+          <tr><td>SF-1320 (anchor)</td><td class="num">1320.0 (pinned)</td><td class="num">96,726</td><td class="num">369.1 ms</td></tr>
+          <tr><td>Maia-1100 (lc0 1n)</td><td class="num">1235.6 &plusmn; 31.7</td><td class="num">1</td><td class="num">2.97 ms</td></tr>
+          <tr class="hl"><td>Nabla-L0</td><td class="num">963.9 &plusmn; 43.4</td><td class="num">36</td><td class="num">0.23 ms</td></tr>
+          <tr><td>AB-PeSTO-0</td><td class="num">119.7 &plusmn; 155.7</td><td class="num">17</td><td class="num">0.00 ms</td></tr>
+          <tr><td>Material-1ply</td><td class="num">116.6 &plusmn; 155.6</td><td class="num">24</td><td class="num">0.01 ms</td></tr>
+          <tr><td>Random</td><td class="num">-211.0 &plusmn; 169.9</td><td class="num">1</td><td class="num">0.01 ms</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="fig">
+      <img src={fig1EloLadder} alt="Anchored Ordo Elo ladder comparing Nabla Levels 0–2 with Stockfish 19 anchors, Maia, and classical PeSTO baselines" />
+      <figcaption>Figure 1. Joint Ordo CCRL-Blitz ratings (95% CIs) across 4,780 pool games pinned to Stockfish 19 anchors.</figcaption>
+    </figure>
+
+    <figure class="fig">
+      <img src={fig2ComputePareto} alt="Elo versus nodes per move and wall-clock time per move comparing Nabla, PeSTO, Maia, and Stockfish" />
+      <figcaption>Figure 2. Strength against mean nodes/move and decision latency: Nabla beats PeSTO at matched search depth, while incremental PSTs remain faster per node.</figcaption>
+    </figure>
+
+    <p>Across pairwise checks, component ablations, temperature sweeps, tactical puzzles, endgame conversions, and quiet evaluation probes, the strengths and open gaps separate cleanly:</p>
+
+    <div class="table-wrap">
+      <table class="results wide">
+        <thead>
+          <tr>
+            <th>Measurement</th>
+            <th>Observed result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Level scaling</td><td>L0→L1 +443 &plusmn; 93 Elo; L1→L2 +372 &plusmn; 79 Elo (<code>noob_3moves</code>: +419 &plusmn; 79)</td></tr>
+          <tr><td>vs Stockfish 19</td><td>L2 vs SF-1500: 58–40–2 (+63 &plusmn; 65, 53× fewer nodes, 20× less time); vs SF-1320: +220 &plusmn; 80; vs SF-1700: −131 &plusmn; 78</td></tr>
+          <tr><td>vs Maia &amp; PeSTO</td><td>L2 beats Maia-1100/1500/1900 (+359 / +193 / +151 Elo); L0 +798 &plusmn; 198 vs AB-PeSTO-0; L2 +56 &plusmn; 45 vs AB-PeSTO-2</td></tr>
+          <tr><td>Ablations (3,200 games)</td><td>L0: Exchange −920, Pawns −91, <em>λ</em> = 0 −44; L1: Pawns −70, King −60, Exchange −53; untuned <em>χ</em> = 0 within noise</td></tr>
+          <tr><td>Temperature &amp; blunders</td><td>T = 0.10 → 2.00 monotonic drop, entropy 1.50 → 2.79 nats, blunders 8.2% → 20.2%; L2 (T = 0) ACPL 67.1, blunders 7.8% vs Maia-1500 10.5%</td></tr>
+          <tr><td>Tactics (WAC-300 / BK-24)</td><td>L2: 85/300 (28.3%) and 5/24 (20.8%), vs AB-PeSTO-2 30.7% / 12.5% and Maia-1500 13.0% / 16.7%</td></tr>
+          <tr><td>Endgames vs SF d8 (<em>n</em> = 200)</td><td>L2 with vs without confinement: KQK 95.0% vs 59.5%, KRK 48.5% vs 7.5%, KPK 74.5% vs 38.5%</td></tr>
+          <tr><td>Static eval vs SF d10 (<em>n</em> = 2,000)</td><td>Spearman <em>ρ</em> = 0.865, Pearson <em>r</em> = 0.907, sign agreement 87.5%, MAE 1.79 pawns (Middlegame <em>ρ</em> = 0.979)</td></tr>
+          <tr><td>Stability &amp; WASM parity</td><td>0 time losses across 9,520 games; 40/40 UCI compliance; 48/48 native–WASM bit-identical (1.42× at L2)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="more-figs">
+      <summary>Additional benchmark figures (ablations, temperature, tactics &amp; endgames, static eval)</summary>
+      <figure class="fig">
+        <img src={fig3Ablations} loading="lazy" alt="Holm-corrected Elo deltas for component ablations at Level 0 and Level 1" />
+        <figcaption>Figure 3. Component ablations (200 games per variant at 30+0.3 s) with Holm-adjusted significance.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src={fig4TemperatureBlunders} loading="lazy" alt="Elo, policy entropy, ACPL, and blunder rates across Boltzmann temperatures" />
+        <figcaption>Figure 4. Monotonic strength decay, policy entropy growth, and blunder rates against Stockfish depth 10.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src={fig5TacticsEndgames} loading="lazy" alt="WAC-300 and BK-24 tactical solve rates alongside KQK, KRK, and KPK endgame conversions" />
+        <figcaption>Figure 5. Tactical suite solve rates and verified endgame conversion against Stockfish depth 8 with and without confinement.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src={fig6EvalCorrelation} loading="lazy" alt="Scatter plot and per-term correlation of Nabla static evaluation against Stockfish depth 10" />
+        <figcaption>Figure 6. Static evaluation correlation across 2,000 quiet middlegame, opening, and endgame positions.</figcaption>
+      </figure>
+    </details>
+
+    <p><code>nabla-tune</code> runs MSE coordinate descent on quiet positions without replacing defaults. Stockfish's Elo cap, when you play it in the lab, is Stockfish's own limit.</p>
 
     <h2>License</h2>
     <p>Nabla is free software under the GNU GPL v3 or later.</p>

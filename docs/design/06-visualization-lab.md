@@ -30,8 +30,11 @@ the board while the other side thinks. Two Nablas use two colours. Moves holds
 the game. The question mark opens the legend. Pause, then hover a mark, to read
 which pieces and squares make it. The pause before an engine move is at the top
 of a seat, and a move does not start while that seat is open. The notes
-show the recorded self-play. Matches against Stockfish and Maia have not been
-recorded. Control is one inset rim under the pieces, and only while Nabla is
+summarise the recorded native benchmark suite (anchored matches against
+Stockfish 19, Maia, and classical alpha-beta baselines, plus ablations,
+temperature curves, tactical suites, endgame conversions, and static evaluation
+correlation) and display its figures. Control is one inset rim under the
+pieces, and only while Nabla is
 to move, in the same geometry the legend draws. Tension ticks,
 hanging-piece numbers, and candidate arrows use that same geometry. Check,
 checkmate, stalemate, and the draw reasons are written on the board. The king that is
@@ -42,8 +45,10 @@ sliders.
 
 Stockfish's Elo cap is Stockfish's own UCI option. A game against it is not a
 rating for Nabla. Maia-3 is fetched by the browser and is not in the repository.
-Anchored matches go through
-`node tools/gauntlet.mjs`, under the conditions in the research protocol.
+Single protocol matches go through `node tools/gauntlet.mjs`, and the full
+benchmark suite reported in [`../research/benchmark-report.md`](../research/benchmark-report.md)
+runs through `python tools/benchmark/run_suite.py`, under the conditions in the
+research protocol.
 
 ---
 

@@ -6,6 +6,11 @@ test("the notes are the front page and the board fits the play page", async ({ p
   await expect(page.locator("h1")).toContainText("∇");
   await expect(page.getByRole("link", { name: /Try it out/ })).toHaveAttribute("href", "/play");
   await expect(page.locator(".math .katex")).toHaveCount(3);
+  const figsLoaded = await page.evaluate(() => {
+    const imgs = [...document.querySelectorAll<HTMLImageElement>(".paper > figure.fig img")];
+    return imgs.length === 2 && imgs.every((img) => img.complete && img.naturalWidth > 0);
+  });
+  expect(figsLoaded).toBeTruthy();
 
   await page.goto("/play");
   await expect(page.locator("piece.white.king")).toBeVisible({ timeout: 15000 });
@@ -107,6 +112,10 @@ test("the notes are the front page and the board fits the play page", async ({ p
 
 test("a narrow screen stacks the reading under the board", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const notesWide = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+  expect(notesWide).toBeTruthy();
+
   await page.goto("/play");
   await expect(page.locator("piece.white.king")).toBeVisible({ timeout: 15000 });
   const board = await page.locator(".board").boundingBox();

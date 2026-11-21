@@ -657,6 +657,19 @@ button.go:disabled { opacity: 0.4; }
 .paper a:not(.go) { color: var(--accent); }
 .results { width: min(100%, 460px); border-collapse: collapse; font-size: 14.5px; margin: 8px 0 16px; }
 .results td { padding: 7px 0; color: var(--ink-2); box-shadow: inset 0 -1px 0 var(--line); }
+.table-wrap { width: 100%; max-width: 62ch; overflow-x: auto; margin: 8px 0 18px; }
+.table-wrap .results { margin: 0; }
+.results.wide { width: 100%; }
+.results th { padding: 6px 8px 6px 0; font-size: 12px; font-weight: 500; text-align: left; color: var(--ink-3); box-shadow: inset 0 -1px 0 var(--line-2); white-space: nowrap; }
+.results.wide td { padding: 6px 8px 6px 0; }
+.results th.num, .results td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; padding-right: 0; padding-left: 12px; }
+.results.wide td:last-child:not(.num) { font-family: var(--font); font-weight: inherit; }
+.results tr.hl td { color: var(--ink); font-weight: 550; }
+.paper figure.fig { width: 100%; max-width: 62ch; margin: 18px 0 24px; }
+.paper figure.fig img { display: block; width: 100%; height: auto; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid var(--line); }
+.paper figcaption { margin-top: 8px; font-size: 13px; color: var(--ink-3); line-height: 1.45; }
+.more-figs { width: 100%; max-width: 62ch; margin: 12px 0 24px; }
+.more-figs summary { cursor: pointer; font-size: 14px; color: var(--accent); padding: 6px 0; }
 code { font-family: var(--mono); font-size: 0.92em; }
 
 @media (max-width: 860px) {

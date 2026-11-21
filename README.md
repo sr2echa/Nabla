@@ -19,16 +19,19 @@ small and explicit: none past the move itself, or captures only, or one reply.
 
 > **Status:** v0.1. The full energy functional, all three selection levels, the
 > Boltzmann policy, the UCI front end, and the playable page in `web/` are
-> implemented. The engine passes the fastchess UCI compliance check. The
-> coefficients are hand-set initial values. A tuner prints a fit and does not
-> install it. Playing strength has not been measured against an anchored pool;
-> self-play confirms that each level beats the one below it by several hundred
-> Elo. See the [roadmap](docs/roadmap.md).
+> implemented. The coefficients are hand-set initial values; a tuner prints a
+> fit and does not replace them. In an **11,920-game** native benchmark suite
+> anchored to Stockfish 19 on the CCRL Blitz scale (`Ordo`, zero adjudication),
+> untuned Level 2 rates **1607 ± 24 Elo**, Level 1 rates **1337 ± 29 Elo**, and
+> Level 0 rates **964 ± 43 Elo** (`0` time forfeits, `0` illegal moves, `40/40`
+> UCI compliance). See the [benchmark report](docs/research/benchmark-report.md)
+> and [roadmap](docs/roadmap.md).
 
 ## Contents
 
 - [Features](#features)
 - [How it works](#how-it-works)
+- [Benchmarks](#benchmarks)
 - [Building](#building)
 - [Using Nabla](#using-nabla)
 - [Repository layout](#repository-layout)
@@ -50,6 +53,13 @@ small and explicit: none past the move itself, or captures only, or one reply.
   pawn units; seeded and reproducible.
 - **Exactly colour-symmetric.** The evaluation is antisymmetric under the colour
   flip bit for bit, enforced by tests on more than 10,000 positions.
+- **Full standard chess rules.** Castling (both wings), en passant (with SEE
+  removing the captured pawn before X-ray discovery), all four pawn promotions
+  (queen promotions in quiescence), checkmate, stalemate, the fifty-move rule,
+  insufficient material, threefold repetition in the lab, and first-recurrence
+  repetition (`±0.15` pawn contempt) in search. Standard chess only (no
+  Chess960); static $`E(S)`$ ignores castling rights and SEE ignores pins
+  ([`02 §12`](docs/design/02-field-model.md#12-known-exclusions)).
 - **Standard UCI.** Works with any UCI GUI and with match runners such as fastchess.
 
 ## How it works
@@ -142,6 +152,77 @@ Sampling is keyed by seed, position, and ply, so games are reproducible.
 The full specification, with every equation and coefficient, is in
 [`docs/design/02-field-model.md`](docs/design/02-field-model.md).
 
+## Benchmarks
+
+Across **11,920 native games** (**9,520** `fastchess` tournament games plus
+**2,400** endgame conversion games), **324** tactical test positions, and
+**2,000** quiet evaluation probes on an Intel Core i7-7700HQ (4 physical cores,
+2.80 GHz; Windows; `rustc 1.100.0`; `fastchess` 1.8.3; `Stockfish 19`; `lc0`
+0.32.1 + Maia; custom PeSTO alpha-beta baselines; `Ordo` v1.0 `-W -M -s 1000`;
+zero adjudication; base seed `20261121`; parameter hash `c3deee9880eb64dc`),
+Nabla completed every included match with **0 time forfeits, 0 illegal moves,
+and 0 crashes** (`40/40` UCI compliance). Full tables and methodology live in
+[`docs/research/benchmark-report.md`](docs/research/benchmark-report.md) and
+[`benchmarks/results/manifest.json`](benchmarks/results/manifest.json).
+
+### Anchored Ordo Elo ladder
+
+4,780 pool games on `8moves_v3.pgn` at `10+0.1 s`, pinned to four Stockfish 19
+`UCI_LimitStrength` anchors (580 anchor games) on the CCRL Blitz scale:
+
+| Engine | Ordo Elo | 95% CI | Pool Games | Score | Nodes / move | Time / move |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| `SF-1900` *(anchor)* | **1900.0** | pinned | 60 | 80.0% | 113,270.1 | 319.53 ms |
+| `SF-1700` *(anchor)* | **1700.0** | pinned | 160 | 73.4% | 86,518.2 | 303.95 ms |
+| **`Nabla-L2`** | **1607.0 ± 24.2** | `[1582.8, 1631.2]` | **1,700** | **77.0%** | **1,701.5** | **16.07 ms** |
+| `AB-PeSTO-2` | 1547.6 ± 34.0 | `[1513.6, 1581.6]` | 400 | 58.2% | 798.3 | 0.44 ms |
+| `SF-1500` *(anchor)* | **1500.0** | pinned | 200 | 52.5% | 89,569.5 | 325.02 ms |
+| `Maia-1900` (`lc0` 1n) | 1450.7 ± 31.0 | `[1419.7, 1481.7]` | 520 | 38.6% | 1.0 | 2.99 ms |
+| `Maia-1500` *(hold-out, 1n)* | 1356.0 ± 26.7 | `[1329.3, 1382.7]` | 1,100 | 39.2% | 1.0 | 3.22 ms |
+| **`Nabla-L1`** | **1336.7 ± 29.4** | `[1307.3, 1366.1]` | **1,260** | **61.0%** | **315.7** | **3.10 ms** |
+| `AB-PeSTO-1` | 1334.2 ± 34.2 | `[1300.0, 1368.4]` | 600 | 43.6% | 177.4 | 0.04 ms |
+| `SF-1320` *(anchor)* | **1320.0** | pinned | 160 | 28.8% | 96,725.5 | 369.06 ms |
+| `Maia-1100` (`lc0` 1n) | 1235.6 ± 31.7 | `[1203.9, 1267.3]` | 1,000 | 39.8% | 1.0 | 2.97 ms |
+| **`Nabla-L0`** | **963.9 ± 43.4** | `[920.5, 1007.3]` | **1,100** | **50.7%** | **35.8** | **0.23 ms** |
+| `AB-PeSTO-0` | 119.7 ± 155.7 | `[-36.0, 275.4]` | 400 | 25.6% | 17.4 | 0.00 ms |
+| `Material-1ply` | 116.6 ± 155.6 | `[-39.0, 272.2]` | 700 | 26.8% | 23.5 | 0.01 ms |
+| `Random` | -211.0 ± 169.9 | `[-380.9, -41.1]` | 200 | 6.8% | 1.0 | 0.01 ms |
+
+![Anchored Ordo Elo Ladder](benchmarks/figures/fig1_elo_ladder.png)
+
+![Compute and Wall-Time Pareto](benchmarks/figures/fig2_compute_pareto.png)
+
+<details>
+<summary>Additional benchmark figures (ablations, temperature &amp; blunders, tactics &amp; endgames, static eval correlation)</summary>
+
+![Structural and Energy-Term Ablations](benchmarks/figures/fig3_ablations.png)
+
+![Boltzmann Temperature Curve and Blunder Profile](benchmarks/figures/fig4_temperature_blunders.png)
+
+![Tactics and Endgame Conversion](benchmarks/figures/fig5_tactics_endgames.png)
+
+![Static Evaluation Correlation vs Stockfish](benchmarks/figures/fig6_eval_correlation.png)
+
+</details>
+
+### Key diagnostics, strengths & trade-offs
+
+- **Head-to-head & level scaling:** `L0 → L1` adds `+442.8 ± 93.0` Elo (`184–13–3`) and `L1 → L2` adds `+372.2 ± 78.6` Elo (`174–16–10`; `+418.5 ± 78.6` on `noob_3moves.epd`). `Nabla-L2` beats `SF-1320` (`74–18–8`, `+219.9 ± 80.4`), `SF-1500` (`58–40–2`, `+63.2 ± 65.1`, `p = 0.049`, using `53×` fewer nodes and `20×` less time), `Maia-1100` (`+358.8 ± 67.7`), `Maia-1500` (`137–36–27`, `+193.2 ± 46.9`; `noob_3moves.epd`: `121–35–44`, `+159.8 ± 47.0`), `Maia-1900` (`116–34–50`, `+151.3 ± 41.8`), and depth-matched `AB-PeSTO-2` (`105–73–22`, `+56.1 ± 44.7`, `p = 0.012`), while losing to `SF-1700` (`32–68–0`, `-130.9 ± 77.7`). At 1 ply, `Nabla-L0` beats `AB-PeSTO-0` `198–2–0` (`+798.2 ± 197.7`).
+- **Ablations (`3,200` games, `30+0.3 s`, Holm-corrected):** At **L0**, `No Exchange` drops `-919.5 ± 155.7` (`p_H < 10⁻³⁰⁰`), `No Pawns` drops `-90.6 ± 43.2` (`p_H = 0.00008`), and `No Attenuation (λ = 0)` drops `-43.7 ± 34.8` (`p = 0.013, p_H = 0.051`). At **L1**, `No Pawns` (`-70.4 ± 45.4`, `p_H = 0.0167`) and `No King` (`-59.6 ± 39.9`, `p_H = 0.0243`) degrade strength significantly, and `No Exchange` drops `-52.5 ± 43.0` (`p = 0.015, p_H = 0.117`). At hand-set defaults, `No X-ray (χ = 0)` stays within noise (`-3.5` to `-15.7` Elo at `n = 200`).
+- **Temperature & blunders (`SF depth 10`):** Elo drops strictly monotonically vs `T = 0` (`0.10`: `-134.9`, `0.25`: `-346.1`, `0.50`: `-511.5`, `1.00`: `-798.2`, `2.00`: `0/100`), while entropy rises `1.495 → 2.785` nats, ACPL `63.1 → 114.5`, and blunders (`≥ 200` cp) `8.2% → 20.2%`. At `T = 0`, `Nabla-L2` records ACPL `67.1`, blunders `7.8%`, and SF Top-1 match `40.5%` (vs `Maia-1500` `65.2`, `10.5%`, `40.3%`).
+- **Tactics & endgames:** `Nabla-L2` solves `85/300` (`28.3%`) on `WAC-300` and `5/24` (`20.8%`) on `BK-24` (vs `AB-PeSTO-2` `30.7%` / `12.5%`, `Maia-1500` `13.0%` / `16.7%`). Confinement drives endgame conversion (`n = 200` verified wins vs `SF depth 8`, 50-move limit): **KQK `95.0%` vs `59.5%`**, **KRK `48.5%` vs `7.5%`**, **KPK `74.5%` vs `38.5%`** (L2 with vs without confinement).
+- **Static eval agreement (`n = 2,000` quiet positions vs `SF depth 10`):** Spearman `ρ = 0.8645`, Pearson `r = 0.9072`, sign agreement (`|SF| ≥ 0.5`) `87.5%`, `MAE = 1.785` pawns (Opening `0.7489`, Middlegame `0.9785`, Endgame `0.9384`).
+- **Speed & WASM parity (`5` `bench` runs):** Native medians `0.36 ms` (L0), `12.54 ms` (L1), `21.02 ms` (L2, `120,368` nps, `8.31 µs/node`); WebAssembly is `48/48` bit-identical (`1.42×` factor at L2).
+- **Modeling boundaries & trade-offs:** Nabla uses a hybrid evaluator (only territory and king pressure read the ray-transport field Φ_c; the other 7 terms use exact bitboards and SEE) with untuned hand-set weights (`MAE = 1.785` pawns). Evaluating the field costs `8.3 µs/node` vs `0.55 µs/node` for PeSTO PSTs, so Nabla wins at equal depth (`+844` Elo at 1 ply, `+56` Elo at 2 ply), whereas deeper classical search wins at equal wall-clock time. Shallow search also leaves a 2-ply tactical/triangulation ceiling (`28.3%` WAC-300, `48.5%` KRK) and no opposite-coloured-bishop/fortress draw scaling.
+
+Reproducing the full suite (installs `fastchess`, `Stockfish`, `lc0`/Maia, openings, builds baselines, runs matches, and regenerates charts):
+
+```sh
+python tools/benchmark/provision.py
+python tools/benchmark/run_suite.py
+python tools/benchmark/plot_results.py
+```
+
 ## Building
 
 **Requirements:** Rust 1.97 or newer ([rustup](https://rustup.rs)). No other
@@ -172,8 +253,9 @@ The notes are the front page. Play is a second page, one viewport high on a
 desktop. Each colour is a seat. Choosing it opens a roster: you, Nabla,
 Stockfish 19 lite, or Maia, and that model's own settings. The judgement bar
 stands to the left of the board. The right column has a Reading tab and a
-Moves tab. Moves can be undone and replayed. The notes show the recorded
-self-play. Matches against Stockfish and Maia have not been recorded.
+Moves tab. Moves can be undone and replayed. The notes summarise the recorded
+native benchmark suite against Stockfish 19, Maia, and classical alpha-beta
+baselines, and include its figures.
 Maia-3 can sit in a seat; its network downloads in the browser the first time
 it moves. Nabla's rims, ticks, and hanging-piece numbers stay on the board
 while the other side thinks, in the same shape as the legend behind the
@@ -211,8 +293,9 @@ chooses. `detail` is `play`, `check`, `checkmate`, `stalemate`, `material`,
 Nabla's search still treats the first recurrence as a draw when it is choosing
 a move (03 §3). That rule does not, by itself, end the game on the board.
 
-Matches against Stockfish, Maia, and the other engines named in the protocol
-are run with `node tools/gauntlet.mjs`. The page's Stockfish lite opponent is
+Single protocol matches against Stockfish, Maia, and the other engines named in
+the protocol run with `node tools/gauntlet.mjs`; the full suite above runs with
+`python tools/benchmark/run_suite.py`. The page's Stockfish lite opponent is
 for play. It is not that measurement.
 
 `bench [level]` runs a fixed 16-position suite (Level 2 by default) and prints the
@@ -234,14 +317,6 @@ not every middlegame. Level 0 on the same three positions stayed under 1 ms
 (20, 50, and 6 visits). The cost follows the number of positions visited.
 Level 0 visits each legal move, plus the forced replies to a check. Level 2
 adds one reply and the captures after it.
-
-Against Stockfish 19 (`UCI_LimitStrength` anchors on the CCRL Blitz scale,
-4,780 pool games with Ordo), Level 2 rates **1607 ± 24 Elo** (scoring 58–40–2
-against `SF-1500`, 137–36–27 against `Maia-1500`, and 105–73–22 against
-depth-matched `AB-PeSTO-2`), Level 1 rates **1337 ± 29 Elo**, and Level 0 rates
-**964 ± 43 Elo** (+844 Elo over 1-ply `AB-PeSTO-0`). Full results, ablations,
-temperature curves, tactical suites, endgame conversions, and figures live in
-[`docs/research/benchmark-report.md`](docs/research/benchmark-report.md).
 
 Nabla is not a neural network. The energy has 57 named coefficients and four
 fixed constants (pawn unit 1, ray cut-off 0.05, light-cone sharpness 0.1,
@@ -278,9 +353,10 @@ fastchess -engine cmd=./target/release/nabla name=Nabla \
 
 Time is handled automatically: Nabla turns the clock (or `go movetime`, or
 `go nodes`) into a node budget, so moves stay deterministic and the engine
-finishes within its clock. In a 3,000-game self-play gate at 2 s + 0.02 s per
-move, with seven games running at once, it lost no game on time. Decisions
-normally take milliseconds; the budget only matters in rare tactical explosions.
+finishes within its clock. In a 600-game self-play stress gate at 4 s + 0.04 s
+per move (`concurrency = 3`) and across all 9,520 `fastchess` benchmark games, it
+lost zero games on time. Decisions normally take milliseconds; the budget only
+matters in rare tactical explosions.
 
 `UCI_LimitStrength` / `UCI_Elo` will be offered once a calibration table exists
 (Milestone 5). For tuning, any coefficient can be overridden with
@@ -326,6 +402,14 @@ Nabla/
 │   ├── nabla-uci/           # the `nabla` binary (UCI front end)
 │   ├── nabla-wasm/          # the same engine for the page
 │   └── nabla-tune/          # prints a fit; does not change the defaults
+├── benchmarks/              # measured results and publication figures
+│   ├── results/             # manifest, Ordo ratings, and per-experiment JSONs
+│   └── figures/             # SVG and 300-DPI PNG benchmark plots
+├── tools/                   # gauntlet, parity check, PeSTO baselines, benchmark suite
+│   ├── baselines/           # standalone classical baselines (Random, Material, AB-PeSTO)
+│   ├── benchmark/           # provision, run_suite, plot_results scripts
+│   ├── check_wasm_parity.mjs
+│   └── gauntlet.mjs
 ├── web/                     # the playable page
 └── docs/                    # specification, decisions, research protocol
 ```
@@ -336,7 +420,7 @@ Read [`AGENTS.md`](AGENTS.md) before changing anything. In short:
 
 1. The specification in `docs/design/` comes first; change it in the same commit
    as the code.
-2. `cargo fmt --all`, `cargo clippy --all-targets -- -D warnings`, and
+2. `cargo fmt --all`, `cargo clippy --release --all-targets -- -D warnings`, and
    `cargo test --release` must pass.
 3. A commit that changes evaluation or search behaviour states the new `bench`
    checksum in its message.
@@ -349,7 +433,9 @@ Read [`AGENTS.md`](AGENTS.md) before changing anything. In short:
 | [Move selection](docs/design/03-move-selection.md) | Graph gradient, boundary conditions, levels |
 | [Strength control](docs/design/04-strength-control.md) | Temperature policy, Elo calibration plan |
 | [Architecture](docs/design/05-architecture.md) | Crates, UCI surface, determinism, tests |
-| [Visualisation lab](docs/design/06-visualization-lab.md) | Planned interactive demo |
+| [Visualisation lab](docs/design/06-visualization-lab.md) | Playable board, notes, and layers |
+| [Benchmark report](docs/research/benchmark-report.md) | 11,920-game anchored Elo, ablations, eval, tactics, endgames |
+| [Hypotheses and protocol](docs/research/hypotheses-and-protocol.md) | Confirmatory criteria, statistics, experimental design |
 | [Documentation index](docs/README.md) | Everything else: reviews, decisions, research protocol |
 
 ## Citing and licence
