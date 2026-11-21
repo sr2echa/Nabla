@@ -298,9 +298,9 @@ export const ablationsData: AblationsData = {
 const matchByTemp = new Map(exp4.matches.map((m) => [m.temp_pawns, m]));
 
 const SHORT_BLUNDER_LABELS: Record<string, string> = {
-  "Nabla-L0": "L0",
-  "Nabla-L1": "L1",
-  "Nabla-L2 (T=0.00)": "L2 T=0",
+  "Nabla-L0": "Nabla-L0",
+  "Nabla-L1": "Nabla-L1",
+  "Nabla-L2 (T=0.00)": "Nabla-L2",
   "Maia-1500": "Maia-1500",
   "Nabla-L2 (T=0.10)": "T=0.10",
   "Nabla-L2 (T=0.25)": "T=0.25",

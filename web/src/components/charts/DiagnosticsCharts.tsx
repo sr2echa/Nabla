@@ -65,6 +65,34 @@ function fmtP(p: number): string {
   return p.toFixed(4);
 }
 
+function renderAngledEngineTick(props: {
+  x?: number | string;
+  y?: number | string;
+  payload?: { value?: string | number };
+}) {
+  const x = Number(props.x ?? 0);
+  const y = Number(props.y ?? 0);
+  const label = String(props.payload?.value ?? "");
+  const isNabla = label.startsWith("Nabla");
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={10}
+        textAnchor="end"
+        transform="rotate(-25)"
+        fontFamily="var(--mono)"
+        fontSize={11}
+        fontWeight={isNabla ? 700 : 400}
+        fill={isNabla ? "var(--ink)" : "var(--ink-3)"}
+      >
+        {label}
+      </text>
+    </g>
+  );
+}
+
 function AblationTooltip({
   active,
   payload,
@@ -534,7 +562,7 @@ export function DiagnosticsCharts({
               <div className="chart-legend-row" style={{ margin: 0 }}>
                 <span className="chart-legend-item">
                   <span className="chart-swatch" style={{ backgroundColor: "var(--chart-1)" }} />
-                  <span>Deterministic Nabla</span>
+                  <span>Deterministic <strong style={{ color: "var(--ink)", fontWeight: 700 }}>Nabla</strong></span>
                 </span>
                 <span className="chart-legend-item">
                   <span className="chart-swatch" style={{ backgroundColor: "var(--chart-3)" }} />
@@ -542,7 +570,7 @@ export function DiagnosticsCharts({
                 </span>
                 <span className="chart-legend-item">
                   <span className="chart-swatch" style={{ backgroundColor: "var(--chart-5)" }} />
-                  <span>Nabla-L2 (τ &gt; 0)</span>
+                  <span><strong style={{ color: "var(--ink)", fontWeight: 700 }}>Nabla-L2</strong> (τ &gt; 0)</span>
                 </span>
               </div>
             )}
@@ -623,17 +651,16 @@ export function DiagnosticsCharts({
               ) : (
                 <BarChart
                   data={temperature.blunders}
-                  margin={{ top: 12, right: 12, left: -8, bottom: 16 }}
+                  margin={{ top: 12, right: 12, left: -4, bottom: 16 }}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="shortLabel"
                     interval={0}
-                    angle={-25}
-                    textAnchor="end"
-                    height={52}
+                    height={58}
                     tickLine={false}
                     axisLine={false}
+                    tick={renderAngledEngineTick}
                   />
                   <YAxis
                     domain={[0, 28]}
@@ -710,7 +737,7 @@ export function DiagnosticsCharts({
               <div className="chart-legend-row" style={{ margin: 0 }}>
                 <span className="chart-legend-item">
                   <span className="chart-swatch" style={{ backgroundColor: "var(--chart-1)" }} />
-                  <span>Nabla-L2</span>
+                  <strong style={{ color: "var(--ink)", fontWeight: 700 }}>Nabla-L2</strong>
                 </span>
                 <span className="chart-legend-item">
                   <span className="chart-swatch" style={{ backgroundColor: "var(--chart-5)" }} />
@@ -718,11 +745,11 @@ export function DiagnosticsCharts({
                 </span>
                 <span className="chart-legend-item">
                   <span className="chart-swatch" style={{ backgroundColor: "var(--chart-2)" }} />
-                  <span>Nabla-L1</span>
+                  <strong style={{ color: "var(--ink)", fontWeight: 700 }}>Nabla-L1</strong>
                 </span>
                 <span className="chart-legend-item">
                   <span className="chart-swatch" style={{ backgroundColor: "var(--chart-muted)" }} />
-                  <span>Nabla-L0</span>
+                  <strong style={{ color: "var(--ink)", fontWeight: 700 }}>Nabla-L0</strong>
                 </span>
               </div>
             ) : (
@@ -776,18 +803,17 @@ export function DiagnosticsCharts({
               ) : (
                 <BarChart
                   data={tacticsEndgames.tactics}
-                  margin={{ top: 12, right: 12, left: -8, bottom: 16 }}
+                  margin={{ top: 12, right: 12, left: -4, bottom: 16 }}
                   barGap={4}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="engine"
                     interval={0}
-                    angle={-22}
-                    textAnchor="end"
-                    height={52}
+                    height={58}
                     tickLine={false}
                     axisLine={false}
+                    tick={renderAngledEngineTick}
                   />
                   <YAxis
                     domain={[0, 46]}

@@ -80,7 +80,7 @@ function renderPointLabel(metric: "nodes" | "time") {
         fontSize={10.5}
         fontFamily="var(--mono)"
         fill={name.startsWith("Nabla") ? "var(--chart-1)" : "var(--ink-2)"}
-        fontWeight={name.startsWith("Nabla") ? 600 : 450}
+        fontWeight={name.startsWith("Nabla") ? 700 : 450}
       >
         {name}
       </text>
@@ -201,7 +201,13 @@ export function ComputeParetoChart({ data }: { data: EloLadderRow[] }) {
                 className="chart-swatch dot"
                 style={{ backgroundColor: chartConfig[fam].color }}
               />
-              <span>{chartConfig[fam].label}</span>
+              {fam === "nabla" ? (
+                <strong style={{ color: "var(--ink)", fontWeight: 700 }}>
+                  {chartConfig[fam].label}
+                </strong>
+              ) : (
+                <span>{chartConfig[fam].label}</span>
+              )}
             </span>
           ),
         )}

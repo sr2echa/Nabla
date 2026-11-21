@@ -10,12 +10,17 @@
 
 .chart-figure {
   width: 100%;
-  max-width: 44rem;
+  max-width: 62ch;
   min-width: 0;
   margin: 28px 0 38px;
   padding: 18px 0 0;
   border-top: 1px solid var(--line);
   background: transparent;
+  font-size: 16px;
+}
+
+.chart-figure .table-wrap {
+  max-width: 100%;
 }
 
 .chart-head {

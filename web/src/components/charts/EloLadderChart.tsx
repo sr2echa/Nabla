@@ -35,6 +35,31 @@ const chartConfig = {
   floor: { label: "Floor baselines", color: "var(--chart-muted)" },
 } satisfies ChartConfig;
 
+function renderPlayerTick(props: {
+  x?: number | string;
+  y?: number | string;
+  payload?: { value?: string | number };
+}) {
+  const x = Number(props.x ?? 0);
+  const y = Number(props.y ?? 0);
+  const label = String(props.payload?.value ?? "");
+  const isNabla = label.startsWith("Nabla");
+  return (
+    <text
+      x={x}
+      y={y}
+      dy={4}
+      textAnchor="end"
+      fontFamily="var(--mono)"
+      fontSize={11}
+      fontWeight={isNabla ? 700 : 400}
+      fill={isNabla ? "var(--ink)" : "var(--ink-3)"}
+    >
+      {label}
+    </text>
+  );
+}
+
 function EloTooltip({
   active,
   payload,
@@ -136,7 +161,13 @@ export function EloLadderChart({ data }: { data: EloLadderRow[] }) {
                       chartConfig[fam as keyof typeof chartConfig].color,
                   }}
                 />
-                <span>{FAMILY_META[fam].label}</span>
+                {fam === "nabla" ? (
+                  <strong style={{ color: "var(--ink)", fontWeight: 700 }}>
+                    {FAMILY_META[fam].label}
+                  </strong>
+                ) : (
+                  <span>{FAMILY_META[fam].label}</span>
+                )}
               </span>
             ))}
           </div>
@@ -162,6 +193,7 @@ export function EloLadderChart({ data }: { data: EloLadderRow[] }) {
                   width={98}
                   tickLine={false}
                   axisLine={false}
+                  tick={renderPlayerTick}
                 />
                 <ReferenceLine x={0} stroke="var(--line-2)" />
                 <ChartTooltip

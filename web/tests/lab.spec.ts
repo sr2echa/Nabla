@@ -2,10 +2,17 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function assertCleanCharts(page: Page, expectedCount: number) {
   const info = await page.evaluate(() => {
+    const p = document.querySelector<HTMLElement>(".paper > p:not(.lede)");
+    const pWidth = p ? p.getBoundingClientRect().width : 0;
     const figures = [...document.querySelectorAll<HTMLElement>(".chart-figure")];
     const allowedBgs = new Set(["rgba(0, 0, 0, 0)", "transparent", "rgb(243, 241, 235)"]);
     const badContainers: string[] = [];
+    const widerThanPara: string[] = [];
     for (const fig of figures) {
+      const rect = fig.getBoundingClientRect();
+      if (pWidth > 0 && rect.width > pWidth + 1) {
+        widerThanPara.push(`${rect.width.toFixed(1)} > ${pWidth.toFixed(1)}`);
+      }
       const s = getComputedStyle(fig);
       if (!allowedBgs.has(s.backgroundColor)) {
         badContainers.push(`figure bg=${s.backgroundColor}`);
@@ -28,10 +35,19 @@ async function assertCleanCharts(page: Page, expectedCount: number) {
       return r.width < 50 || r.height < 50;
     }).length;
     const nanAttrs: string[] = [];
+    const unboldedNabla: string[] = [];
     for (const s of svgs) {
       const sBg = getComputedStyle(s).backgroundColor;
       if (!allowedBgs.has(sBg)) {
         badContainers.push(`svg bg=${sBg}`);
+      }
+      for (const t of s.querySelectorAll<SVGTextElement>("text")) {
+        if ((t.textContent ?? "").includes("Nabla")) {
+          const fw = Number(getComputedStyle(t).fontWeight);
+          if (!Number.isFinite(fw) || fw < 700) {
+            unboldedNabla.push(`${t.textContent}=${getComputedStyle(t).fontWeight}`);
+          }
+        }
       }
       for (const el of s.querySelectorAll("*")) {
         for (const attr of ["d", "cx", "cy", "x", "y", "x1", "x2", "y1", "y2", "width", "height"]) {
@@ -40,12 +56,22 @@ async function assertCleanCharts(page: Page, expectedCount: number) {
         }
       }
     }
-    return { count: svgs.length, zeroSized, nanAttrs, badContainers };
+    return { count: svgs.length, zeroSized, nanAttrs, badContainers, widerThanPara, unboldedNabla };
   });
   expect(info.count).toBe(expectedCount);
   expect(info.zeroSized).toBe(0);
   expect(info.nanAttrs).toEqual([]);
   expect(info.badContainers).toEqual([]);
+  expect(info.widerThanPara).toEqual([]);
+  expect(info.unboldedNabla).toEqual([]);
+}
+
+async function assertMinBoldNablaLabels(page: Page, minCount: number) {
+  const count = await page.evaluate(() => {
+    const texts = [...document.querySelectorAll<SVGTextElement>(".shadcn-chart svg.recharts-surface text")];
+    return texts.filter((t) => (t.textContent ?? "").includes("Nabla") && Number(getComputedStyle(t).fontWeight) >= 700).length;
+  });
+  expect(count).toBeGreaterThanOrEqual(minCount);
 }
 
 test("the notes are the front page and the board fits the play page", async ({ page }) => {
@@ -62,6 +88,7 @@ test("the notes are the front page and the board fits the play page", async ({ p
   await expect(page.locator(".math .katex")).toHaveCount(3);
   await expect(page.locator(".shadcn-chart svg.recharts-surface")).toHaveCount(4, { timeout: 10000 });
   await assertCleanCharts(page, 4);
+  await assertMinBoldNablaLabels(page, 6);
 
   // Interactive chart toggles & diagnostics tabs
   await page.getByRole("button", { name: "Data table" }).click();
@@ -71,6 +98,7 @@ test("the notes are the front page and the board fits the play page", async ({ p
 
   await page.getByRole("button", { name: "Time / move (ms)" }).click();
   await assertCleanCharts(page, 4);
+  await assertMinBoldNablaLabels(page, 6);
 
   await page.getByRole("button", { name: "Level 0 (6 terms)" }).click();
   await assertCleanCharts(page, 4);
@@ -79,11 +107,13 @@ test("the notes are the front page and the board fits the play page", async ({ p
   await assertCleanCharts(page, 4);
   await page.getByRole("button", { name: "Blunder Rate & ACPL" }).click();
   await assertCleanCharts(page, 4);
+  await assertMinBoldNablaLabels(page, 9);
 
   await page.getByRole("tab", { name: "Tactics & Endgames" }).click();
   await assertCleanCharts(page, 4);
   await page.getByRole("button", { name: /WAC-300/ }).click();
   await assertCleanCharts(page, 4);
+  await assertMinBoldNablaLabels(page, 9);
 
   await page.getByRole("tab", { name: "Static Eval" }).click();
   await assertCleanCharts(page, 4);
