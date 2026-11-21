@@ -99,7 +99,7 @@ const args = [
   "-rounds", String(rounds),
   "-repeat",
   "-concurrency", values.concurrency,
-  "-pgnout", pgn,
+  "-pgnout", `file=${pgn}`, "append=false",
 ];
 
 if (!values.book) {

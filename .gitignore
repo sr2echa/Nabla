@@ -5,3 +5,6 @@
 /web/test-results
 /web/playwright-report
 /tools/gauntlet/out
+/tools/bench-bin
+/tools/baselines/target
+/benchmarks/raw

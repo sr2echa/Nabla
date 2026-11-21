@@ -65,6 +65,7 @@ dependencies = [
 name = "nabla-tune"
 version = "0.1.0"
 dependencies = [
+ "libm",
  "nabla-core",
  "shakmaty",
 ]

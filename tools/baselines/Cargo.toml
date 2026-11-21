@@ -1,0 +1,11 @@
+[package]
+name = "nabla-baselines"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+[workspace]
+
+[dependencies]
+shakmaty = "0.30.2"
