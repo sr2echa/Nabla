@@ -31,6 +31,55 @@ fn see_reference_positions() {
         promotion: None,
     };
     assert_eq!(see_move(pos.board(), nxe5), -2);
+
+    // Defended low-takes-high captures must account for the recapture.
+    // White Rd1 attacks Black Qd4 defended by Black Pc5: 9 - 5 = +4 (not +9).
+    let pos = common::parse("4k3/8/8/2p5/3q4/8/8/3RK3 w - - 0 1");
+    assert_eq!(see_square(pos.board(), Square::D4, Color::White), 4);
+
+    // White Pe4 attacks Black Nd5 defended by Black Pc6: 3 - 1 = +2 (not +3).
+    let pos = common::parse("4k3/8/2p5/3n4/4P3/8/8/4K3 w - - 0 1");
+    assert_eq!(see_square(pos.board(), Square::D5, Color::White), 2);
+
+    // White Bd2 attacks Black Re3 defended by Black Pf4: 5 - 3 = +2 (not +5).
+    let pos = common::parse("4k3/8/8/8/5p2/4r3/3B4/4K3 w - - 0 1");
+    assert_eq!(see_square(pos.board(), Square::E3, Color::White), 2);
+
+    // Three-ply capture chain: QxP (+1), RxQ (-8), PxR (-3).
+    let pos = common::parse("3rk3/8/8/3p4/4P3/8/3Q4/4K3 w - - 0 1");
+    let qxd5 = Move::Normal {
+        role: Role::Queen,
+        from: Square::D2,
+        capture: Some(Role::Pawn),
+        to: Square::D5,
+        promotion: None,
+    };
+    assert_eq!(see_move(pos.board(), qxd5), -3);
+
+    // En passant removes the captured pawn from its square, revealing X-ray defenders.
+    // White Pe5 takes Black Pd5 e.p. on d6; Black Rd8 and White Rd1 are aligned on the d-file.
+    // Removing d5 lets Black Rd8 recapture d6 (-1+1=0) and White Rd1 take back (+1), net +1.
+    let pos = common::parse("3rk3/8/8/3pP3/8/8/8/3RK3 w - d6 0 1");
+    let ep = Move::EnPassant {
+        from: Square::E5,
+        to: Square::D6,
+    };
+    assert_eq!(see_move(pos.board(), ep), 1);
+
+    // Without White Rd1, removing d5 lets Black Rd8 capture the e.p. pawn for free (+1 - 1 = 0).
+    let pos = common::parse("3rk3/8/8/3pP3/8/8/8/4K3 w - d6 0 1");
+    assert_eq!(see_move(pos.board(), ep), 0);
+
+    // Promotion capture: g7xh8=Q defended by Black Ra8 scores 5 + 8 - 9 = +4.
+    let pos = common::parse("r6r/6P1/4k3/8/8/8/8/4K3 w - - 0 1");
+    let gxh8q = Move::Normal {
+        role: Role::Pawn,
+        from: Square::G7,
+        capture: Some(Role::Rook),
+        to: Square::H8,
+        promotion: Some(Role::Queen),
+    };
+    assert_eq!(see_move(pos.board(), gxh8q), 4);
 }
 
 #[test]

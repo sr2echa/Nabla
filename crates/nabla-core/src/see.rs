@@ -1,8 +1,9 @@
 //! Static exchange evaluation (02 §5.4).
 //!
 //! Swap algorithm with least-valuable-attacker ordering and X-ray discovery.
-//! Documented simplifications: pins of capturing pieces are ignored, and
-//! promotions during the exchange are not credited.
+//! `see_move` models en passant captures and first-move promotion captures;
+//! documented simplifications: pins of capturing pieces and mid-sequence
+//! promotions are ignored.
 
 use shakmaty::{Bitboard, Board, Color, Move, Role, Square, attacks};
 
@@ -45,47 +46,91 @@ fn least_valuable(board: &Board, side: Color, candidates: Bitboard) -> Option<Sq
 }
 
 /// Material gain for `side` from capturing first on `target` (0 if the square
-/// is empty or `side` has no legal-looking capture). Never positive for the
-/// opponent; may be negative when the first capture loses material.
+/// is empty or `side` has no capture). Never positive for the opponent; may be
+/// negative when the first capture loses material.
 pub fn see_square(board: &Board, target: Square, side: Color) -> i32 {
-    if board.piece_at(target).is_none() {
+    let Some(victim) = board.role_at(target) else {
         return 0;
-    }
+    };
     let candidates = attackers_to(board, target, board.occupied()) & board.by_color(side);
     match least_valuable(board, side, candidates) {
-        Some(from) => swap(board, target, from),
+        Some(from) => {
+            let Some(attacker) = board.role_at(from) else {
+                return 0;
+            };
+            swap_with(
+                board,
+                target,
+                from,
+                side,
+                attacker,
+                value(victim),
+                board.occupied(),
+            )
+        }
         None => 0,
     }
 }
 
-/// SEE of a specific capture move. En passant captures and non-captures
-/// return 0.
+/// SEE of a specific capture move, including en passant and promotion captures.
+/// Non-captures return 0.
 pub fn see_move(board: &Board, m: Move) -> i32 {
     match m {
         Move::Normal {
+            role,
             from,
             to,
-            capture: Some(_),
-            ..
-        } => swap(board, to, from),
+            capture: Some(victim),
+            promotion,
+        } => {
+            let Some(first) = board.piece_at(from) else {
+                return 0;
+            };
+            let initial_gain = value(victim) + promotion.map_or(0, |r| value(r) - value(role));
+            let initial_role = promotion.unwrap_or(first.role);
+            swap_with(
+                board,
+                to,
+                from,
+                first.color,
+                initial_role,
+                initial_gain,
+                board.occupied(),
+            )
+        }
+        Move::EnPassant { from, to } => {
+            let Some(first) = board.piece_at(from) else {
+                return 0;
+            };
+            let captured_sq = Square::from_coords(to.file(), from.rank());
+            let initial_occupied = board.occupied().without(captured_sq);
+            swap_with(
+                board,
+                to,
+                from,
+                first.color,
+                Role::Pawn,
+                value(Role::Pawn),
+                initial_occupied,
+            )
+        }
         _ => 0,
     }
 }
 
 /// Swap algorithm with a fixed first attacker on `from`.
-fn swap(board: &Board, target: Square, from: Square) -> i32 {
-    let Some(victim) = board.role_at(target) else {
-        return 0;
-    };
-    let Some(first) = board.piece_at(from) else {
-        return 0;
-    };
+fn swap_with(
+    board: &Board,
+    target: Square,
+    from: Square,
+    mut side: Color,
+    mut attacker_role: Role,
+    initial_gain: i32,
+    mut occupied: Bitboard,
+) -> i32 {
     let mut gain = [0i32; 34];
-    let mut occupied = board.occupied();
-    let mut side = first.color;
     let mut attacker_sq = from;
-    let mut attacker_role = first.role;
-    gain[0] = value(victim);
+    gain[0] = initial_gain;
     let mut d = 0usize;
     loop {
         // A king may capture only onto a square the opponent no longer attacks.
@@ -100,9 +145,6 @@ fn swap(board: &Board, target: Square, from: Square) -> i32 {
         }
         d += 1;
         gain[d] = value(attacker_role) - gain[d - 1];
-        if (-gain[d - 1]).max(gain[d]) < 0 {
-            break;
-        }
         occupied = occupied.without(attacker_sq);
         side = !side;
         let candidates = attackers_to(board, target, occupied) & board.by_color(side);

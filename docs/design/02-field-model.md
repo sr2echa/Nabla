@@ -243,9 +243,12 @@ square the opponent no longer attacks. Ties between equal-valued attackers are
 broken in the capturing side's relative square order, because the choice decides
 which X-ray is revealed and an absolute order would break colour symmetry. Values
 are fixed at $`(1, 3, 3, 5, 9)`$ for P, N, B, R, Q so that tactical accounting does
-not drift during tuning. Documented simplifications: pins of capturing pieces are
-ignored, promotions during the exchange are not credited, and en passant captures
-score 0.
+not drift during tuning. For a specific move (`see_move`), en passant removes the
+captured pawn from its square before scanning X-rays (initial gain $`1`$), and a
+promotion capture credits the promotion delta $`\mathrm{val}(\text{promo}) - 1`$ with
+the promoted piece standing on the target square. Documented simplifications: pins
+of capturing pieces are ignored, and promotions occurring mid-sequence (after the
+first move) are not credited.
 
 **Exchange term.** Let $`g_c(i) = \max(0, \mathrm{SEE}_c(i))`$ be the gain for colour
 $c$ from capturing on a square $i$ holding an enemy piece other than the king, and
@@ -660,8 +663,8 @@ These are expected weaknesses of a static evaluator; they are listed so that the
 paper reports them and the protocol measures them.
 
 1. SEE ignores pins of the capturing piece, overloaded defenders, discovered
-   attacks other than X-ray ordering, promotions during the exchange, and
-   en passant (scored 0).
+   attacks other than X-ray ordering, and promotions occurring mid-sequence
+   (after the first move).
 2. $E_\text{ex}$ treats a capture as never removing a threat (a capture that
    takes the attacker still leaves its threat counted), treats every threat as
    parryable (a trapped or pinned piece is not), and counts two threats from
